@@ -1,37 +1,7 @@
 
-#include "runners.h"
-#include <unistd.h>
+#include "c.h"
 
 #include <QDebug>
-
-RunnerA::RunnerA(QObject *parent)
-    : AbstractRunner(parent)
-{
-    sleep(3);
-
-}
-
-
-RunnerSessionData *RunnerA::createSessionData()
-{
-    return 0;
-}
-
-RunnableMatch *RunnerA::createMatcher(RunnerSessionData *sessionData, RunnerContext &context)
-{
-    return 0;
-}
-
-
-RunnerB::RunnerB(QObject *parent)
-    : AbstractRunner(parent)
-{
-}
-
-RunnableMatch *RunnerB::createMatcher(RunnerSessionData *sessionData, RunnerContext &context)
-{
-    return 0;
-}
 
 RunnerCMatcher::RunnerCMatcher(RunnerC *runner, RunnerSessionData *sessionData, const RunnerContext &context)
     : RunnableMatch(sessionData, context)
@@ -72,24 +42,6 @@ RunnableMatch *RunnerC::createMatcher(RunnerSessionData *sessionData, RunnerCont
     return matcher;
 }
 
-
-RunnerD::RunnerD(QObject *parent)
-    : AbstractRunner(parent)
-{
-
-}
-
-
-RunnerSessionData *RunnerD::createSessionData()
-{
-    return 0;
-}
-
-RunnableMatch *RunnerD::createMatcher(RunnerSessionData *sessionData, RunnerContext &context)
-{
-    return 0;
-}
-
-#include "runners.moc"
+#include "c.moc"
 
 

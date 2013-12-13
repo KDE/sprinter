@@ -9,11 +9,18 @@ set(runnermanagerlib_SRCS
     lib/runnerhelper.cpp
     lib/runnermanager.cpp
     lib/runnermanagerthread.cpp
-    lib/runners.cpp
+)
+
+set(runners_SRCS
+    runners/a/a.cpp
+    runners/b/b.cpp
+    runners/c/c.cpp
+    runners/d/d.cpp
 )
 
 set(runnermanager_SRCS
     ${runnermanagerlib_SRCS}
+    ${runners_SRCS}
     test/main.cpp
     test/simulator.cpp
 )
@@ -23,5 +30,3 @@ KDE4_ADD_EXECUTABLE(runnermanager ${runnermanager_SRCS})
 target_link_libraries(runnermanager ${QT_QTCORE_LIBRARY})
 
 install(TARGETS runnermanager ${INSTALL_TARGETS_DEFAULT_ARGS} )
-
-

@@ -5,7 +5,10 @@
 #include <QThreadPool>
 
 // temporary include for non-pluggable plugins
-#include "runners.h"
+#include "runners/a/a.h"
+#include "runners/b/b.h"
+#include "runners/c/c.h"
+#include "runners/d/d.h"
 
 RunnerHelper::RunnerHelper(QObject *parent)
     : QObject(parent)
