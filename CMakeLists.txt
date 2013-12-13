@@ -4,14 +4,18 @@ find_package(KDE4 REQUIRED)
 include(KDE4Defaults)
 include_directories( ${KDE4_INCLUDES} ${QT_INCLUDES} ${CMAKE_SOURCE_DIR}/lib)
 
+set(runnermanagerlib_SRCS
+    lib/abstractrunner.cpp
+    lib/runnerhelper.cpp
+    lib/runnermanager.cpp
+    lib/runnermanagerthread.cpp
+    lib/runners.cpp
+)
+
 set(runnermanager_SRCS
-    abstractrunner.cpp
-    main.cpp
-    runnerhelper.cpp
-    runnermanager.cpp
-    runnermanagerthread.cpp
-    runners.cpp
-    simulator.cpp
+    ${runnermanagerlib_SRCS}
+    test/main.cpp
+    test/simulator.cpp
 )
 
 KDE4_ADD_EXECUTABLE(runnermanager ${runnermanager_SRCS})
