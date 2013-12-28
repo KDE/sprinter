@@ -5,31 +5,11 @@
 #include <QObject>
 #include <QRunnable>
 
+#include <runnercontext.h>
+
 class QueryMatch;
 class AbstractRunner;
-
-class RunnerContext
-{
-public:
-    RunnerContext();
-    RunnerContext(const RunnerContext &other);
-    ~RunnerContext();
-
-    RunnerContext &operator=(const RunnerContext &other);
-
-    void setQuery(const QString &query);
-    QString query() const;
-
-    bool isValid() const;
-
-    void addMatches(const QList<QueryMatch> &matches);
-
-    void reset();
-
-private:
-    class Private;
-    QExplicitlySharedDataPointer<Private> d;
-};
+class RunnerContext;
 
 class RunnerSessionData
 {
@@ -70,21 +50,6 @@ public:
 private:
     class Private;
     Private * const d;
-};
-
-class QueryMatch
-{
-public:
-    QueryMatch(AbstractRunner *runner);
-    QueryMatch(const QueryMatch &other);
-    ~QueryMatch();
-
-    void setText(const QString &text);
-    QString text() const;
-
-private:
-    class Private;
-    QSharedDataPointer<Private> d;
 };
 
 #endif

@@ -6,6 +6,8 @@ include_directories( ${KDE4_INCLUDES} ${QT_INCLUDES} ${CMAKE_SOURCE_DIR}/lib)
 
 set(runnermanagerlib_SRCS
     lib/abstractrunner.cpp
+    lib/querymatch.cpp
+    lib/runnercontext.cpp
     lib/runnerhelper.cpp
     lib/runnermanager.cpp
     lib/runnermanagerthread.cpp
