@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-#include "runnermanagerthread.h"
+#include "runnermanagerthread_p.h"
 
 class RunnerManager::Private
 {

@@ -1,4 +1,4 @@
-#include "runnerhelper.h"
+#include "runnerhelper_p.h"
 
 #include <QDebug>
 #include <QThread>

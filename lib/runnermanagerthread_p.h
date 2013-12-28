@@ -1,23 +1,31 @@
-#ifndef RUNNERHELPER
-#define RUNNERHELPER
+#ifndef RUNNERMANAGERTHREAD
+#define RUNNERMANAGERTHREAD
 
-#include <QObject>
 #include <QHash>
 #include <QRunnable>
 #include <QSet>
+#include <QThread>
 #include <QWeakPointer>
 
-#include "abstractrunner.h"
+#include "runnercontext.h"
 
-class RunnerHelper : public QObject
+class AbstractRunner;
+class RunnableMatch;
+class RunnerManager;
+class RunnerSessionData;
+
+class RunnerManagerThread : public QThread
 {
     Q_OBJECT
 
 public:
-    RunnerHelper(QObject *parent = 0);
-    ~RunnerHelper();
+    RunnerManagerThread(RunnerManager *parent = 0);
+    ~RunnerManagerThread();
 
-    void loadRunners();
+    void run();
+
+Q_SIGNALS:
+    void matchesUpdated();
 
 public Q_SLOTS:
     void sessionDataRetrieved(AbstractRunner *runner, RunnerSessionData *data);
@@ -25,9 +33,11 @@ public Q_SLOTS:
     void querySessionCompleted();
 
 private:
+    void loadRunners();
     void retrieveSessionData();
     void launchJobs();
 
+    RunnerManager *m_manager;
     QSet<AbstractRunner *> m_runners;
     QHash<AbstractRunner *, RunnerSessionData *> m_runnerSessions;
     QHash<AbstractRunner *, RunnableMatch *> m_matchers;
