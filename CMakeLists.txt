@@ -10,6 +10,7 @@ set(runnermanagerlib_SRCS
     lib/runnercontext.cpp
     lib/runnermanager.cpp
     lib/runnermanagerthread.cpp
+    lib/runnersessiondata.cpp
 )
 
 set(runners_SRCS
