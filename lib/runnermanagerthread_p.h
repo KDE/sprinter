@@ -64,6 +64,7 @@ private:
     QString m_query;
     QUuid m_sessionId;
     QTimer *m_restartMatchingTimer;
+    MatchRunnable *m_dummyMatcher;
 };
 
 class SessionDataRetriever : public QObject, public QRunnable

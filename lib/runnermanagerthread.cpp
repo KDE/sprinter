@@ -4,6 +4,7 @@
 #include <QReadLocker>
 #include <QThreadPool>
 #include <QTimer>
+#include <QTime>
 #include <QWriteLocker>
 
 #include "abstractrunner.h"
@@ -21,7 +22,8 @@ RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
       m_runnerBookmark(-1),
       m_currentRunner(-1),
       m_sessionId(QUuid::createUuid()),
-      m_restartMatchingTimer(0)
+      m_restartMatchingTimer(0),
+      m_dummyMatcher(new MatchRunnable(0, 0, m_context))
 {
     qRegisterMetaType<QUuid>("QUuid");
 }
@@ -37,7 +39,12 @@ RunnerManagerThread::~RunnerManagerThread()
         }
     }
 
+    delete m_dummyMatcher;
+
+    //TODO: this will break if there are threads running
     qDeleteAll(m_runners);
+
+    //TODO: wait for threads to complete?
 }
 
 void RunnerManagerThread::run()
@@ -45,6 +52,7 @@ void RunnerManagerThread::run()
     connect(m_manager, SIGNAL(queryChanged(QString)),
             this, SLOT(startQuery(QString)));
     qDebug() << "should we do this query, then?" << m_manager->query();
+
     m_restartMatchingTimer = new QTimer(this);
     m_restartMatchingTimer->setInterval(10);
     m_restartMatchingTimer->setSingleShot(true);
@@ -52,10 +60,13 @@ void RunnerManagerThread::run()
             m_restartMatchingTimer, SLOT(start()));
     connect(m_restartMatchingTimer, SIGNAL(timeout()),
             this, SLOT(startMatching()));
+
     loadRunners();
     retrieveSessionData();
     startQuery(m_manager->query());
+
     exec();
+
     delete m_restartMatchingTimer;
     m_restartMatchingTimer = 0;
     deleteLater();
@@ -64,10 +75,8 @@ void RunnerManagerThread::run()
 
 void RunnerManagerThread::loadRunners()
 {
-    if (!m_runners.isEmpty()) {
-        return;
-    }
-
+    QTime t;
+    t.start();
     m_sessionId = QUuid::createUuid();
 
     //FIXME: will crash if matches are ungoing. reference count?
@@ -84,7 +93,7 @@ void RunnerManagerThread::loadRunners()
     }
     m_sessionData.clear();
 
-    m_matchers.clear();
+    m_matchers.clear();;
 
     //TODO: this should be loading from plugins, obviously
     m_runners.append(new RunnerA);
@@ -92,13 +101,12 @@ void RunnerManagerThread::loadRunners()
     m_runners.append(new RunnerC);
     m_runners.append(new RunnerD);
 
-
     QWriteLocker lock(&m_matchIndexLock);
     m_currentRunner = m_runnerBookmark = m_runners.isEmpty() ? -1 : 0;
     m_sessionData.resize(m_runners.size());
     m_matchers.resize(m_runners.size());
 
-    qDebug() << "Runners are loaded" << m_runners.count();
+    qDebug() << "Runners are loaded" << m_runners.count() << "in" << t.elapsed();
 }
 
 void RunnerManagerThread::retrieveSessionData()
@@ -137,15 +145,19 @@ void RunnerManagerThread::startMatching()
             continue;
         }
 
-        matcher = new MatchRunnable(m_runners.at(m_currentRunner),
-                                    m_sessionData.at(m_currentRunner),
-                                    m_context);
-        matcher->setAutoDelete(true);
+        AbstractRunner *runner = m_runners.at(m_currentRunner);
 
-        if (!QThreadPool::globalInstance()->tryStart(matcher)) {
-            delete matcher;
-            emit requestFurtherMatching();
-            return;
+        if (!runner->shouldStartMatch(sessionData, m_context)) {
+            matcher = m_dummyMatcher;
+        } else {
+            matcher = new MatchRunnable(runner, sessionData, m_context);
+            matcher->setAutoDelete(true);
+
+            if (!QThreadPool::globalInstance()->tryStart(matcher)) {
+                delete matcher;
+                emit requestFurtherMatching();
+                return;
+            }
         }
 
         m_matchers[m_currentRunner] = matcher;
@@ -225,13 +237,17 @@ MatchRunnable::MatchRunnable(AbstractRunner *runner, RunnerSessionData *sessionD
       m_sessionData(sessionData),
       m_context(context)
 {
-    m_sessionData->ref();
+    if (m_sessionData) {
+        m_sessionData->ref();
+    }
 }
 
 void MatchRunnable::run()
 {
-    m_runner->startMatch(m_sessionData, m_context);
-    m_sessionData->deref();
+    if (m_sessionData) {
+        m_runner->startMatch(m_sessionData, m_context);
+        m_sessionData->deref();
+    }
 }
 
 SessionDataRetriever::SessionDataRetriever(const QUuid &sessionId, int index, AbstractRunner *runner)
