@@ -33,8 +33,8 @@ void Simulator::setupTimer()
         }
     }
 
-    const int interval = fast ? 500 * (qreal(qrand()) / RAND_MAX)
-                              : 2000;
+    const int interval = fast ? 50 * (qreal(qrand()) / RAND_MAX)
+                              : 500;
     m_timer->start(interval);
 }
 
