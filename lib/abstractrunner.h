@@ -32,6 +32,8 @@ public:
     AbstractRunner(QObject *parent);
     ~AbstractRunner();
 
+    bool shouldStartMatch(const RunnerSessionData *sessionData, const RunnerContext &context) const;
+
     void startMatch(RunnerSessionData *sessionData, RunnerContext &context);
     virtual RunnerSessionData *createSessionData();
 
@@ -47,4 +49,3 @@ private:
 };
 
 #endif
-

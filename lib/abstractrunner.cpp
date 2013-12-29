@@ -57,17 +57,28 @@ RunnerSessionData *AbstractRunner::createSessionData()
     return new RunnerSessionData();
 }
 
-void AbstractRunner::startMatch(RunnerSessionData *sessionData, RunnerContext &context)
+bool AbstractRunner::shouldStartMatch(const RunnerSessionData *sessionData, const RunnerContext &context) const
 {
+    if (!sessionData) {
+        return false;
+    }
+
     if (!context.isValid()) {
-        return;
+        return false;
     }
 
     if ((uint)context.query().length() < d->minQueryLength) {
-        return;
+        return false;
     }
 
-    match(sessionData, context);
+    return true;
+}
+
+void AbstractRunner::startMatch(RunnerSessionData *sessionData, RunnerContext &context)
+{
+    if (shouldStartMatch(sessionData, context)) {
+        match(sessionData, context);
+    }
 }
 
 void AbstractRunner::match(RunnerSessionData *sessionData, RunnerContext &context)
