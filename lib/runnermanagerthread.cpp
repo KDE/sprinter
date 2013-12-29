@@ -82,15 +82,18 @@ void RunnerManagerThread::launchJobs()
     while (sessions.hasNext()) {
         sessions.next();
         AbstractRunner *runner = sessions.key();
-        RunnableMatch *match = m_matchers.value(runner);
-        if (!match) {
-            // no matcher, so we fetch the match for it
+        RunnableMatch *matcher = m_matchers.value(runner);
+        if (!matcher) {
+            // no matcher, so we fetch the matcher for it and start
             //TODO: also thread?
-            match = runner->createMatcher(sessions.value(), m_context);
-        }
+            matcher = runner->createMatcher(sessions.value());
 
-        if (match) {
-            QThreadPool::globalInstance()->start(match);
+            if (matcher) {
+                matcher->setAutoDelete(true);
+                matcher->setContext(m_context);
+                m_matchers.insert(runner, matcher);
+                QThreadPool::globalInstance()->start(matcher);
+            }
         }
     }
 }
@@ -116,6 +119,7 @@ void RunnerManagerThread::startQuery(const QString &query)
     }
 
     qDebug() << "kicking off a query ..." << QThread::currentThread() << query;
+    m_matchers.clear();
     m_query = query;
     m_context.setQuery(m_query);
     launchJobs();

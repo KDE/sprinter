@@ -18,7 +18,7 @@ class RunnerSessionData
 class RunnableMatch : public QRunnable
 {
 public:
-    RunnableMatch(RunnerSessionData *sessionData, const RunnerContext &context);
+    RunnableMatch(RunnerSessionData *sessionData);
     ~RunnableMatch();
 
     RunnerSessionData *sessionData();
@@ -26,6 +26,9 @@ public:
     const QString query() const;
     bool isValid() const;
     void addMatches(const QList<QueryMatch> &matches);
+
+    void setContext(const RunnerContext &context);
+    RunnerContext &context() const;
 
     virtual void match() = 0;
 
@@ -45,7 +48,7 @@ public:
     ~AbstractRunner();
 
     virtual RunnerSessionData *createSessionData();
-    virtual RunnableMatch *createMatcher(RunnerSessionData *sessionData, RunnerContext &context);
+    virtual RunnableMatch *createMatcher(RunnerSessionData *sessionData);
 
 private:
     class Private;

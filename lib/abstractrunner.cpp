@@ -11,11 +11,10 @@ public:
     RunnerContext context;
 };
 
-RunnableMatch::RunnableMatch(RunnerSessionData *sessionData, const RunnerContext &context)
+RunnableMatch::RunnableMatch(RunnerSessionData *sessionData)
     : d(new Private)
 {
     d->sessionData = sessionData;
-    d->context = context;
 }
 
 RunnableMatch::~RunnableMatch()
@@ -28,19 +27,14 @@ RunnerSessionData *RunnableMatch::sessionData()
     return d->sessionData;
 }
 
-void RunnableMatch::addMatches(const QList<QueryMatch> &matches)
+void RunnableMatch::setContext(const RunnerContext &context)
 {
-    d->context.addMatches(matches);
+    d->context = context;
 }
 
-const QString RunnableMatch::query() const
+RunnerContext &RunnableMatch::context() const
 {
-    return d->context.query();
-}
-
-bool RunnableMatch::isValid() const
-{
-    return d->context.isValid();
+    return d->context;
 }
 
 void RunnableMatch::run()
@@ -72,10 +66,9 @@ RunnerSessionData *AbstractRunner::createSessionData()
     return 0;
 }
 
-RunnableMatch *AbstractRunner::createMatcher(RunnerSessionData *sessionData, RunnerContext &context)
+RunnableMatch *AbstractRunner::createMatcher(RunnerSessionData *sessionData)
 {
     Q_UNUSED(sessionData)
-    Q_UNUSED(context)
     return 0;
 }
 

@@ -49,6 +49,7 @@ public:
     void setPrecision(Precision precision);
     Precision precision() const;
 
+    //TODO run match, icon, actions (sub-QueryMatches?), id (QUuid?)
 private:
     class Private;
     QSharedDataPointer<Private> d;
