@@ -93,7 +93,7 @@ void RunnerManagerThread::loadRunners()
     }
     m_sessionData.clear();
 
-    m_matchers.clear();;
+    m_matchers.clear();
 
     //TODO: this should be loading from plugins, obviously
     m_runners.append(new RunnerA);
