@@ -1,7 +1,10 @@
 #include "runnermanagerthread_p.h"
 
 #include <QDebug>
+#include <QReadLocker>
 #include <QThreadPool>
+#include <QTimer>
+#include <QWriteLocker>
 
 #include "abstractrunner.h"
 #include "runnermanager.h"
@@ -15,17 +18,23 @@
 RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
     : QThread(parent),
       m_manager(parent),
-      m_sessionId(QUuid::createUuid())
+      m_runnerBookmark(-1),
+      m_currentRunner(-1),
+      m_sessionId(QUuid::createUuid()),
+      m_restartMatchingTimer(0)
 {
     qRegisterMetaType<QUuid>("QUuid");
 }
 
 RunnerManagerThread::~RunnerManagerThread()
 {
-    QHashIterator<AbstractRunner *, RunnerSessionData *> sessions(m_runnerSessions);
-    while (sessions.hasNext()) {
-        sessions.next();
-        delete sessions.value();
+    const int sessions = m_sessionData.size();
+    RunnerSessionData *sessionData;
+    for (int i = 0; i < sessions; ++i) {
+        sessionData = m_sessionData.at(i);
+        if (sessionData) {
+            sessionData->deref();
+        }
     }
 
     qDeleteAll(m_runners);
@@ -36,10 +45,19 @@ void RunnerManagerThread::run()
     connect(m_manager, SIGNAL(queryChanged(QString)),
             this, SLOT(startQuery(QString)));
     qDebug() << "should we do this query, then?" << m_manager->query();
+    m_restartMatchingTimer = new QTimer(this);
+    m_restartMatchingTimer->setInterval(10);
+    m_restartMatchingTimer->setSingleShot(true);
+    connect(this, SIGNAL(requestFurtherMatching()),
+            m_restartMatchingTimer, SLOT(start()));
+    connect(m_restartMatchingTimer, SIGNAL(timeout()),
+            this, SLOT(startMatching()));
     loadRunners();
     retrieveSessionData();
     startQuery(m_manager->query());
     exec();
+    delete m_restartMatchingTimer;
+    m_restartMatchingTimer = 0;
     deleteLater();
     qDebug() << "leaving run";
 }
@@ -50,66 +68,116 @@ void RunnerManagerThread::loadRunners()
         return;
     }
 
+    m_sessionId = QUuid::createUuid();
+
+    //FIXME: will crash if matches are ungoing. reference count?
+    qDeleteAll(m_runners);
+    m_runners.clear();
+
+    const int sessions = m_sessionData.size();
+    RunnerSessionData *sessionData;
+    for (int i = 0; i < sessions; ++i) {
+        sessionData = m_sessionData.at(i);
+        if (sessionData) {
+            sessionData->deref();
+        }
+    }
+    m_sessionData.clear();
+
+    m_matchers.clear();
+
     //TODO: this should be loading from plugins, obviously
-    m_runners.insert(new RunnerA);
-    m_runners.insert(new RunnerB);
-    m_runners.insert(new RunnerC);
-    m_runners.insert(new RunnerD);
+    m_runners.append(new RunnerA);
+    m_runners.append(new RunnerB);
+    m_runners.append(new RunnerC);
+    m_runners.append(new RunnerD);
+
+
+    QWriteLocker lock(&m_matchIndexLock);
+    m_currentRunner = m_runnerBookmark = m_runners.isEmpty() ? -1 : 0;
+    m_sessionData.resize(m_runners.size());
+    m_matchers.resize(m_runners.size());
+
     qDebug() << "Runners are loaded" << m_runners.count();
 }
 
 void RunnerManagerThread::retrieveSessionData()
 {
-    QSetIterator<AbstractRunner *> it(m_runners);
-    while (it.hasNext()) {
-        AbstractRunner *runner = it.next();
+    for (int i = 0; i < m_runners.size(); ++i) {
+        AbstractRunner *runner = m_runners.at(i);
 
-        if (m_runnerSessions.contains(runner)) {
+        if (m_sessionData.at(i)) {
             continue;
         }
 
-        SessionDataRetriever *rtrver = new SessionDataRetriever(m_sessionId, runner);
+        SessionDataRetriever *rtrver = new SessionDataRetriever(m_sessionId, i, runner);
         rtrver->setAutoDelete(true);
-        connect(rtrver, SIGNAL(sessionDataRetrieved(QUuid,AbstractRunner*,RunnerSessionData*)),
-                this, SLOT(sessionDataRetrieved(QUuid,AbstractRunner*,RunnerSessionData*)));
+        connect(rtrver, SIGNAL(sessionDataRetrieved(QUuid,int,RunnerSessionData*)),
+                this, SLOT(sessionDataRetrieved(QUuid,int,RunnerSessionData*)));
         QThreadPool::globalInstance()->start(rtrver);
     }
 }
 
-void RunnerManagerThread::launchJobs()
+void RunnerManagerThread::startMatching()
 {
-    QHashIterator<AbstractRunner *, RunnerSessionData *> sessions(m_runnerSessions);
-    while (sessions.hasNext()) {
-        sessions.next();
-        AbstractRunner *runner = sessions.key();
-        RunnableMatch *matcher = m_matchers.value(runner);
-        if (!matcher) {
-            // no matcher, so we fetch the matcher for it and start
-            //TODO: also thread?
-            matcher = runner->createMatcher(sessions.value());
+    QWriteLocker lock(&m_matchIndexLock);
 
-            if (matcher) {
-                matcher->setAutoDelete(true);
-                matcher->setContext(m_context);
-                m_matchers.insert(runner, matcher);
-                QThreadPool::globalInstance()->start(matcher);
-            }
-        }
+    if (m_currentRunner < 0) {
+        return;
     }
+
+   do {
+        RunnerSessionData *sessionData = m_sessionData.at(m_currentRunner);
+        if (!sessionData) {
+            continue;
+        }
+
+        MatchRunnable *matcher = m_matchers.at(m_currentRunner);
+        if (matcher) {
+            continue;
+        }
+
+        matcher = new MatchRunnable(m_runners.at(m_currentRunner),
+                                    m_sessionData.at(m_currentRunner),
+                                    m_context);
+        matcher->setAutoDelete(true);
+
+        if (!QThreadPool::globalInstance()->tryStart(matcher)) {
+            delete matcher;
+            emit requestFurtherMatching();
+            return;
+        }
+
+        m_matchers[m_currentRunner] = matcher;
+        m_currentRunner = (m_currentRunner + 1) % m_runners.size();
+    } while (m_currentRunner != m_runnerBookmark);
 }
 
-void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, AbstractRunner *runner, RunnerSessionData *data)
+void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index, RunnerSessionData *data)
 {
-    qDebug() << "got the data for" << runner;
-    if (!runner || sessionId != m_sessionId) {
+    qDebug() << "got the data for" << index;
+
+    if (index < 0 || index >= m_sessionData.size()) {
         delete data;
         return;
     }
 
-    delete m_runnerSessions.value(runner);
-    m_runnerSessions.insert(runner, data);
-    //m_activeRunners.insert(runner);
-    launchJobs();
+    RunnerSessionData *oldData = m_sessionData.at(index);
+    if (oldData) {
+        oldData->deref();
+    }
+
+    if (sessionId != m_sessionId) {
+        delete data;
+        data = 0;
+    }
+
+    m_sessionData[index] = data;
+
+    if (data) {
+        data->ref();
+        emit requestFurtherMatching();
+    }
 }
 
 void RunnerManagerThread::startQuery(const QString &query)
@@ -119,38 +187,64 @@ void RunnerManagerThread::startQuery(const QString &query)
     }
 
     qDebug() << "kicking off a query ..." << QThread::currentThread() << query;
-    m_matchers.clear();
     m_query = query;
     m_context.setQuery(m_query);
-    launchJobs();
+
+    {
+        QWriteLocker lock(&m_matchIndexLock);
+        m_runnerBookmark = m_currentRunner == 0 ? m_runners.size() - 1 : m_currentRunner - 1;
+        m_matchers.fill(0);
+    }
+
+    emit requestFurtherMatching();
 }
 
 void RunnerManagerThread::querySessionCompleted()
 {
     m_sessionId = QUuid::createUuid();
-    QMutableHashIterator<AbstractRunner *, RunnerSessionData *> it(m_runnerSessions);
-    while (it.hasNext()) {
-        it.next();
-        delete it.value();
-        it.value() = 0;
+
+    QWriteLocker lock(&m_matchIndexLock);
+
+    const int sessions = m_sessionData.size();
+    RunnerSessionData *sessionData;
+    for (int i = 0; i < sessions; ++i) {
+        sessionData = m_sessionData.at(i);
+        if (sessionData) {
+            sessionData->deref();
+        }
     }
-    m_runnerSessions.clear();
+
+    m_sessionData.fill(0);
+    m_matchers.fill(0);
+
+    m_runnerBookmark = m_currentRunner = 0;
 }
 
-
-SessionDataRetriever::SessionDataRetriever(const QUuid &sessionId, AbstractRunner *runner)
+MatchRunnable::MatchRunnable(AbstractRunner *runner, RunnerSessionData *sessionData, RunnerContext &context)
     : m_runner(runner),
-      m_sessionId(sessionId)
+      m_sessionData(sessionData),
+      m_context(context)
+{
+    m_sessionData->ref();
+}
+
+void MatchRunnable::run()
+{
+    m_runner->startMatch(m_sessionData, m_context);
+    m_sessionData->deref();
+}
+
+SessionDataRetriever::SessionDataRetriever(const QUuid &sessionId, int index, AbstractRunner *runner)
+    : m_runner(runner),
+      m_sessionId(sessionId),
+      m_index(index)
 {
 }
 
 void SessionDataRetriever::run()
 {
-    if (m_runner) {
-        //FIXME: race condition between check value and using it below
-        RunnerSessionData *session = m_runner.data()->createSessionData();
-        emit sessionDataRetrieved(m_sessionId, m_runner.data(), session);
-    }
+    RunnerSessionData *session = m_runner->createSessionData();
+    emit sessionDataRetrieved(m_sessionId, m_index, session);
 }
 
 #include "runnermanagerthread_p.moc"
