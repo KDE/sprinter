@@ -5,19 +5,31 @@
 class QueryMatch::Private : public QSharedData
 {
 public:
+    Private(AbstractRunner *r)
+        : runner(r),
+          type(UnknownType),
+          precision(UnrelatedMatch),
+          updateInterval(0)
+    {
+    }
+
     AbstractRunner *runner;
     QString title;
     QString text;
+    QString id;
     Type type;
     Precision precision;
+    uint updateInterval;
 };
 
-QueryMatch::QueryMatch(AbstractRunner *runner)
-    : d(new Private)
+QueryMatch::QueryMatch()
+    : d(new Private(0))
 {
-    d->runner = runner;
-    d->type = UnknownType;
-    d->precision = UnrelatedMatch;
+}
+
+QueryMatch::QueryMatch(AbstractRunner *runner)
+    : d(new Private(runner))
+{
 }
 
 QueryMatch::QueryMatch(const QueryMatch &other)
@@ -27,6 +39,12 @@ QueryMatch::QueryMatch(const QueryMatch &other)
 
 QueryMatch::~QueryMatch()
 {
+}
+
+QueryMatch &QueryMatch::operator=(const QueryMatch &other)
+{
+    d = other.d;
+    return *this;
 }
 
 void QueryMatch::setTitle(const QString &title)
@@ -49,7 +67,6 @@ QString QueryMatch::text() const
     return d->text;
 }
 
-
 void QueryMatch::setType(Type type)
 {
     d->type = type;
@@ -70,3 +87,28 @@ QueryMatch::Precision QueryMatch::precision() const
     return d->precision;
 }
 
+void QueryMatch::setInternalId(const QString &id)
+{
+    d->id = id;
+}
+
+QString QueryMatch::internalId() const
+{
+    return d->id;
+}
+
+void QueryMatch::setUpdateInterval(uint interval)
+{
+    d->updateInterval = interval;
+    //TODO: implement interval checking
+    if (interval > 0) {
+
+    } else {
+
+    }
+}
+
+uint QueryMatch::updateInterval() const
+{
+    return d->updateInterval;
+}
