@@ -20,6 +20,7 @@ RunnerManager::RunnerManager(QObject *parent)
     : QAbstractItemModel(parent),
       d(new Private(this))
 {
+    //TODO set row names for model
     d->thread->start();
 }
 
@@ -44,26 +45,39 @@ QString RunnerManager::query() const
 
 int RunnerManager::columnCount(const QModelIndex &parent) const
 {
+    //TODO
+    Q_UNUSED(parent)
     return 0;
 }
 
 QVariant RunnerManager::data(const QModelIndex &index, int role) const
 {
+    //TODO
+    Q_UNUSED(index)
+    Q_UNUSED(role)
     return QVariant();
 }
 
 QModelIndex RunnerManager::index(int row, int column, const QModelIndex &parent) const
 {
+    //TODO
+    Q_UNUSED(row)
+    Q_UNUSED(column)
+    Q_UNUSED(parent)
     return QModelIndex();
 }
 
 QModelIndex RunnerManager::parent(const QModelIndex &index) const
 {
+    //TODO
+    Q_UNUSED(index)
     return QModelIndex();
 }
 
 int RunnerManager::rowCount(const QModelIndex & parent) const
 {
+    //TODO
+    Q_UNUSED(parent)
     return 0;
 }
 
