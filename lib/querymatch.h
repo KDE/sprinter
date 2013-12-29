@@ -11,7 +11,7 @@ class QueryMatch
 public:
     enum Type {
         UnknownType = 0,
-        InformationType,
+        InformationalType,
         FileType,
         ExecutableType,
         NetworkLocationType,
@@ -36,6 +36,9 @@ public:
     QueryMatch(AbstractRunner *runner);
     QueryMatch(const QueryMatch &other);
     ~QueryMatch();
+
+    void setTitle(const QString &title);
+    QString title() const;
 
     void setText(const QString &text);
     QString text() const;

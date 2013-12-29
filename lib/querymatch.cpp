@@ -6,6 +6,7 @@ class QueryMatch::Private : public QSharedData
 {
 public:
     AbstractRunner *runner;
+    QString title;
     QString text;
     Type type;
     Precision precision;
@@ -26,6 +27,16 @@ QueryMatch::QueryMatch(const QueryMatch &other)
 
 QueryMatch::~QueryMatch()
 {
+}
+
+void QueryMatch::setTitle(const QString &title)
+{
+    d->title = title;
+}
+
+QString QueryMatch::title() const
+{
+    return d->title;
 }
 
 void QueryMatch::setText(const QString &text)
