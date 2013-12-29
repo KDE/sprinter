@@ -14,8 +14,10 @@
 
 RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
     : QThread(parent),
-      m_manager(parent)
+      m_manager(parent),
+      m_sessionId(QUuid::createUuid())
 {
+    qRegisterMetaType<QUuid>("QUuid");
 }
 
 RunnerManagerThread::~RunnerManagerThread()
@@ -66,10 +68,10 @@ void RunnerManagerThread::retrieveSessionData()
             continue;
         }
 
-        SessionDataRetriever *rtrver = new SessionDataRetriever(runner);
+        SessionDataRetriever *rtrver = new SessionDataRetriever(m_sessionId, runner);
         rtrver->setAutoDelete(true);
-        connect(rtrver, SIGNAL(sessionDataRetrieved(AbstractRunner*,RunnerSessionData*)),
-                this, SLOT(sessionDataRetrieved(AbstractRunner*,RunnerSessionData*)));
+        connect(rtrver, SIGNAL(sessionDataRetrieved(QUuid,AbstractRunner*,RunnerSessionData*)),
+                this, SLOT(sessionDataRetrieved(QUuid,AbstractRunner*,RunnerSessionData*)));
         QThreadPool::globalInstance()->start(rtrver);
     }
 }
@@ -93,10 +95,10 @@ void RunnerManagerThread::launchJobs()
     }
 }
 
-void RunnerManagerThread::sessionDataRetrieved(AbstractRunner *runner, RunnerSessionData *data)
+void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, AbstractRunner *runner, RunnerSessionData *data)
 {
     qDebug() << "got the data for" << runner;
-    if (!runner) {
+    if (!runner || sessionId != m_sessionId) {
         delete data;
         return;
     }
@@ -131,8 +133,9 @@ void RunnerManagerThread::querySessionCompleted()
 }
 
 
-SessionDataRetriever::SessionDataRetriever(AbstractRunner *runner)
-    : m_runner(runner)
+SessionDataRetriever::SessionDataRetriever(const QUuid &sessionId, AbstractRunner *runner)
+    : m_runner(runner),
+      m_sessionId(sessionId)
 {
 }
 
@@ -141,7 +144,7 @@ void SessionDataRetriever::run()
     if (m_runner) {
         //FIXME: race condition between check value and using it below
         RunnerSessionData *session = m_runner.data()->createSessionData();
-        emit sessionDataRetrieved(m_runner.data(), session);
+        emit sessionDataRetrieved(m_sessionId, m_runner.data(), session);
     }
 }
 

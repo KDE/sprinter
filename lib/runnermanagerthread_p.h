@@ -6,6 +6,7 @@
 #include <QSet>
 #include <QThread>
 #include <QWeakPointer>
+#include <QUuid>
 
 #include "runnercontext.h"
 
@@ -28,7 +29,7 @@ Q_SIGNALS:
     void matchesUpdated();
 
 public Q_SLOTS:
-    void sessionDataRetrieved(AbstractRunner *runner, RunnerSessionData *data);
+    void sessionDataRetrieved(const QUuid &sessionId, AbstractRunner *runner, RunnerSessionData *data);
     void startQuery(const QString &query);
     void querySessionCompleted();
 
@@ -43,20 +44,22 @@ private:
     QHash<AbstractRunner *, RunnableMatch *> m_matchers;
     RunnerContext m_context;
     QString m_query;
+    QUuid m_sessionId;
 };
 
 class SessionDataRetriever : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    SessionDataRetriever(AbstractRunner *runner);
+    SessionDataRetriever(const QUuid &sessionId, AbstractRunner *runner);
     void run();
 
 Q_SIGNALS:
-    void sessionDataRetrieved(AbstractRunner *runner, RunnerSessionData *data);
+    void sessionDataRetrieved(const QUuid &sessionId, AbstractRunner *runner, RunnerSessionData *data);
 
 private:
     QWeakPointer<AbstractRunner> m_runner;
+    QUuid m_sessionId;
 };
 
 #endif
