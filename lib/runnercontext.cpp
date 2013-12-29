@@ -90,12 +90,3 @@ bool RunnerContext::isValid() const
 {
     return d->q;
 }
-
-void RunnerContext::addMatches(const QList<QueryMatch> &matches)
-{
-    if (!d->q) {
-        return;
-    }
-
-    qDebug() << "Got new matches ..." << matches.count();
-}

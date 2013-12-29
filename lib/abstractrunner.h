@@ -12,16 +12,27 @@ class QueryMatch;
 class AbstractRunner;
 class RunnerContext;
 
+//TODO: use QExplicitlySharedDataPointer or QSharedDataPointer instead of doing ref counting manually?
 class RunnerSessionData
 {
 public:
+    enum MatchState {
+        SynchronizedMatches,
+        NewMatches
+    };
+
+    RunnerSessionData(AbstractRunner *runner);
     virtual ~RunnerSessionData();
+
+    void addMatches(const QVector<QueryMatch> &matches);
+    QVector<QueryMatch> matches(MatchState state) const;
 
     void ref();
     void deref();
 
 private:
-    QAtomicInt m_ref;
+    class Private;
+    Private * const d;
 };
 
 class AbstractRunner : public QObject

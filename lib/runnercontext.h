@@ -22,9 +22,6 @@ public:
     QString query() const;
 
     bool isValid() const;
-
-    void addMatches(const QList<QueryMatch> &matches);
-
     void reset();
 
 private:

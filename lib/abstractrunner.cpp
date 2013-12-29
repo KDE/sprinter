@@ -4,19 +4,58 @@
 #include <QSharedData>
 #include <QWeakPointer>
 
+class RunnerSessionData::Private
+{
+public:
+    Private(AbstractRunner *r)
+        : runner(r)
+    {
+    }
+
+    AbstractRunner *runner;
+    QAtomicInt ref;
+    QVector<QueryMatch> syncedMatches;
+    QVector<QueryMatch> currentMatches;
+};
+
+RunnerSessionData::RunnerSessionData(AbstractRunner *runner)
+    : d(new Private(runner))
+{
+}
+
 RunnerSessionData::~RunnerSessionData()
 {
 }
 
 void RunnerSessionData::ref()
 {
-    m_ref.ref();
+    d->ref.ref();
 }
 
 void RunnerSessionData::deref()
 {
-    if (!m_ref.deref()) {
+    if (!d->ref.deref()) {
         delete this;
+    }
+}
+
+void RunnerSessionData::addMatches(const QVector<QueryMatch> &matches)
+{
+//     if (!d->q) {
+//         return;
+//     }
+    //FIXME: implement *merging* rather than simply addition
+    //FIXME: notify the outside world that matches have changed
+    d->currentMatches += matches;
+    qDebug() << "Got new matches ..." << matches.count();
+}
+
+QVector<QueryMatch> RunnerSessionData::matches(MatchState state) const
+{
+    if (state == SynchronizedMatches) {
+        return d->syncedMatches;
+    } else {
+        return d->currentMatches;
     }
 }
 
@@ -54,7 +93,7 @@ int AbstractRunner::minQueryLength() const
 
 RunnerSessionData *AbstractRunner::createSessionData()
 {
-    return new RunnerSessionData();
+    return new RunnerSessionData(this);
 }
 
 bool AbstractRunner::shouldStartMatch(const RunnerSessionData *sessionData, const RunnerContext &context) const
