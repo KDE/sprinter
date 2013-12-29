@@ -1,6 +1,7 @@
 #ifndef ABSTRACTRUNNER
 #define ABSTRACTRUNNER
 
+#include <QAtomicInt>
 #include <QExplicitlySharedDataPointer>
 #include <QObject>
 #include <QRunnable>
@@ -13,30 +14,14 @@ class RunnerContext;
 
 class RunnerSessionData
 {
-};
-
-class RunnableMatch : public QRunnable
-{
 public:
-    RunnableMatch(RunnerSessionData *sessionData);
-    ~RunnableMatch();
+    virtual ~RunnerSessionData();
 
-    RunnerSessionData *sessionData();
-
-    const QString query() const;
-    bool isValid() const;
-    void addMatches(const QList<QueryMatch> &matches);
-
-    void setContext(const RunnerContext &context);
-    RunnerContext &context() const;
-
-    virtual void match() = 0;
+    void ref();
+    void deref();
 
 private:
-    void run();
-
-    class Private;
-    Private * const d;
+    QAtomicInt m_ref;
 };
 
 class AbstractRunner : public QObject
@@ -47,8 +32,14 @@ public:
     AbstractRunner(QObject *parent);
     ~AbstractRunner();
 
+    void startMatch(RunnerSessionData *sessionData, RunnerContext &context);
     virtual RunnerSessionData *createSessionData();
-    virtual RunnableMatch *createMatcher(RunnerSessionData *sessionData);
+
+    void setMinQueryLength(uint length);
+    int minQueryLength() const;
+
+protected:
+    virtual void match(RunnerSessionData *sessionData, RunnerContext &context);
 
 private:
     class Private;

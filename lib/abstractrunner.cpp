@@ -4,50 +4,31 @@
 #include <QSharedData>
 #include <QWeakPointer>
 
-class RunnableMatch::Private
+RunnerSessionData::~RunnerSessionData()
 {
-public:
-    RunnerSessionData *sessionData;
-    RunnerContext context;
-};
-
-RunnableMatch::RunnableMatch(RunnerSessionData *sessionData)
-    : d(new Private)
-{
-    d->sessionData = sessionData;
 }
 
-RunnableMatch::~RunnableMatch()
+void RunnerSessionData::ref()
 {
-    delete d;
+    m_ref.ref();
 }
 
-RunnerSessionData *RunnableMatch::sessionData()
+void RunnerSessionData::deref()
 {
-    return d->sessionData;
-}
-
-void RunnableMatch::setContext(const RunnerContext &context)
-{
-    d->context = context;
-}
-
-RunnerContext &RunnableMatch::context() const
-{
-    return d->context;
-}
-
-void RunnableMatch::run()
-{
-    if (d->context.isValid()) {
-        match();
+    if (!m_ref.deref()) {
+        delete this;
     }
 }
 
 class AbstractRunner::Private
 {
 public:
+    Private()
+        : minQueryLength(3)
+    {
+    }
 
+    uint minQueryLength;
 };
 
 AbstractRunner::AbstractRunner(QObject *parent)
@@ -61,15 +42,38 @@ AbstractRunner::~AbstractRunner()
     delete d;
 }
 
-RunnerSessionData *AbstractRunner::createSessionData()
+void AbstractRunner::setMinQueryLength(uint length)
 {
-    return 0;
+    d->minQueryLength = length;
 }
 
-RunnableMatch *AbstractRunner::createMatcher(RunnerSessionData *sessionData)
+int AbstractRunner::minQueryLength() const
+{
+    return d->minQueryLength;
+}
+
+RunnerSessionData *AbstractRunner::createSessionData()
+{
+    return new RunnerSessionData();
+}
+
+void AbstractRunner::startMatch(RunnerSessionData *sessionData, RunnerContext &context)
+{
+    if (!context.isValid()) {
+        return;
+    }
+
+    if ((uint)context.query().length() < d->minQueryLength) {
+        return;
+    }
+
+    match(sessionData, context);
+}
+
+void AbstractRunner::match(RunnerSessionData *sessionData, RunnerContext &context)
 {
     Q_UNUSED(sessionData)
-    return 0;
+    Q_UNUSED(context)
 }
 
 #include "abstractrunner.moc"
