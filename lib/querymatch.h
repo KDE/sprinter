@@ -9,12 +9,42 @@ class AbstractRunner;
 class QueryMatch
 {
 public:
+    enum Type {
+        UnknownType = 0,
+        InformationType,
+        FileType,
+        ExecutableType,
+        NetworkLocationType,
+        ContactType,
+        EventType,
+        BookmarkType,
+        DesktopShellType,
+        HardwareType,
+        AppActionType,
+        AppSessionType,
+        LocationType,
+        LanguageType
+    };
+
+    enum Precision {
+        UnrelatedMatch = 0,
+        FuzzyMatch,
+        CloseMatch,
+        ExactMatch
+    };
+
     QueryMatch(AbstractRunner *runner);
     QueryMatch(const QueryMatch &other);
     ~QueryMatch();
 
     void setText(const QString &text);
     QString text() const;
+
+    void setType(Type type);
+    Type type() const;
+
+    void setPrecision(Precision precision);
+    Precision precision() const;
 
 private:
     class Private;
