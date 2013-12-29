@@ -123,6 +123,7 @@ void RunnerManagerThread::startQuery(const QString &query)
 
 void RunnerManagerThread::querySessionCompleted()
 {
+    m_sessionId = QUuid::createUuid();
     QMutableHashIterator<AbstractRunner *, RunnerSessionData *> it(m_runnerSessions);
     while (it.hasNext()) {
         it.next();
