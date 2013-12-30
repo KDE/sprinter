@@ -48,6 +48,7 @@ QueryMatch &QueryMatch::operator=(const QueryMatch &other)
     return *this;
 }
 
+//FIXME: if the runner is deleted?
 void QueryMatch::setTitle(const QString &title)
 {
     d->title = title;

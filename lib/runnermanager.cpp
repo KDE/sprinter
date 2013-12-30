@@ -81,4 +81,4 @@ int RunnerManager::rowCount(const QModelIndex & parent) const
     return 0;
 }
 
-#include <runnermanager.moc>
+#include "moc_runnermanager.cpp"

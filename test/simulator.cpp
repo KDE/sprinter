@@ -44,5 +44,5 @@ void Simulator::generateQuery()
     setupTimer();
 }
 
-#include <simulator.moc>
+#include <moc_simulator.cpp>
 

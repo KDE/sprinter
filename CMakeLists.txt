@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
-find_package(KDE4 REQUIRED)
+find_package(Qt5Core)
+set(CMAKE_AUTOMOC ON)
+include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/lib ${CMAKE_BINARY_DIR})
 
-include(KDE4Defaults)
-include_directories( ${KDE4_INCLUDES} ${QT_INCLUDES} ${CMAKE_SOURCE_DIR}/lib)
-
-set(runnermanagerlib_SRCS
+set(sprinterlib_SRCS
     lib/abstractrunner.cpp
     lib/querymatch.cpp
     lib/runnercontext.cpp
@@ -20,15 +19,13 @@ set(runners_SRCS
     runners/d/d.cpp
 )
 
-set(runnermanager_SRCS
-    ${runnermanagerlib_SRCS}
+set(sprinter_SRCS
+    ${sprinterlib_SRCS}
     ${runners_SRCS}
     test/main.cpp
     test/simulator.cpp
 )
 
-KDE4_ADD_EXECUTABLE(runnermanager ${runnermanager_SRCS})
-
-target_link_libraries(runnermanager ${QT_QTCORE_LIBRARY})
-
-install(TARGETS runnermanager ${INSTALL_TARGETS_DEFAULT_ARGS} )
+add_executable(sprinter ${sprinter_SRCS})
+qt5_use_modules(sprinter Core)
+install(TARGETS sprinter DESTINATION bin)

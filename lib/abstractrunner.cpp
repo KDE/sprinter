@@ -71,5 +71,5 @@ void AbstractRunner::match(RunnerSessionData *sessionData, RunnerContext &contex
     Q_UNUSED(context)
 }
 
-#include "abstractrunner.moc"
+#include "moc_abstractrunner.cpp"
 

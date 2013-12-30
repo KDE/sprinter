@@ -263,4 +263,4 @@ void SessionDataRetriever::run()
     emit sessionDataRetrieved(m_sessionId, m_index, session);
 }
 
-#include "runnermanagerthread_p.moc"
+#include "moc_runnermanagerthread_p.cpp"
