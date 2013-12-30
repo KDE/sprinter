@@ -23,7 +23,8 @@ RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
       m_currentRunner(-1),
       m_sessionId(QUuid::createUuid()),
       m_restartMatchingTimer(0),
-      m_dummyMatcher(new MatchRunnable(0, 0, m_context))
+      m_dummyMatcher(new MatchRunnable(0, 0, m_context)),
+      m_dummySessionData(new RunnerSessionData(0))
 {
     qRegisterMetaType<QUuid>("QUuid");
 }
@@ -118,6 +119,7 @@ void RunnerManagerThread::retrieveSessionData()
             continue;
         }
 
+        m_sessionData[i] = m_dummySessionData;
         SessionDataRetriever *rtrver = new SessionDataRetriever(m_sessionId, i, runner);
         rtrver->setAutoDelete(true);
         connect(rtrver, SIGNAL(sessionDataRetrieved(QUuid,int,RunnerSessionData*)),
@@ -202,7 +204,7 @@ void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index
     }
 
     RunnerSessionData *oldData = m_sessionData.at(index);
-    if (oldData) {
+    if (oldData && oldData != m_dummySessionData) {
         oldData->deref();
     }
 
