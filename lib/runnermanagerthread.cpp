@@ -11,7 +11,7 @@
 #include "runnermanager.h"
 
 // temporary include for non-pluggable plugins
-#include "runners/a/a.h"
+#include "runners/datetime/datetime.h"
 #include "runners/b/b.h"
 #include "runners/c/c.h"
 #include "runners/d/d.h"
