@@ -19,6 +19,8 @@ public:
     RunnerSessionData(AbstractRunner *runner);
     virtual ~RunnerSessionData();
 
+    AbstractRunner *runner() const;
+
     void addMatches(const QVector<QueryMatch> &matches);
     QVector<QueryMatch> matches(MatchState state) const;
 

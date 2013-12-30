@@ -26,6 +26,11 @@ RunnerSessionData::~RunnerSessionData()
 {
 }
 
+AbstractRunner *RunnerSessionData::runner() const
+{
+    return d->runner;
+}
+
 void RunnerSessionData::ref()
 {
     d->ref.ref();
@@ -45,8 +50,16 @@ void RunnerSessionData::addMatches(const QVector<QueryMatch> &matches)
 //     }
     //FIXME: implement *merging* rather than simply addition
     //FIXME: notify the outside world that matches have changed
+    if (matches.isEmpty()) {
+        return;
+    }
+
+    qDebug() << "New matches: " << matches.count();
+    int count = 0;
+    foreach (const QueryMatch &match, matches) {
+        qDebug() << "     " << count++ << match.title();
+    }
     d->currentMatches += matches;
-    qDebug() << "Got new matches ..." << matches.count();
 }
 
 QVector<QueryMatch> RunnerSessionData::matches(MatchState state) const
