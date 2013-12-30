@@ -14,9 +14,7 @@ set(sprinterlib_SRCS
 
 set(runners_SRCS
     runners/datetime/datetime.cpp
-    runners/b/b.cpp
     runners/c/c.cpp
-    runners/d/d.cpp
 )
 
 set(sprinter_SRCS

@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2013 Aaron Seigo <aseigo@kde.org>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "runnermanagerthread_p.h"
 
 #include <QDebug>
@@ -12,9 +29,7 @@
 
 // temporary include for non-pluggable plugins
 #include "runners/datetime/datetime.h"
-#include "runners/b/b.h"
 #include "runners/c/c.h"
-#include "runners/d/d.h"
 
 RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
     : QThread(parent),
@@ -98,9 +113,7 @@ void RunnerManagerThread::loadRunners()
 
     //TODO: this should be loading from plugins, obviously
     m_runners.append(new DateTimeRunner);
-    m_runners.append(new RunnerB);
     m_runners.append(new RunnerC);
-    m_runners.append(new RunnerD);
 
     QWriteLocker lock(&m_matchIndexLock);
     m_currentRunner = m_runnerBookmark = m_runners.isEmpty() ? -1 : 0;
