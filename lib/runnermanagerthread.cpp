@@ -96,7 +96,7 @@ void RunnerManagerThread::loadRunners()
     m_matchers.clear();
 
     //TODO: this should be loading from plugins, obviously
-    m_runners.append(new RunnerA);
+    m_runners.append(new DateTimeRunner);
     m_runners.append(new RunnerB);
     m_runners.append(new RunnerC);
     m_runners.append(new RunnerD);
@@ -106,7 +106,7 @@ void RunnerManagerThread::loadRunners()
     m_sessionData.resize(m_runners.size());
     m_matchers.resize(m_runners.size());
 
-    qDebug() << "Runners are loaded" << m_runners.count() << "in" << t.elapsed();
+    qDebug() << m_runners.count() << "runners loaded" << "in" << t.elapsed() << "ms";
 }
 
 void RunnerManagerThread::retrieveSessionData()
@@ -126,43 +126,70 @@ void RunnerManagerThread::retrieveSessionData()
     }
 }
 
+bool RunnerManagerThread::startNextRunner()
+{
+    //qDebug() << "    starting for" << m_currentRunner;
+    RunnerSessionData *sessionData = m_sessionData.at(m_currentRunner);
+    if (!sessionData) {
+        m_currentRunner = (m_currentRunner + 1) % m_runners.size();
+        //qDebug() << "         no session data";
+        return true;
+    }
+
+    MatchRunnable *matcher = m_matchers.at(m_currentRunner);
+    if (matcher) {
+        m_currentRunner = (m_currentRunner + 1) % m_runners.size();
+        //qDebug() << "          got a matcher already";
+        return true;
+    }
+
+    AbstractRunner *runner = m_runners.at(m_currentRunner);
+
+    if (!runner->shouldStartMatch(sessionData, m_context)) {
+        //qDebug() << "          skipping";
+        matcher = m_dummyMatcher;
+    } else {
+        matcher = new MatchRunnable(runner, sessionData, m_context);
+        matcher->setAutoDelete(true);
+
+        //qDebug() << "          created a new matcher";
+        if (!QThreadPool::globalInstance()->tryStart(matcher)) {
+            //qDebug() << "          threads be full";
+            delete matcher;
+            emit requestFurtherMatching();
+            return false;
+        }
+    }
+
+    m_matchers[m_currentRunner] = matcher;
+    return true;
+}
+
 void RunnerManagerThread::startMatching()
 {
-    QWriteLocker lock(&m_matchIndexLock);
-
-    if (m_currentRunner < 0) {
+    qDebug() << "starting to match with" << m_context.query() << m_currentRunner << m_runnerBookmark;
+    if (!m_matchIndexLock.tryLockForWrite()) {
+        emit requestFurtherMatching();
         return;
     }
 
-   do {
-        RunnerSessionData *sessionData = m_sessionData.at(m_currentRunner);
-        if (!sessionData) {
-            continue;
+    if (m_currentRunner < 0) {
+        m_matchIndexLock.unlock();
+        return;
+    }
+
+    for (;
+         m_currentRunner != m_runnerBookmark;
+         m_currentRunner = (m_currentRunner + 1) % m_runners.size()) {
+        //m_currentRunner = (m_currentRunner + 1) % m_runners.size();
+        if (!startNextRunner()) {
+        m_matchIndexLock.unlock();
+            return;
         }
+    }
 
-        MatchRunnable *matcher = m_matchers.at(m_currentRunner);
-        if (matcher) {
-            continue;
-        }
-
-        AbstractRunner *runner = m_runners.at(m_currentRunner);
-
-        if (!runner->shouldStartMatch(sessionData, m_context)) {
-            matcher = m_dummyMatcher;
-        } else {
-            matcher = new MatchRunnable(runner, sessionData, m_context);
-            matcher->setAutoDelete(true);
-
-            if (!QThreadPool::globalInstance()->tryStart(matcher)) {
-                delete matcher;
-                emit requestFurtherMatching();
-                return;
-            }
-        }
-
-        m_matchers[m_currentRunner] = matcher;
-        m_currentRunner = (m_currentRunner + 1) % m_runners.size();
-    } while (m_currentRunner != m_runnerBookmark);
+    startNextRunner();
+    m_matchIndexLock.unlock();
 }
 
 void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index, RunnerSessionData *data)

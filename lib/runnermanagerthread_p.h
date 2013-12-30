@@ -52,6 +52,7 @@ public Q_SLOTS:
 private:
     void loadRunners();
     void retrieveSessionData();
+    bool startNextRunner();
 
     RunnerManager *m_manager;
     QVector<AbstractRunner *> m_runners;
