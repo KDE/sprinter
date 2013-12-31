@@ -28,7 +28,7 @@ Simulator::Simulator(QObject * parent)
     connect(m_timer, SIGNAL(timeout()), this, SLOT(generateQuery()));
     m_timer->setSingleShot(true);
     m_queries << "KDE" << "plasma" << "earthworks";
-    m_queries << "date" << "time UTC" << "time MST" << "date Hong_Kong";
+    m_queries << "date" << "time UTC" << "time MST" << "date Hong Kong";
     m_iterator = m_queries.constBegin();
     setupTimer();
 }
