@@ -21,18 +21,38 @@
 #include <QReadWriteLock>
 #include <QRunnable>
 #include <QThread>
+#include <QTimer>
 #include <QVector>
 #include <QWeakPointer>
 #include <QUuid>
 
 #include "runnercontext.h"
 
-class QTimer;
 
 class AbstractRunner;
 class RunnableMatch;
 class RunnerManager;
 class RunnerSessionData;
+
+
+class NonRestartingTimer : public QTimer
+{
+    Q_OBJECT
+//
+public:
+    NonRestartingTimer(QObject *parent)
+        : QTimer(parent)
+    {
+    }
+
+public Q_SLOTS:
+    void startIfStopped()
+    {
+        if (!isActive()) {
+            start();
+        }
+    }
+};
 
 class MatchRunnable : public QRunnable
 {
@@ -55,16 +75,22 @@ public:
     ~RunnerManagerThread();
 
     void run();
-
+    void syncMatches();
+    int matchCount() const;
+    QueryMatch matchAt(int index);
 
 Q_SIGNALS:
     void requestFurtherMatching();
+    void requestSync();
 
 public Q_SLOTS:
     void sessionDataRetrieved(const QUuid &sessionId, int, RunnerSessionData *data);
     void startQuery(const QString &query);
     void querySessionCompleted();
     void startMatching();
+
+private Q_SLOTS:
+    void startSync();
 
 private:
     void loadRunners();
@@ -82,8 +108,10 @@ private:
     QString m_query;
     QUuid m_sessionId;
     QTimer *m_restartMatchingTimer;
+    NonRestartingTimer *m_startSyncTimer;
     MatchRunnable *m_dummyMatcher;
     RunnerSessionData *m_dummySessionData;
+    int m_matchCount;
 };
 
 class SessionDataRetriever : public QObject, public QRunnable

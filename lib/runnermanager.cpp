@@ -55,39 +55,80 @@ void RunnerManager::setQuery(const QString &query)
     emit queryChanged(query);
 }
 
+void RunnerManager::matchesArrived()
+{
+    d->thread->syncMatches();
+}
+
 QString RunnerManager::query() const
 {
     return d->query;
 }
 
+void RunnerManager::addingMatches(int start, int end)
+{
+    beginInsertRows(QModelIndex(), start, end);
+}
+
+void RunnerManager::matchesAdded()
+{
+    endInsertRows();
+}
+
+void RunnerManager::removingMatches(int start, int end)
+{
+    beginRemoveRows(QModelIndex(), start, end);
+}
+
+void RunnerManager::matchesRemoved()
+{
+    endRemoveRows();
+}
+
+void RunnerManager::matchesUpdated(int start, int end)
+{
+    emit dataChanged(createIndex(start, 0), createIndex(end, 0));
+}
+
 int RunnerManager::columnCount(const QModelIndex &parent) const
 {
-    //TODO
-    Q_UNUSED(parent)
-    return 0;
+    if (parent.isValid()) {
+        return 0;
+    }
+
+    return 1;
 }
 
 QVariant RunnerManager::data(const QModelIndex &index, int role) const
 {
-    //TODO
-    Q_UNUSED(index)
+    if (!index.isValid() || index.row() > 0 || index.parent().isValid()) {
+        return QVariant();
+    }
+
+    QueryMatch match = d->thread->matchAt(index.row());
+    //TODO: more roles
+    switch (role) {
+        case Qt::DisplayRole:
+            return match.title();
+            break;
+        default:
+            break;
+    }
     Q_UNUSED(role)
     return QVariant();
 }
 
 QModelIndex RunnerManager::index(int row, int column, const QModelIndex &parent) const
 {
-    //TODO
-    Q_UNUSED(row)
-    Q_UNUSED(column)
-    Q_UNUSED(parent)
-    return QModelIndex();
+    if (parent.isValid()) {
+        return QModelIndex();
+    }
+
+    return createIndex(row, column);
 }
 
 QModelIndex RunnerManager::parent(const QModelIndex &index) const
 {
-    //TODO
-    Q_UNUSED(index)
     return QModelIndex();
 }
 
@@ -95,7 +136,7 @@ int RunnerManager::rowCount(const QModelIndex & parent) const
 {
     //TODO
     Q_UNUSED(parent)
-    return 0;
+    return d->thread->matchCount();
 }
 
 #include "moc_runnermanager.cpp"

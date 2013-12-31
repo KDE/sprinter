@@ -75,14 +75,14 @@ bool AbstractRunner::shouldStartMatch(const RunnerSessionData *sessionData, cons
     return true;
 }
 
-void AbstractRunner::startMatch(RunnerSessionData *sessionData, RunnerContext &context)
+void AbstractRunner::startMatch(RunnerSessionData *sessionData, const RunnerContext &context)
 {
     if (shouldStartMatch(sessionData, context)) {
         match(sessionData, context);
     }
 }
 
-void AbstractRunner::match(RunnerSessionData *sessionData, RunnerContext &context)
+void AbstractRunner::match(RunnerSessionData *sessionData, const RunnerContext &context)
 {
     Q_UNUSED(sessionData)
     Q_UNUSED(context)

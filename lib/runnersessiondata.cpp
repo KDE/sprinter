@@ -17,14 +17,24 @@
 
 #include "runnersessiondata.h"
 
-#include <QDebug>
 #include <QAtomicInt>
+#include <QDebug>
+#include <QMutex>
+#include <QMutexLocker>
+
+#include "runnermanager.h"
+#include "runnercontext.h"
+
+#define DEBUG
 
 class RunnerSessionData::Private
 {
 public:
     Private(AbstractRunner *r)
-        : runner(r)
+        : runner(r),
+          manager(0),
+          modelOffset(0),
+          matchesUnsynced(false)
     {
     }
 
@@ -32,6 +42,10 @@ public:
     QAtomicInt ref;
     QVector<QueryMatch> syncedMatches;
     QVector<QueryMatch> currentMatches;
+    RunnerManager *manager;
+    QMutex currentMatchesLock;
+    int modelOffset;
+    bool matchesUnsynced;
 };
 
 RunnerSessionData::RunnerSessionData(AbstractRunner *runner)
@@ -41,6 +55,60 @@ RunnerSessionData::RunnerSessionData(AbstractRunner *runner)
 
 RunnerSessionData::~RunnerSessionData()
 {
+}
+
+void RunnerSessionData::associateManager(RunnerManager *manager)
+{
+    if (manager == d->manager) {
+        return;
+    }
+
+    d->manager = manager;
+    if (d->manager && !d->currentMatches.isEmpty()) {
+        d->manager->matchesArrived();
+    }
+}
+
+int RunnerSessionData::syncMatches(int offset)
+{
+    Q_ASSERT(d->manager);
+
+    QVector<QueryMatch> unsynced;
+    // TODO: do we need to syncronize this variable (threading)?
+    d->modelOffset = offset;
+
+    {
+        QMutexLocker lock(&d->currentMatchesLock);
+        if (d->matchesUnsynced) {
+            d->matchesUnsynced = false;
+            unsynced = d->currentMatches;
+            d->currentMatches.clear();
+        } else {
+            return d->syncedMatches.count();
+        }
+    }
+
+    if (d->syncedMatches.isEmpty()) {
+        // no sync'd matches, so we only need to do something if we now do have matches
+        if (!unsynced.isEmpty()) {
+            // we had no matches, now we do
+            d->manager->addingMatches(offset, offset + unsynced.size());
+            d->syncedMatches = unsynced;
+            d->manager->matchesAdded();
+        }
+    } else if (unsynced.isEmpty()) {
+        // we had matches, and now we don't
+        d->manager->removingMatches(offset, offset + d->syncedMatches.size());
+        d->syncedMatches.clear();
+        d->manager->matchesRemoved();
+    } else {
+        // now the more complex situation: we have both synced and new matches
+        // these need to be merged with the correct add/remove/update rows
+        // methods called in the manager (the model)
+        //TODO: implement
+    }
+
+    return d->syncedMatches.count();
 }
 
 AbstractRunner *RunnerSessionData::runner() const
@@ -60,23 +128,41 @@ void RunnerSessionData::deref()
     }
 }
 
-void RunnerSessionData::addMatches(const QVector<QueryMatch> &matches)
+void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const RunnerContext &context)
 {
-//     if (!d->q) {
-//         return;
-//     }
-    //FIXME: implement *merging* rather than simply addition
-    //FIXME: notify the outside world that matches have changed
-    if (matches.isEmpty()) {
+    if (!context.isValid()) {
         return;
     }
 
+#ifdef DEBUG
     qDebug() << "New matches: " << matches.count();
     int count = 0;
     foreach (const QueryMatch &match, matches) {
         qDebug() << "     " << count++ << match.title();
     }
-    d->currentMatches += matches;
+#endif
+
+    {
+        QMutexLocker lock(&d->currentMatchesLock);
+
+        if (matches.isEmpty()) {
+            if (d->currentMatches.isEmpty()) {
+                // nothing going on here
+                return;
+            }
+
+            d->currentMatches.clear();
+        } else {
+            //FIXME: implement *merging* rather than simply addition
+            d->currentMatches += matches;
+        }
+
+        d->matchesUnsynced = true;
+    }
+
+    if (d->manager) {
+        d->manager->matchesArrived();
+    }
 }
 
 QVector<QueryMatch> RunnerSessionData::matches(MatchState state) const

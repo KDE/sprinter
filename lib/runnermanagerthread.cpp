@@ -38,10 +38,27 @@ RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
       m_currentRunner(-1),
       m_sessionId(QUuid::createUuid()),
       m_restartMatchingTimer(0),
+      m_startSyncTimer(0),
       m_dummyMatcher(new MatchRunnable(0, 0, m_context)),
-      m_dummySessionData(new RunnerSessionData(0))
+      m_dummySessionData(new RunnerSessionData(0)),
+      m_matchCount(-1)
 {
     qRegisterMetaType<QUuid>("QUuid");
+
+    // to synchronize in the thread the manager lives in
+    // the timer is created in this parent thread, rather than in
+    // run() below
+    // if synchronization becomes too slow, it could be moved to happen
+    // in this thread with significant complexity
+    m_startSyncTimer = new NonRestartingTimer(this);
+    m_startSyncTimer->setInterval(10);
+    m_startSyncTimer->setSingleShot(true);
+    // these connects may look quite round-about, but allows the timer to
+    // be moved to any thread and the right thing happen
+    connect(this, SIGNAL(requestSync()),
+            m_startSyncTimer, SLOT(start()));
+    connect(m_startSyncTimer, SIGNAL(timeout()),
+            this, SLOT(startSync()));
 }
 
 RunnerManagerThread::~RunnerManagerThread()
@@ -87,6 +104,64 @@ void RunnerManagerThread::run()
     m_restartMatchingTimer = 0;
     deleteLater();
     qDebug() << "leaving run";
+}
+
+void RunnerManagerThread::syncMatches()
+{
+    // this looks quite round-about, but allows the timer to
+    // be moved to any thread and the right thing happen
+    emit requestSync();
+}
+
+void RunnerManagerThread::startSync()
+{
+    // TODO: do we need to do the sync in chunks?
+    // for large numbers of runners and matches, doing them
+    // all at once may be too slow. needs to be measured in future
+    QTime t;
+    t.start();
+    m_matchCount = -1;
+
+    int offset = 0;
+    foreach (RunnerSessionData *data, m_sessionData) {
+        offset += data->syncMatches(offset);
+    }
+    m_matchCount = offset;
+    qDebug() << "synchronization took" << t.elapsed();
+}
+
+int RunnerManagerThread::matchCount() const
+{
+    if (m_matchCount < 0) {
+        int count = 0;
+
+        foreach (RunnerSessionData *data, m_sessionData) {
+            count += data->matches(RunnerSessionData::SynchronizedMatches).size();
+        }
+
+        const_cast<RunnerManagerThread *>(this)->m_matchCount = count;
+    }
+
+    return m_matchCount;
+}
+
+QueryMatch RunnerManagerThread::matchAt(int index)
+{
+    if (index < 0 || index >= matchCount()) {
+        return QueryMatch();
+    }
+
+    QVector<QueryMatch> matches;
+    foreach (RunnerSessionData *data, m_sessionData) {
+        matches = data->matches(RunnerSessionData::SynchronizedMatches);
+        if (matches.size() >= index) {
+            return matches[index];
+        } else {
+            index -= matches.size();
+        }
+    }
+
+    return QueryMatch();
 }
 
 void RunnerManagerThread::loadRunners()
