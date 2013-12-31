@@ -25,5 +25,5 @@ set(sprinter_SRCS
 )
 
 add_executable(sprinter ${sprinter_SRCS})
-qt5_use_modules(sprinter Core)
+qt5_use_modules(sprinter Widgets)
 install(TARGETS sprinter DESTINATION bin)

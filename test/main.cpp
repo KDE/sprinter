@@ -15,19 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QTimer>
+
+#include <QAction>
+#include <QLineEdit>
+#include <QListView>
+#include <QVBoxLayout>
 
 #include "runnermanager.h"
 #include "simulator.h"
 
+// #define SIMULATE
+
 int main(int argc, char** argv)
 {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     Simulator *simulator = new Simulator;
     RunnerManager *manager = new RunnerManager;
 
+#ifdef SIMULATE
     QObject::connect(simulator, SIGNAL(query(QString)), manager, SLOT(setQuery(QString)));
     //QObject::connect(simulator, SIGNAL(done()), manager, SIGNAL(querySessionCompleted()));
     QTimer delayedQuit;
@@ -35,6 +43,29 @@ int main(int argc, char** argv)
     QObject::connect(simulator, SIGNAL(done()), &delayedQuit, SLOT(start()));
     QObject::connect(&delayedQuit, SIGNAL(timeout()), manager, SLOT(deleteLater()));
     QObject::connect(manager, SIGNAL(destroyed()), &app, SLOT(quit()));
+#else
+    QWidget *top = new QWidget;
+
+    QLineEdit *edit = new QLineEdit(top);
+    QObject::connect(edit, SIGNAL(textChanged(QString)),
+                     manager, SLOT(setQuery(QString)));
+
+    QListView *view = new QListView(top);
+    view->setModel(manager);
+
+    QVBoxLayout *layout = new QVBoxLayout(top);
+    layout->addWidget(edit);
+    layout->addWidget(view);
+    top->resize(400, 700);
+    top->show();
+    edit->setFocus();
+
+    QAction *action = new QAction(top);
+    action->setShortcut(Qt::CTRL + Qt::Key_Q);
+    top->addAction(action);
+    QObject::connect(action, SIGNAL(triggered()), &app, SLOT(quit()));
+#endif
+
 
     return app.exec();
 }
