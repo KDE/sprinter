@@ -218,7 +218,7 @@ void RunnerManagerThread::retrieveSessionData()
 
 void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index, RunnerSessionData *data)
 {
-    qDebug() << "got the data for" << index;
+    qDebug() << "got session data for runner at index " << index;
 
     if (index < 0 || index >= m_sessionData.size()) {
         delete data;
