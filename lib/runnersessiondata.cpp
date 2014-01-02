@@ -105,7 +105,24 @@ int RunnerSessionData::syncMatches(int offset)
         // now the more complex situation: we have both synced and new matches
         // these need to be merged with the correct add/remove/update rows
         // methods called in the manager (the model)
-        //TODO: implement
+        //TODO: implement merging; this implementation is naive and does not
+        // allow for updating results
+        const int oldCount = d->syncedMatches.count();
+        const int newCount = unsynced.count();
+        if (oldCount == newCount) {
+            d->syncedMatches = unsynced;
+            d->manager->matchesUpdated(offset, offset + newCount);
+        } else if (oldCount < newCount) {
+            d->manager->addingMatches(offset + oldCount, offset + newCount);
+            d->syncedMatches = unsynced;
+            d->manager->matchesAdded();
+            d->manager->matchesUpdated(offset, offset + newCount);
+        } else {
+            d->manager->removingMatches(offset + newCount, offset + oldCount);
+            d->syncedMatches = unsynced;
+            d->manager->matchesAdded();
+            d->manager->matchesUpdated(offset, offset + newCount);
+        }
     }
 
     return d->syncedMatches.count();
