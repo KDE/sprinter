@@ -274,6 +274,7 @@ bool RunnerManagerThread::startNextRunner()
 
     if (!runner->shouldStartMatch(sessionData, m_context)) {
         //qDebug() << "          skipping";
+        sessionData->setMatches(QVector<QueryMatch>(), m_context);
         matcher = m_dummyMatcher;
     } else {
         matcher = new MatchRunnable(runner, sessionData, m_context);
