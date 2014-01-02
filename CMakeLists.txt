@@ -15,6 +15,7 @@ set(sprinterlib_SRCS
 set(runners_SRCS
     runners/datetime/datetime.cpp
     runners/c/c.cpp
+    runners/youtube/youtube.cpp
 )
 
 set(sprinter_SRCS
@@ -25,5 +26,5 @@ set(sprinter_SRCS
 )
 
 add_executable(sprinter ${sprinter_SRCS})
-qt5_use_modules(sprinter Widgets)
+qt5_use_modules(sprinter Widgets Network)
 install(TARGETS sprinter DESTINATION bin)
