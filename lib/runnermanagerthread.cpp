@@ -153,10 +153,13 @@ QueryMatch RunnerManagerThread::matchAt(int index)
         return QueryMatch();
     }
 
+    //qDebug() << "** matchAt" << index;
     QVector<QueryMatch> matches;
     foreach (RunnerSessionData *data, m_sessionData) {
         matches = data->matches(RunnerSessionData::SynchronizedMatches);
+        //qDebug() << "    " << matches.size() << index;
         if (matches.size() > index) {
+            //qDebug() << "     found" << matches[index].title();
             return matches[index];
         } else {
             index -= matches.size();
