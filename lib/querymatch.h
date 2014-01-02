@@ -18,8 +18,9 @@
 #ifndef QUERYMATCH
 #define QUERYMATCH
 
-#include <QString>
 #include <QExplicitlySharedDataPointer>
+#include <QString>
+#include <QVariant>
 
 class AbstractRunner;
 
@@ -69,6 +70,9 @@ public:
 
     void setType(Type type);
     Type type() const;
+
+    void setData(const QVariant &data);
+    QVariant data() const;
 
     void setPrecision(Precision precision);
     Precision precision() const;
