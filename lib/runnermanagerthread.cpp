@@ -238,6 +238,7 @@ void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index
     m_sessionData[index] = data;
 
     if (data) {
+        data->associateManager(m_manager);
         data->ref();
         emit requestFurtherMatching();
     }
