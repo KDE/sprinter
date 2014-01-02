@@ -101,7 +101,7 @@ int RunnerManager::columnCount(const QModelIndex &parent) const
 
 QVariant RunnerManager::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.row() > 0 || index.parent().isValid()) {
+    if (!index.isValid() || index.column() > 0 || index.parent().isValid()) {
         return QVariant();
     }
 
