@@ -34,7 +34,9 @@ public:
         : runner(r),
           manager(0),
           modelOffset(0),
-          matchesUnsynced(false)
+          matchesUnsynced(false),
+          pageSize(10),
+          offset(0)
     {
     }
 
@@ -46,6 +48,8 @@ public:
     QMutex currentMatchesLock;
     int modelOffset;
     bool matchesUnsynced;
+    uint pageSize;
+    uint offset;
 };
 
 RunnerSessionData::RunnerSessionData(AbstractRunner *runner)
@@ -61,6 +65,7 @@ RunnerSessionData::~RunnerSessionData()
 void RunnerSessionData::associateManager(RunnerManager *manager)
 {
     if (manager == d->manager) {
+        qDebug() << "query finished .. but no reply" << sender();
         return;
     }
 
@@ -190,6 +195,26 @@ QVector<QueryMatch> RunnerSessionData::matches(MatchState state) const
     } else {
         return d->currentMatches;
     }
+}
+
+void RunnerSessionData::setResultsPageSize(uint pageSize)
+{
+    d->pageSize = pageSize;
+}
+
+uint RunnerSessionData::resultsPageSize() const
+{
+    return d->pageSize;
+}
+
+void RunnerSessionData::setResultsOffset(uint offset)
+{
+    d->offset = offset;
+}
+
+uint RunnerSessionData::resultsOffset() const
+{
+    return d->offset;
 }
 
 #include "moc_runnersessiondata.cpp"

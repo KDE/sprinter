@@ -50,6 +50,12 @@ public:
 
     void setMatches(const QVector<QueryMatch> &matches, const RunnerContext &context);
 
+    void setResultsPageSize(uint pageSize);
+    uint resultsPageSize() const;
+
+    void setResultsOffset(uint page);
+    uint resultsOffset() const;
+
 private:
     friend class RunnerManagerThread;
     int syncMatches(int offset);
