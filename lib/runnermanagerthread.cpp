@@ -216,6 +216,33 @@ void RunnerManagerThread::retrieveSessionData()
     }
 }
 
+void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index, RunnerSessionData *data)
+{
+    qDebug() << "got the data for" << index;
+
+    if (index < 0 || index >= m_sessionData.size()) {
+        delete data;
+        return;
+    }
+
+    RunnerSessionData *oldData = m_sessionData.at(index);
+    if (oldData && oldData != m_dummySessionData) {
+        oldData->deref();
+    }
+
+    if (sessionId != m_sessionId) {
+        delete data;
+        data = 0;
+    }
+
+    m_sessionData[index] = data;
+
+    if (data) {
+        data->ref();
+        emit requestFurtherMatching();
+    }
+}
+
 bool RunnerManagerThread::startNextRunner()
 {
     //qDebug() << "    starting for" << m_currentRunner;
@@ -280,33 +307,6 @@ void RunnerManagerThread::startMatching()
 
     startNextRunner();
     m_matchIndexLock.unlock();
-}
-
-void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index, RunnerSessionData *data)
-{
-    qDebug() << "got the data for" << index;
-
-    if (index < 0 || index >= m_sessionData.size()) {
-        delete data;
-        return;
-    }
-
-    RunnerSessionData *oldData = m_sessionData.at(index);
-    if (oldData && oldData != m_dummySessionData) {
-        oldData->deref();
-    }
-
-    if (sessionId != m_sessionId) {
-        delete data;
-        data = 0;
-    }
-
-    m_sessionData[index] = data;
-
-    if (data) {
-        data->ref();
-        emit requestFurtherMatching();
-    }
 }
 
 void RunnerManagerThread::startQuery(const QString &query)
