@@ -154,7 +154,7 @@ QueryMatch RunnerManagerThread::matchAt(int index)
     QVector<QueryMatch> matches;
     foreach (RunnerSessionData *data, m_sessionData) {
         matches = data->matches(RunnerSessionData::SynchronizedMatches);
-        if (matches.size() >= index) {
+        if (matches.size() > index) {
             return matches[index];
         } else {
             index -= matches.size();
