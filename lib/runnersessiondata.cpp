@@ -93,6 +93,10 @@ int RunnerSessionData::syncMatches(int offset)
         }
     }
 
+#ifdef DEBUG
+    qDebug() << "SYNC offset, synced, unsynced:" << offset << d->syncedMatches.count() << unsynced.count();
+#endif
+
     if (d->syncedMatches.isEmpty()) {
         // no sync'd matches, so we only need to do something if we now do have matches
         if (!unsynced.isEmpty()) {
@@ -157,7 +161,7 @@ void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const Run
     }
 
 #ifdef DEBUG
-    qDebug() << "New matches: " << matches.count();
+    qDebug() << "New matches from, to: " << d->currentMatches.count() << matches.count();
     int count = 0;
     foreach (const QueryMatch &match, matches) {
         qDebug() << "     " << count++ << match.title();
@@ -168,12 +172,12 @@ void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const Run
         QMutexLocker lock(&d->currentMatchesLock);
 
         if (matches.isEmpty()) {
-            if (d->currentMatches.isEmpty()) {
+            d->currentMatches.clear();
+
+            if (d->syncedMatches.isEmpty()) {
                 // nothing going on here
                 return;
             }
-
-            d->currentMatches.clear();
         } else {
             //FIXME: implement *merging* rather than simply addition
             d->currentMatches += matches;
