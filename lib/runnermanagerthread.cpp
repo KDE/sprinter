@@ -30,6 +30,7 @@
 // temporary include for non-pluggable plugins
 #include "runners/datetime/datetime.h"
 #include "runners/c/c.h"
+#include "runners/youtube/youtube.h"
 
 RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
     : QThread(parent),
@@ -44,6 +45,7 @@ RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
       m_matchCount(-1)
 {
     qRegisterMetaType<QUuid>("QUuid");
+    qRegisterMetaType<QUuid>("RunnerContext");
 
     // to synchronize in the thread the manager lives in
     // the timer is created in this parent thread, rather than in
@@ -189,6 +191,7 @@ void RunnerManagerThread::loadRunners()
     //TODO: this should be loading from plugins, obviously
     m_runners.append(new DateTimeRunner);
     m_runners.append(new RunnerC);
+    m_runners.append(new YoutubeRunner);
 
     QWriteLocker lock(&m_matchIndexLock);
     m_currentRunner = m_runnerBookmark = m_runners.isEmpty() ? -1 : 0;
@@ -208,7 +211,7 @@ void RunnerManagerThread::retrieveSessionData()
         }
 
         m_sessionData[i] = m_dummySessionData;
-        SessionDataRetriever *rtrver = new SessionDataRetriever(m_sessionId, i, runner);
+        SessionDataRetriever *rtrver = new SessionDataRetriever(this, m_sessionId, i, runner);
         rtrver->setAutoDelete(true);
         connect(rtrver, SIGNAL(sessionDataRetrieved(QUuid,int,RunnerSessionData*)),
                 this, SLOT(sessionDataRetrieved(QUuid,int,RunnerSessionData*)));
@@ -235,11 +238,14 @@ void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index
         data = 0;
     }
 
-    m_sessionData[index] = data;
-
     if (data) {
         data->associateManager(m_manager);
         data->ref();
+    }
+
+    m_sessionData[index] = data;
+
+    if (data) {
         emit requestFurtherMatching();
     }
 }
@@ -268,7 +274,6 @@ bool RunnerManagerThread::startNextRunner()
         matcher = m_dummyMatcher;
     } else {
         matcher = new MatchRunnable(runner, sessionData, m_context);
-        matcher->setAutoDelete(true);
 
         //qDebug() << "          created a new matcher";
         if (!QThreadPool::globalInstance()->tryStart(matcher)) {
@@ -368,8 +373,9 @@ void MatchRunnable::run()
     }
 }
 
-SessionDataRetriever::SessionDataRetriever(const QUuid &sessionId, int index, AbstractRunner *runner)
-    : m_runner(runner),
+SessionDataRetriever::SessionDataRetriever(RunnerManagerThread *rmt, const QUuid &sessionId, int index, AbstractRunner *runner)
+    : m_rmt(rmt),
+      m_runner(runner),
       m_sessionId(sessionId),
       m_index(index)
 {
@@ -378,6 +384,8 @@ SessionDataRetriever::SessionDataRetriever(const QUuid &sessionId, int index, Ab
 void SessionDataRetriever::run()
 {
     RunnerSessionData *session = m_runner->createSessionData();
+    //FIXME: session could be deleted at this point, and then this crashes?
+    session->moveToThread(m_rmt);
     emit sessionDataRetrieved(m_sessionId, m_index, session);
 }
 

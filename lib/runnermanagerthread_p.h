@@ -28,7 +28,6 @@
 
 #include "runnercontext.h"
 
-
 class AbstractRunner;
 class RunnableMatch;
 class RunnerManager;
@@ -118,13 +117,14 @@ class SessionDataRetriever : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    SessionDataRetriever(const QUuid &sessionId, int index, AbstractRunner *runner);
+    SessionDataRetriever(RunnerManagerThread *rmt, const QUuid &sessionId, int index, AbstractRunner *runner);
     void run();
 
 Q_SIGNALS:
     void sessionDataRetrieved(const QUuid &sessionId, int index, RunnerSessionData *data);
 
 private:
+    RunnerManagerThread *m_rmt;
     AbstractRunner *m_runner;
     QUuid m_sessionId;
     int m_index;
