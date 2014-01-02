@@ -18,7 +18,7 @@
 #ifndef RUNNERSESSIONDATA
 #define RUNNERSESSIONDATA
 
-#include <QVector>
+#include <QObject>
 
 #include "querymatch.h"
 
@@ -27,8 +27,10 @@ class RunnerContext;
 class RunnerManager;
 
 //TODO: use QExplicitlySharedDataPointer or QSharedDataPointer instead of doing ref counting manually?
-class RunnerSessionData
+class RunnerSessionData : public QObject
 {
+    Q_OBJECT
+
 public:
     enum MatchState {
         SynchronizedMatches,

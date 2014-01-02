@@ -49,7 +49,8 @@ public:
 };
 
 RunnerSessionData::RunnerSessionData(AbstractRunner *runner)
-    : d(new Private(runner))
+    : QObject(0),
+      d(new Private(runner))
 {
 }
 
@@ -190,3 +191,5 @@ QVector<QueryMatch> RunnerSessionData::matches(MatchState state) const
         return d->currentMatches;
     }
 }
+
+#include "moc_runnersessiondata.cpp"
