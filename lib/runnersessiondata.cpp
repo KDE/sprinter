@@ -65,7 +65,6 @@ RunnerSessionData::~RunnerSessionData()
 void RunnerSessionData::associateManager(RunnerManager *manager)
 {
     if (manager == d->manager) {
-        qDebug() << "query finished .. but no reply" << sender();
         return;
     }
 
