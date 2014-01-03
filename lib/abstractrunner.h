@@ -37,10 +37,9 @@ public:
     AbstractRunner(QObject *parent);
     ~AbstractRunner();
 
-    bool shouldStartMatch(const RunnerSessionData *sessionData, const RunnerContext &context) const;
+    virtual RunnerSessionData *createSessionData();
 
     void startMatch(RunnerSessionData *sessionData, const RunnerContext &context);
-    virtual RunnerSessionData *createSessionData();
 
     void setMinQueryLength(uint length);
     int minQueryLength() const;

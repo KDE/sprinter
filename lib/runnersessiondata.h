@@ -48,6 +48,9 @@ public:
     void ref();
     void deref();
 
+    virtual bool shouldStartMatch(const RunnerContext &context) const;
+
+
     void setMatches(const QVector<QueryMatch> &matches, const RunnerContext &context);
 
     void setResultsPageSize(uint pageSize);

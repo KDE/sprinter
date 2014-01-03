@@ -22,6 +22,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 
+#include "abstractrunner.h"
 #include "runnermanager.h"
 #include "runnercontext.h"
 
@@ -218,6 +219,23 @@ void RunnerSessionData::setResultsOffset(uint offset)
 uint RunnerSessionData::resultsOffset() const
 {
     return d->offset;
+}
+
+bool RunnerSessionData::shouldStartMatch(const RunnerContext &context) const
+{
+    if (!d->runner) {
+        return false;
+    }
+
+    if (!context.isValid()) {
+        return false;
+    }
+
+    if ((uint)context.query().length() < d->runner->minQueryLength()) {
+        return false;
+    }
+
+    return true;
 }
 
 #include "moc_runnersessiondata.cpp"

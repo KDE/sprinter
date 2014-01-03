@@ -58,26 +58,9 @@ RunnerSessionData *AbstractRunner::createSessionData()
     return new RunnerSessionData(this);
 }
 
-bool AbstractRunner::shouldStartMatch(const RunnerSessionData *sessionData, const RunnerContext &context) const
-{
-    if (!sessionData) {
-        return false;
-    }
-
-    if (!context.isValid()) {
-        return false;
-    }
-
-    if ((uint)context.query().length() < d->minQueryLength) {
-        return false;
-    }
-
-    return true;
-}
-
 void AbstractRunner::startMatch(RunnerSessionData *sessionData, const RunnerContext &context)
 {
-    if (shouldStartMatch(sessionData, context)) {
+    if (sessionData && sessionData->shouldStartMatch(context)) {
         match(sessionData, context);
     }
 }
