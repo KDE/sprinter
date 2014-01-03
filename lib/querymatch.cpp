@@ -19,6 +19,8 @@
 
 #include "abstractrunner.h"
 
+#include <QDebug>
+
 class QueryMatch::Private : public QSharedData
 {
 public:
@@ -65,6 +67,12 @@ QueryMatch &QueryMatch::operator=(const QueryMatch &other)
 {
     d = other.d;
     return *this;
+}
+
+bool QueryMatch::isValid() const
+{
+    //FIXME: really the best way?
+    return !d->title.isEmpty();
 }
 
 //FIXME: if the runner is deleted?

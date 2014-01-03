@@ -61,6 +61,7 @@ public:
     ~QueryMatch();
 
     QueryMatch &operator=(const QueryMatch &other);
+    bool isValid() const;
 
     void setTitle(const QString &title);
     QString title() const;
