@@ -26,13 +26,15 @@ class RunnerManager : public QAbstractItemModel
     Q_PROPERTY(QString query WRITE setQuery READ query NOTIFY queryChanged)
 
 public:
-    enum Roles {
+    enum DisplayRoles {
         TextRole = Qt::UserRole,
         TypeRole,
         PrecisionRole,
         UserDataRole,
         DataRole
     };
+    Q_ENUMS(DisplayRoles)
+
     RunnerManager(QObject *parent = 0);
     ~RunnerManager();
 
@@ -45,7 +47,8 @@ public:
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
     QModelIndex parent(const QModelIndex &index) const;
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
-
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    QHash<int, QByteArray> roleNames() const;
     // setRunners
     // listRunners
 

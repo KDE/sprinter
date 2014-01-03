@@ -18,6 +18,7 @@
 #include "runnermanager.h"
 
 #include <QDebug>
+#include <QMetaEnum>
 
 #include "runnermanagerthread_p.h"
 
@@ -31,12 +32,22 @@ public:
 
     RunnerManagerThread *thread;
     QString query;
+    QHash<int, QByteArray> roles;
+    QVector<int> roleColumns;
 };
 
 RunnerManager::RunnerManager(QObject *parent)
     : QAbstractItemModel(parent),
       d(new Private(this))
 {
+    d->roles.insert(Qt::DisplayRole, "Title");
+    d->roleColumns.append(Qt::DisplayRole);
+    QMetaEnum e = metaObject()->enumerator(metaObject()->indexOfEnumerator("DisplayRoles"));
+    for (int i = 0; i < e.keyCount(); ++i) {
+        d->roles.insert(e.value(i), e.key(i));
+        d->roleColumns.append(e.value(i));
+    }
+
     //TODO set row names for model
     d->thread->start();
 }
@@ -96,17 +107,23 @@ int RunnerManager::columnCount(const QModelIndex &parent) const
         return 0;
     }
 
-    return 1;
+    return d->roles.count();
 }
 
 QVariant RunnerManager::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.column() > 0 || index.parent().isValid()) {
+    if (!index.isValid() || index.parent().isValid()) {
         return QVariant();
     }
 
     QueryMatch match = d->thread->matchAt(index.row());
-    //TODO: more roles
+
+    if (index.column() > 0 &&
+        index.column() < d->roleColumns.count() &&
+        role == Qt::DisplayRole) {
+        role = d->roleColumns[index.column()];
+    }
+
     switch (role) {
         case Qt::DisplayRole:
             return match.title();
@@ -129,8 +146,43 @@ QVariant RunnerManager::data(const QModelIndex &index, int role) const
         default:
             break;
     }
-    Q_UNUSED(role)
+
     return QVariant();
+}
+
+QVariant RunnerManager::headerData(int section, Qt::Orientation orientation, int role) const {
+    if (section > 0 &&
+        section < d->roleColumns.count() &&
+        role == Qt::DisplayRole) {
+        role = d->roleColumns[section];
+    }
+
+    if (orientation == Qt::Horizontal) {
+        switch (role) {
+            case Qt::DisplayRole:
+                return tr("Title");
+                break;
+            case TextRole:
+                return tr("Text");
+                break;
+            case TypeRole:
+                return tr("Type");
+                break;
+            case PrecisionRole:
+                return tr("Precision");
+                break;
+            case UserDataRole:
+                return tr("User Data");
+                break;
+            case DataRole:
+                return tr("Data");
+                break;
+            default:
+                break;
+        }
+    }
+
+    return QAbstractItemModel::headerData(section, orientation, role);
 }
 
 QModelIndex RunnerManager::index(int row, int column, const QModelIndex &parent) const
@@ -152,6 +204,11 @@ int RunnerManager::rowCount(const QModelIndex & parent) const
     //TODO
     Q_UNUSED(parent)
     return d->thread->matchCount();
+}
+
+QHash<int, QByteArray> RunnerManager::roleNames() const
+{
+    return d->roles;
 }
 
 #include "moc_runnermanager.cpp"
