@@ -3,10 +3,6 @@ find_package(Qt5Core REQUIRED)
 set(CMAKE_AUTOMOC ON)
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/lib ${CMAKE_BINARY_DIR})
 
-#FOR RUNNERS
-find_package(QJSON REQUIRED)
-#END FOR RUNNERS
-
 set(sprinterlib_SRCS
     lib/abstractrunner.cpp
     lib/querymatch.cpp
@@ -31,9 +27,5 @@ set(sprinter_SRCS
 
 add_executable(sprinter ${sprinter_SRCS})
 qt5_use_modules(sprinter Widgets Network)
-
-#FOR RUNNERS
-target_link_libraries(sprinter ${QJSON_LIBRARIES})
-#END FOR RUNNERS
 
 install(TARGETS sprinter DESTINATION bin)
