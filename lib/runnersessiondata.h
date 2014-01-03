@@ -52,6 +52,7 @@ public:
 
 
     void setMatches(const QVector<QueryMatch> &matches, const RunnerContext &context);
+    void updateMatches(const QVector<QueryMatch> &matches);
 
     void setResultsPageSize(uint pageSize);
     uint resultsPageSize() const;

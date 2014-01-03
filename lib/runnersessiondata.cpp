@@ -135,6 +135,30 @@ int RunnerSessionData::syncMatches(int offset)
         }
     }
 
+//     //TODO: ripping through the entire collection is a bit brute force
+//     //      would be nice to find a nicer way to do this
+//     int updateInterval = 0;
+//     foreach (const QueryMatch &match, d->syncedMatches) {
+//         //FIXME: only has one interval right now: 1 second
+//         if (match.updateInterval() > 0) {
+//             updateInterval = 1;//FIXME
+//         }
+//     }
+//
+//     if (updateInterval > 0) {
+//         if (!d->updateTimer) {
+//             d->updateTimer = new QTimer(this);
+//             connect(d->updateTimer, SIGNAL(timeout()),
+//                     this, SLOT(d->updateMatches()));
+//         }
+//
+//         d->updateTimer->setInterval(updateInterval);
+//         d->updateTimer->start();
+//     } else if (d->updateTimer) {
+//         delete d->updatTimer;
+//         d->updateTimer = 0;
+//     }
+
     return d->syncedMatches.count();
 }
 
@@ -188,6 +212,69 @@ void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const Run
     }
 
     if (d->manager) {
+        d->manager->matchesArrived();
+    }
+}
+
+void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
+{
+    Q_ASSERT(d->manager);
+
+    //TODO: make this safe against being called from another threading
+    //      probably requires a signal/slot call and Yet Another QVector
+    //      for the matches ... which leads me to believe it would be far
+    //      nicer to be able to update matches *directly* and have that
+    //      propogate to the model *directly*
+    // FIXME: this is a truly horrible way of doing this: nested for loops,
+    //        comparing data() .. *shudder*
+    int offset = 0; // FIXME: obviously wrong!
+    QMutexLocker lock(&d->currentMatchesLock);
+    qDebug() << "updating" << matches.count();
+    bool updateModel = false;
+
+    foreach (const QueryMatch &match, matches) {
+        //qDebug() <<" looking through" << match.data();
+        if (match.data().isNull()) {
+            continue;
+        }
+
+
+        QMutableVectorIterator<QueryMatch> cit (d->currentMatches);
+        int count = 0;
+        bool found = false;
+
+        while (cit.hasNext()) {
+            if (match.data() == cit.next().data()) {
+                //qDebug() << "found update in pending matches at" << count << cit.value().data();
+                cit.setValue(match);
+                d->matchesUnsynced = true;
+                d->manager->matchesArrived();
+                found = true;
+                break;
+            }
+            //qDebug() << "compared" << match.data() << cit.value().data();
+            ++count;
+        }
+
+        if (!found) {
+            QVectorIterator<QueryMatch> sit (d->syncedMatches);
+            count = 0;
+            while (sit.hasNext()) {
+                if (match.data() == sit.next().data()) {
+                    //qDebug() << "found update in existing matches at" << count;
+                    d->currentMatches << match;
+                    d->matchesUnsynced = true;
+                    found = true;
+                    break;
+                }
+                ++count;
+            }
+        }
+
+        updateModel = updateModel || found;
+    }
+
+    if (updateModel) {
         d->manager->matchesArrived();
     }
 }
