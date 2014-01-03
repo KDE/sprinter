@@ -27,8 +27,7 @@ public:
     Private(AbstractRunner *r)
         : runner(r),
           type(UnknownType),
-          precision(UnrelatedMatch),
-          updateInterval(0)
+          precision(UnrelatedMatch)
     {
     }
 
@@ -38,7 +37,6 @@ public:
     QString id;
     Type type;
     Precision precision;
-    uint updateInterval;
     QVariant data;
     QVariant userData;
 };
@@ -144,20 +142,4 @@ void QueryMatch::setInternalId(const QString &id)
 QString QueryMatch::internalId() const
 {
     return d->id;
-}
-
-void QueryMatch::setUpdateInterval(uint interval)
-{
-    d->updateInterval = interval;
-    //TODO: implement interval checking
-    if (interval > 0) {
-
-    } else {
-
-    }
-}
-
-uint QueryMatch::updateInterval() const
-{
-    return d->updateInterval;
 }

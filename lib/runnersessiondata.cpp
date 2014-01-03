@@ -135,30 +135,6 @@ int RunnerSessionData::syncMatches(int offset)
         }
     }
 
-//     //TODO: ripping through the entire collection is a bit brute force
-//     //      would be nice to find a nicer way to do this
-//     int updateInterval = 0;
-//     foreach (const QueryMatch &match, d->syncedMatches) {
-//         //FIXME: only has one interval right now: 1 second
-//         if (match.updateInterval() > 0) {
-//             updateInterval = 1;//FIXME
-//         }
-//     }
-//
-//     if (updateInterval > 0) {
-//         if (!d->updateTimer) {
-//             d->updateTimer = new QTimer(this);
-//             connect(d->updateTimer, SIGNAL(timeout()),
-//                     this, SLOT(d->updateMatches()));
-//         }
-//
-//         d->updateTimer->setInterval(updateInterval);
-//         d->updateTimer->start();
-//     } else if (d->updateTimer) {
-//         delete d->updatTimer;
-//         d->updateTimer = 0;
-//     }
-
     return d->syncedMatches.count();
 }
 

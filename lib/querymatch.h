@@ -89,13 +89,6 @@ public:
     void setPrecision(Precision precision);
     Precision precision() const;
 
-    /**
-     * @arg interval the number of seconds with which to attempt to update
-     * this match; 0 means "never" and is the default
-     */
-    void setUpdateInterval(uint interval);
-    uint updateInterval() const;
-
     void setInternalId(const QString &id);
     QString internalId() const;
 

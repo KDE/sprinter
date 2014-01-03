@@ -50,7 +50,6 @@ public:
 
     virtual bool shouldStartMatch(const RunnerContext &context) const;
 
-
     void setMatches(const QVector<QueryMatch> &matches, const RunnerContext &context);
     void updateMatches(const QVector<QueryMatch> &matches);
 
