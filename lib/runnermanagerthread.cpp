@@ -272,7 +272,7 @@ bool RunnerManagerThread::startNextRunner()
 
     AbstractRunner *runner = m_runners.at(m_currentRunner);
 
-    if (!runner->shouldStartMatch(sessionData, m_context)) {
+    if (!sessionData->shouldStartMatch(m_context)) {
         //qDebug() << "          skipping";
         sessionData->setMatches(QVector<QueryMatch>(), m_context);
         matcher = m_dummyMatcher;
@@ -308,9 +308,8 @@ void RunnerManagerThread::startMatching()
     for (;
          m_currentRunner != m_runnerBookmark;
          m_currentRunner = (m_currentRunner + 1) % m_runners.size()) {
-        //m_currentRunner = (m_currentRunner + 1) % m_runners.size();
         if (!startNextRunner()) {
-        m_matchIndexLock.unlock();
+            m_matchIndexLock.unlock();
             return;
         }
     }
@@ -321,7 +320,7 @@ void RunnerManagerThread::startMatching()
 
 void RunnerManagerThread::startQuery(const QString &query)
 {
-    if (query.isEmpty() || m_query == query) {
+    if (m_query == query) {
         return;
     }
 
