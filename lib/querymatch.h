@@ -71,6 +71,17 @@ public:
     void setType(Type type);
     Type type() const;
 
+    /**
+     * User data is what ends up on e.g. the clipboard for the user to
+     * later reference
+     */
+    void setUserData(const QVariant &data);
+    QVariant userData() const;
+
+    /**
+     * Data is an internal notation for the runner to use in conjuction
+     * with this match
+     */
     void setData(const QVariant &data);
     QVariant data() const;
 

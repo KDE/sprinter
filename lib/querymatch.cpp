@@ -38,6 +38,7 @@ public:
     Precision precision;
     uint updateInterval;
     QVariant data;
+    QVariant userData;
 };
 
 QueryMatch::QueryMatch()
@@ -90,6 +91,16 @@ QString QueryMatch::text() const
 void QueryMatch::setType(Type type)
 {
     d->type = type;
+}
+
+void QueryMatch::setUserData(const QVariant &data)
+{
+    d->userData = data;
+}
+
+QVariant QueryMatch::userData() const
+{
+    return d->userData;
 }
 
 void QueryMatch::setData(const QVariant &data)
