@@ -26,6 +26,13 @@ class RunnerManager : public QAbstractItemModel
     Q_PROPERTY(QString query WRITE setQuery READ query NOTIFY queryChanged)
 
 public:
+    enum Roles {
+        TextRole = Qt::UserRole,
+        TypeRole,
+        PrecisionRole,
+        UserDataRole,
+        DataRole
+    };
     RunnerManager(QObject *parent = 0);
     ~RunnerManager();
 

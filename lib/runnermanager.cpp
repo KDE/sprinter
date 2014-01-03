@@ -111,6 +111,21 @@ QVariant RunnerManager::data(const QModelIndex &index, int role) const
         case Qt::DisplayRole:
             return match.title();
             break;
+        case TextRole:
+            return match.text();
+            break;
+        case TypeRole:
+            return match.type();
+            break;
+        case PrecisionRole:
+            return match.precision();
+            break;
+        case UserDataRole:
+            return match.userData();
+            break;
+        case DataRole:
+            return match.data();
+            break;
         default:
             break;
     }
