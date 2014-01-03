@@ -20,7 +20,7 @@
 
 #include <QAction>
 #include <QLineEdit>
-#include <QListView>
+#include <QTreeView>
 #include <QVBoxLayout>
 
 #include "runnermanager.h"
@@ -50,8 +50,9 @@ int main(int argc, char** argv)
     QObject::connect(edit, SIGNAL(textChanged(QString)),
                      manager, SLOT(setQuery(QString)));
 
-    QListView *view = new QListView(top);
+    QTreeView *view = new QTreeView(top);
     view->setModel(manager);
+    view->setAllColumnsShowFocus(true);
 
     QVBoxLayout *layout = new QVBoxLayout(top);
     layout->addWidget(edit);
