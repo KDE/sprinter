@@ -65,6 +65,8 @@ RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
 
 RunnerManagerThread::~RunnerManagerThread()
 {
+    delete m_restartMatchingTimer;
+
     const int sessions = m_sessionData.size();
     RunnerSessionData *sessionData;
     for (int i = 0; i < sessions; ++i) {
@@ -88,14 +90,15 @@ void RunnerManagerThread::run()
             this, SLOT(startQuery(QString)));
     qDebug() << "should we do this query, then?" << m_manager->query();
 
-    m_restartMatchingTimer = new QTimer(this);
+    // can't create this with 'this' as the parent as we are in a different
+    // thread at this point.
+    m_restartMatchingTimer = new QTimer();
     m_restartMatchingTimer->setInterval(10);
     m_restartMatchingTimer->setSingleShot(true);
     connect(this, SIGNAL(requestFurtherMatching()),
             m_restartMatchingTimer, SLOT(start()));
     connect(m_restartMatchingTimer, SIGNAL(timeout()),
             this, SLOT(startMatching()));
-
     loadRunners();
     retrieveSessionData();
     startQuery(m_manager->query());
