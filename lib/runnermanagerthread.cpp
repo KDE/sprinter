@@ -58,7 +58,7 @@ RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
     // these connects may look quite round-about, but allows the timer to
     // be moved to any thread and the right thing happen
     connect(this, SIGNAL(requestSync()),
-            m_startSyncTimer, SLOT(start()));
+            m_startSyncTimer, SLOT(startIfStopped()));
     connect(m_startSyncTimer, SIGNAL(timeout()),
             this, SLOT(startSync()));
 }
