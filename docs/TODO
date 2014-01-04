@@ -1,0 +1,19 @@
+== Curent milestone: 0.1
+
+* Clear all TODOs/FIXMEs in code
+* RunnerSessionData::busy/setBusy
+    * make visible in the model
+* RunnerSessionData::updateMatches
+* Replacement for Plasma::QuerySyntax that is actually useful for:
+    * run time help / hints for the user
+    * automatic query construction
+    * pre-threading query filtering (e.g. in RunnerSessionData::shouldStartMatching)
+* QueryMatch execution
+    * Pass into an AbstractRunner::exec type method
+    * Learning: record chosen QueryMatches, weight future matches with this information
+    * QueryMatch::isSearchTerm() for re-searchables
+* Query pre-processing (similar to Plasma::RunnerContext)
+* move from QThreadPool::global to a private threadpool (so as not to interfere with host application usage of same)
+* Improved "single runner" mode
+
+== Next milestone: 0.2
