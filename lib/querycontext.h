@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef RUNNERCONTEXT
-#define RUNNERCONTEXT
+#ifndef QUERYCONTEXT
+#define QUERYCONTEXT
 
 #include <querymatch.h>
 
@@ -26,14 +26,14 @@
 class QueryMatch;
 
 
-class RunnerContext
+class QueryContext
 {
 public:
-    RunnerContext();
-    RunnerContext(const RunnerContext &other);
-    ~RunnerContext();
+    QueryContext();
+    QueryContext(const QueryContext &other);
+    ~QueryContext();
 
-    RunnerContext &operator=(const RunnerContext &other);
+    QueryContext &operator=(const QueryContext &other);
 
     void setQuery(const QString &query);
     QString query() const;

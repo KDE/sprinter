@@ -24,7 +24,7 @@
 
 #include "abstractrunner.h"
 #include "runnermanager.h"
-#include "runnercontext.h"
+#include "querycontext.h"
 
 #define DEBUG
 
@@ -155,7 +155,7 @@ void RunnerSessionData::deref()
     }
 }
 
-void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const RunnerContext &context)
+void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const QueryContext &context)
 {
     if (!context.isValid()) {
         return;
@@ -284,7 +284,7 @@ uint RunnerSessionData::resultsOffset() const
     return d->offset;
 }
 
-bool RunnerSessionData::shouldStartMatch(const RunnerContext &context) const
+bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
 {
     if (!d->runner) {
         return false;

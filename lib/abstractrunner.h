@@ -21,12 +21,12 @@
 #include <QObject>
 #include <QRunnable>
 
-#include <runnercontext.h>
+#include <querycontext.h>
 #include <runnersessiondata.h>
 
 class QueryMatch;
 class AbstractRunner;
-class RunnerContext;
+class QueryContext;
 class RunnerSessionData;
 
 class AbstractRunner : public QObject
@@ -39,13 +39,13 @@ public:
 
     virtual RunnerSessionData *createSessionData();
 
-    void startMatch(RunnerSessionData *sessionData, const RunnerContext &context);
+    void startMatch(RunnerSessionData *sessionData, const QueryContext &context);
 
     void setMinQueryLength(uint length);
     int minQueryLength() const;
 
 protected:
-    virtual void match(RunnerSessionData *sessionData, const RunnerContext &context);
+    virtual void match(RunnerSessionData *sessionData, const QueryContext &context);
 
 private:
     class Private;

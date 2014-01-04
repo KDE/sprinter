@@ -23,7 +23,7 @@
 #include "querymatch.h"
 
 class AbstractRunner;
-class RunnerContext;
+class QueryContext;
 class RunnerManager;
 
 //TODO: use QExplicitlySharedDataPointer or QSharedDataPointer instead of doing ref counting manually?
@@ -48,9 +48,9 @@ public:
     void ref();
     void deref();
 
-    virtual bool shouldStartMatch(const RunnerContext &context) const;
+    virtual bool shouldStartMatch(const QueryContext &context) const;
 
-    void setMatches(const QVector<QueryMatch> &matches, const RunnerContext &context);
+    void setMatches(const QVector<QueryMatch> &matches, const QueryContext &context);
     void updateMatches(const QVector<QueryMatch> &matches);
 
     void setResultsPageSize(uint pageSize);

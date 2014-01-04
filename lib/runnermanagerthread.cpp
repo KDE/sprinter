@@ -45,7 +45,7 @@ RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
       m_matchCount(-1)
 {
     qRegisterMetaType<QUuid>("QUuid");
-    qRegisterMetaType<QUuid>("RunnerContext");
+    qRegisterMetaType<QUuid>("QueryContext");
 
     // to synchronize in the thread the manager lives in
     // the timer is created in this parent thread, rather than in
@@ -361,7 +361,7 @@ void RunnerManagerThread::querySessionCompleted()
     m_runnerBookmark = m_currentRunner = 0;
 }
 
-MatchRunnable::MatchRunnable(AbstractRunner *runner, RunnerSessionData *sessionData, RunnerContext &context)
+MatchRunnable::MatchRunnable(AbstractRunner *runner, RunnerSessionData *sessionData, QueryContext &context)
     : m_runner(runner),
       m_sessionData(sessionData),
       m_context(context)

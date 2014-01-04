@@ -16,16 +16,16 @@
  */
 
 
-#include "runnercontext.h"
+#include "querycontext.h"
 
 
 #include <QDebug>
 #include <QReadWriteLock>
 
-class RunnerContext::Private : public QSharedData
+class QueryContext::Private : public QSharedData
 {
 public:
-    Private(RunnerContext *context)
+    Private(QueryContext *context)
         : QSharedData(),
           q(context)
     {
@@ -42,32 +42,32 @@ public:
 
     QString query;
     QReadWriteLock lock;
-    RunnerContext *q;
+    QueryContext *q;
 };
 
-RunnerContext::RunnerContext()
+QueryContext::QueryContext()
     : d(new Private(this))
 {
 }
 
-RunnerContext::RunnerContext(const RunnerContext &other)
+QueryContext::QueryContext(const QueryContext &other)
 {
     other.d->lock.lockForRead();
     d = other.d;
     other.d->lock.unlock();
 }
 
-RunnerContext::~RunnerContext()
+QueryContext::~QueryContext()
 {
 }
 
-RunnerContext &RunnerContext::operator=(const RunnerContext &other)
+QueryContext &QueryContext::operator=(const QueryContext &other)
 {
     if (this->d == other.d) {
         return *this;
     }
 
-    QExplicitlySharedDataPointer<RunnerContext::Private> oldD = d;
+    QExplicitlySharedDataPointer<QueryContext::Private> oldD = d;
     d->lock.lockForWrite();
     other.d->lock.lockForRead();
     d = other.d;
@@ -76,13 +76,13 @@ RunnerContext &RunnerContext::operator=(const RunnerContext &other)
     return *this;
 }
 
-void RunnerContext::reset()
+void QueryContext::reset()
 {
     // We will detach if we are a copy of someone. But we will reset
     // if we are the 'main' context others copied from. Resetting
-    // one RunnerContext makes all the copies obsolete.
+    // one QueryContext makes all the copies obsolete.
 
-    // We need to mark the q pointer of the detached RunnerContextPrivate
+    // We need to mark the q pointer of the detached QueryContextPrivate
     // as dirty on detach to avoid receiving results for old queries
     d->q = 0;
 
@@ -93,17 +93,17 @@ void RunnerContext::reset()
     d->q = this;
 }
 
-void RunnerContext::setQuery(const QString &query)
+void QueryContext::setQuery(const QString &query)
 {
     d->query = query;
 }
 
-QString RunnerContext::query() const
+QString QueryContext::query() const
 {
     return d->query;
 }
 
-bool RunnerContext::isValid() const
+bool QueryContext::isValid() const
 {
     return d->q;
 }

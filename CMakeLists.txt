@@ -14,7 +14,7 @@ include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/lib ${CMAKE_BINARY_D
 set(sprinterlib_SRCS
     lib/abstractrunner.cpp
     lib/querymatch.cpp
-    lib/runnercontext.cpp
+    lib/querycontext.cpp
     lib/runnermanager.cpp
     lib/runnermanagerthread.cpp
     lib/runnersessiondata.cpp

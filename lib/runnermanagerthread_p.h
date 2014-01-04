@@ -26,7 +26,7 @@
 #include <QWeakPointer>
 #include <QUuid>
 
-#include "runnercontext.h"
+#include "querycontext.h"
 
 class AbstractRunner;
 class RunnableMatch;
@@ -56,13 +56,13 @@ public Q_SLOTS:
 class MatchRunnable : public QRunnable
 {
 public:
-    MatchRunnable(AbstractRunner *runner, RunnerSessionData *sessionData, RunnerContext &context);
+    MatchRunnable(AbstractRunner *runner, RunnerSessionData *sessionData, QueryContext &context);
     void run();
 
 private:
     AbstractRunner *m_runner;
     RunnerSessionData *m_sessionData;
-    RunnerContext &m_context;
+    QueryContext &m_context;
 };
 
 class RunnerManagerThread : public QThread
@@ -103,7 +103,7 @@ private:
     QReadWriteLock m_matchIndexLock;
     int m_runnerBookmark;
     int m_currentRunner;
-    RunnerContext m_context;
+    QueryContext m_context;
     QString m_query;
     QUuid m_sessionId;
     QTimer *m_restartMatchingTimer;
