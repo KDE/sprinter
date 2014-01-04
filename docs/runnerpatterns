@@ -1,0 +1,34 @@
+= Runner Patterns
+
+Regardless of the type of information a runner is matching queries against, there are  a small number of patterns for getting from raw query to match set. These are outlined below.
+
+== When To Subclass RunnerSessionData
+
+A runner should create a subclass of RunnerSessionData and return it from a reimplementation of AbstractRunner::createSessionData when one or more of the following is true:
+
+ * there is shareable, non-trivial data or session set up needed to perform AbstractRunner::match. Putting this into RunnerSessionData and doing the initialization in creationSessionData allows this to happens once per query session and in a separate thread (therefore non-blocking)
+ * the runner produces matches asynchronously
+
+== Fast Synchronous Matching
+
+Runners whose query matching is necessarily synchronous, either because a library they are using only offers a synchronous API or because the matching is fast (e.g. sub-100ms), can take the easiest approach: reimplement AbstractRunner::match and call RunnerSessionData::setMatches at least once, even on failure (this will clear the set of matches).
+
+== Slow Synchronous
+
+(fill in once there is at least one clean working example)
+
+== Asynchronous
+
+To achieve proper asynchronous matching the following steps must be followed:
+
+* Create a RunnerSessionData subclass, returned from AbstractRunner::createSessionData
+* In the RunnerSessionData subclass include a slot that will create the async jobs
+* Add a signal to the runner that can send all necessary information to the RunnerSessionData's slot; at a minimum this will include the QueryContext
+* Connect the runner's signal to the slot in the RunnerSessionData constructor; this is important to ensure that the connection, and therefore the slot call, happens in the correct thread
+* In AbstractRunner::match, after doing any necessary pre-processing of the QueryContext, emit the signal
+* In the RunnerSessionData slot start the job, invalidating or merging older jobs; it will need to at a minimum hold on to the QueryContext object associated with the query
+* When the async jobs complete, the RunnerSessionData subclass should create the matches and call setMatches if the associated QueryContext is still valid
+
+== Paging
+
+When matchng, a runner should never return more than RunnerSessionData::resultsPageSize() matches and should always start at RunnerSessionData::resultsOffset() into the dataset.
