@@ -27,25 +27,41 @@ class AbstractRunner;
 class QueryMatch
 {
 public:
+    //TODO organize these in a more orderl fashion
     enum Type {
         UnknownType = 0,
-        InformationalType,
+        ExecutableType,
         FileType,
+        MathAndUnitsType,
         DocumentType,
         BookType,
         AlbumType,
         AudioType,
-        ExecutableType,
+        VideoType,
+        FilesystemLocationType,
         NetworkLocationType,
         ContactType,
         EventType,
+        MessageType,
         BookmarkType,
-        DesktopShellType,
+        DesktopType,
+        WindowType,
         HardwareType,
         AppActionType,
         AppSessionType,
         LocationType,
-        LanguageType
+        LanguageType,
+        DateTimeType,
+        InstallableType
+    };
+
+    enum Source {
+        FromInternalSource = 0,
+        FromFilesystem,
+        FromLocalIndex, // file indexing, db, etc
+        FromLocalService, // o.s., middelware, user session, etc.
+        FromDesktopShell,
+        FromNetworkService
     };
 
     enum Precision {
@@ -71,6 +87,9 @@ public:
 
     void setType(Type type);
     Type type() const;
+
+    void setSource(Source source);
+    Source source() const;
 
     /**
      * User data is what ends up on e.g. the clipboard for the user to

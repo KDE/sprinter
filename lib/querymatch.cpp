@@ -27,7 +27,8 @@ public:
     Private(AbstractRunner *r)
         : runner(r),
           type(UnknownType),
-          precision(UnrelatedMatch)
+          precision(UnrelatedMatch),
+          source(FromInternalSource)
     {
     }
 
@@ -36,6 +37,7 @@ public:
     QString text;
     QString id;
     Type type;
+    Source source;
     Precision precision;
     QVariant data;
     QVariant userData;
@@ -97,6 +99,16 @@ QString QueryMatch::text() const
 void QueryMatch::setType(Type type)
 {
     d->type = type;
+}
+
+void QueryMatch::setSource(Source source)
+{
+    d->source = source;
+}
+
+QueryMatch::Source QueryMatch::source() const
+{
+    return d->source;
 }
 
 void QueryMatch::setUserData(const QVariant &data)
