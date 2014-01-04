@@ -110,6 +110,18 @@ int RunnerManager::columnCount(const QModelIndex &parent) const
     return d->roles.count();
 }
 
+QString textForEnum(QObject *obj, const char *enumName, int value)
+{
+    QMetaEnum e = obj->metaObject()->enumerator(obj->metaObject()->indexOfEnumerator(enumName));
+    for (int i = 0; i < e.keyCount(); ++i) {
+        if (e.value(i) == value) {
+            return e.key(i);
+        }
+    }
+
+    return "Unknown";
+}
+
 QVariant RunnerManager::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.parent().isValid()) {
@@ -118,9 +130,11 @@ QVariant RunnerManager::data(const QModelIndex &index, int role) const
 
     QueryMatch match = d->thread->matchAt(index.row());
 
+    bool asText = false;
     if (index.column() > 0 &&
         index.column() < d->roleColumns.count() &&
         role == Qt::DisplayRole) {
+        asText = true;
         role = d->roleColumns[index.column()];
     }
 
@@ -133,6 +147,9 @@ QVariant RunnerManager::data(const QModelIndex &index, int role) const
             break;
         case TypeRole:
             return match.type();
+            break;
+        case SourceRole:
+            return match.source();
             break;
         case PrecisionRole:
             return match.precision();
@@ -167,6 +184,9 @@ QVariant RunnerManager::headerData(int section, Qt::Orientation orientation, int
                 break;
             case TypeRole:
                 return tr("Type");
+                break;
+            case SourceRole:
+                return tr("From");
                 break;
             case PrecisionRole:
                 return tr("Precision");

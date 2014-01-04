@@ -29,6 +29,7 @@ public:
     enum DisplayRoles {
         TextRole = Qt::UserRole,
         TypeRole,
+        SourceRole,
         PrecisionRole,
         UserDataRole,
         DataRole
