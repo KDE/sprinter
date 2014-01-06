@@ -110,7 +110,7 @@ int RunnerManager::columnCount(const QModelIndex &parent) const
     return d->roles.count();
 }
 
-QString textForEnum(QObject *obj, const char *enumName, int value)
+QString textForEnum(const QObject *obj, const char *enumName, int value)
 {
     QMetaEnum e = obj->metaObject()->enumerator(obj->metaObject()->indexOfEnumerator(enumName));
     for (int i = 0; i < e.keyCount(); ++i) {
@@ -146,13 +146,25 @@ QVariant RunnerManager::data(const QModelIndex &index, int role) const
             return match.text();
             break;
         case TypeRole:
-            return match.type();
+            if (asText) {
+                return textForEnum(this, "MatchType", match.type());
+            } else {
+                return match.type();
+            }
             break;
         case SourceRole:
-            return match.source();
+            if (asText) {
+                return textForEnum(this, "MatchSource", match.source());
+            } else {
+                return match.source();
+            }
             break;
         case PrecisionRole:
-            return match.precision();
+            if (asText) {
+                return textForEnum(this, "MatchPrecision", match.precision());
+            } else {
+                return match.precision();
+            }
             break;
         case UserDataRole:
             return match.userData();
