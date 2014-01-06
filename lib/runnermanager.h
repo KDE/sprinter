@@ -88,8 +88,6 @@ public:
 
     QString query() const;
 
-    void matchesArrived();
-
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
@@ -112,14 +110,11 @@ Q_SIGNALS:
 private:
     // these methods are for RunnserSessionData class (e.g. in syncMatches) only
     friend class RunnerSessionData;
-    void addingMatches(int start, int end);
-    void matchesAdded();
-    void removingMatches(int start, int end);
-    void matchesRemoved();
-    void matchesUpdated(int start, int end);
 
     class Private;
+    friend class Private;
     Private * const d;
+
     Q_PRIVATE_SLOT(d, void executionFinished(const QueryMatch &match, bool success));
 };
 

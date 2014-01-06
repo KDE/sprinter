@@ -24,6 +24,7 @@
 
 #include "abstractrunner.h"
 #include "runnermanager.h"
+#include "runnermanager_p.h"
 #include "querycontext.h"
 
 #define DEBUG
@@ -92,7 +93,7 @@ void RunnerSessionData::associateManager(RunnerManager *manager)
 
     d->manager = manager;
     if (d->manager && !d->currentMatches.isEmpty()) {
-        d->manager->matchesArrived();
+        d->manager->d->matchesArrived();
     }
 }
 
@@ -123,15 +124,15 @@ int RunnerSessionData::syncMatches(int offset)
         // no sync'd matches, so we only need to do something if we now do have matches
         if (!unsynced.isEmpty()) {
             // we had no matches, now we do
-            d->manager->addingMatches(offset, offset + unsynced.size());
+            d->manager->d->addingMatches(offset, offset + unsynced.size());
             d->syncedMatches = unsynced;
-            d->manager->matchesAdded();
+            d->manager->d->matchesAdded();
         }
     } else if (unsynced.isEmpty()) {
         // we had matches, and now we don't
-        d->manager->removingMatches(offset, offset + d->syncedMatches.size());
+        d->manager->d->removingMatches(offset, offset + d->syncedMatches.size());
         d->syncedMatches.clear();
-        d->manager->matchesRemoved();
+        d->manager->d->matchesRemoved();
     } else {
         // now the more complex situation: we have both synced and new matches
         // these need to be merged with the correct add/remove/update rows
@@ -142,17 +143,17 @@ int RunnerSessionData::syncMatches(int offset)
         const int newCount = unsynced.count();
         if (oldCount == newCount) {
             d->syncedMatches = unsynced;
-            d->manager->matchesUpdated(offset, offset + newCount);
+            d->manager->d->matchesUpdated(offset, offset + newCount);
         } else if (oldCount < newCount) {
-            d->manager->addingMatches(offset + oldCount, offset + newCount);
+            d->manager->d->addingMatches(offset + oldCount, offset + newCount);
             d->syncedMatches = unsynced;
-            d->manager->matchesAdded();
-            d->manager->matchesUpdated(offset, offset + newCount);
+            d->manager->d->matchesAdded();
+            d->manager->d->matchesUpdated(offset, offset + newCount);
         } else {
-            d->manager->removingMatches(offset + newCount, offset + oldCount);
+            d->manager->d->removingMatches(offset + newCount, offset + oldCount);
             d->syncedMatches = unsynced;
-            d->manager->matchesAdded();
-            d->manager->matchesUpdated(offset, offset + newCount);
+            d->manager->d->matchesAdded();
+            d->manager->d->matchesUpdated(offset, offset + newCount);
         }
     }
 
@@ -209,7 +210,7 @@ void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const Que
     }
 
     if (d->manager) {
-        d->manager->matchesArrived();
+        d->manager->d->matchesArrived();
     }
 }
 
@@ -245,7 +246,7 @@ void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
                 //qDebug() << "found update in pending matches at" << count << cit.value().data();
                 cit.setValue(match);
                 d->matchesUnsynced = true;
-                d->manager->matchesArrived();
+                d->manager->d->matchesArrived();
                 found = true;
                 break;
             }
@@ -272,7 +273,7 @@ void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
     }
 
     if (updateModel) {
-        d->manager->matchesArrived();
+        d->manager->d->matchesArrived();
     }
 }
 

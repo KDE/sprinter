@@ -16,6 +16,7 @@
  */
 
 #include "runnermanager.h"
+#include "runnermanager_p.h"
 
 #include <QDebug>
 #include <QMetaEnum>
@@ -23,24 +24,49 @@
 
 #include "runnermanagerthread_p.h"
 
-class RunnerManager::Private
+RunnerManager::Private::Private(RunnerManager *manager)
+    : q(manager),
+        thread(new RunnerManagerThread(manager))
 {
-public:
-    Private(RunnerManager *q)
-        : thread(new RunnerManagerThread(q))
-    {
-        qRegisterMetaType<QUuid>("QUuid");
-        qRegisterMetaType<QUuid>("QueryContext");
-        qRegisterMetaType<QUuid>("QueryMatch");
-    }
+    qRegisterMetaType<QUuid>("QUuid");
+    qRegisterMetaType<QUuid>("QueryContext");
+    qRegisterMetaType<QUuid>("QueryMatch");
+}
 
-    void executionFinished(const QueryMatch &match, bool success);
+void RunnerManager::Private::executionFinished(const QueryMatch &match, bool success)
+{
+    //TODO tell the outside world that execution has completed
+}
 
-    RunnerManagerThread *thread;
-    QString query;
-    QHash<int, QByteArray> roles;
-    QVector<int> roleColumns;
-};
+void RunnerManager::Private::addingMatches(int start, int end)
+{
+    q->beginInsertRows(QModelIndex(), start, end);
+}
+
+void RunnerManager::Private::matchesAdded()
+{
+    q->endInsertRows();
+}
+
+void RunnerManager::Private::removingMatches(int start, int end)
+{
+    q->beginRemoveRows(QModelIndex(), start, end);
+}
+
+void RunnerManager::Private::matchesRemoved()
+{
+    q->endRemoveRows();
+}
+
+void RunnerManager::Private::matchesUpdated(int start, int end)
+{
+    emit q->dataChanged(q->createIndex(start, 0), q->createIndex(end, 0));
+}
+
+void RunnerManager::Private::matchesArrived()
+{
+    thread->syncMatches();
+}
 
 RunnerManager::RunnerManager(QObject *parent)
     : QAbstractItemModel(parent),
@@ -92,44 +118,9 @@ void RunnerManager::executeMatch(const QModelIndex &index)
     executeMatch(index.row());
 }
 
-void RunnerManager::Private::executionFinished(const QueryMatch &match, bool success)
-{
-    //TODO tell the outside world that execution has completed
-}
-
-void RunnerManager::matchesArrived()
-{
-    d->thread->syncMatches();
-}
-
 QString RunnerManager::query() const
 {
     return d->query;
-}
-
-void RunnerManager::addingMatches(int start, int end)
-{
-    beginInsertRows(QModelIndex(), start, end);
-}
-
-void RunnerManager::matchesAdded()
-{
-    endInsertRows();
-}
-
-void RunnerManager::removingMatches(int start, int end)
-{
-    beginRemoveRows(QModelIndex(), start, end);
-}
-
-void RunnerManager::matchesRemoved()
-{
-    endRemoveRows();
-}
-
-void RunnerManager::matchesUpdated(int start, int end)
-{
-    emit dataChanged(createIndex(start, 0), createIndex(end, 0));
 }
 
 int RunnerManager::columnCount(const QModelIndex &parent) const

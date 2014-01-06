@@ -21,7 +21,6 @@
 * Clear all TODOs/FIXMEs in code
 * Improve RunnerSessionData::updateMatches
 * Implement proper merging in setMatches
-* Move private methods in RunnerManager into Private class
 
 == Bugfixes
 * Ensure all threads cleaned up before exit
