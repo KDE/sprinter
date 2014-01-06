@@ -1,8 +1,8 @@
 == Curent milestone: 0.1
 
 * Clear all TODOs/FIXMEs in code
-* RunnerSessionData::busy/setBusy
-    * make visible in the model
+* RunnerSessionData::isBusy
+    * make visible via a model (QAbstractItemModel *RunnerManager::runnersModel()?)
 * Improve RunnerSessionData::updateMatches
 * Implement proper merging in setMatches
 * Replacement for Plasma::QuerySyntax that is actually useful for:

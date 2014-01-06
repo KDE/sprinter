@@ -372,6 +372,8 @@ MatchRunnable::MatchRunnable(AbstractRunner *runner, RunnerSessionData *sessionD
 void MatchRunnable::run()
 {
     if (m_sessionData) {
+        m_sessionData->ref();
+        RunnerSessionData::Busy busy(m_sessionData);
         m_runner->startMatch(m_sessionData, m_context);
         m_sessionData->deref();
     }

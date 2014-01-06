@@ -43,6 +43,7 @@ public:
 
     AbstractRunner *runner;
     QAtomicInt ref;
+    QAtomicInt busyCount;
     QVector<QueryMatch> syncedMatches;
     QVector<QueryMatch> currentMatches;
     RunnerManager *manager;
@@ -52,6 +53,26 @@ public:
     uint pageSize;
     uint offset;
 };
+
+RunnerSessionData::Busy::Busy(RunnerSessionData *data)
+    : m_data(data)
+{
+    Q_ASSERT(m_data);
+    bool busy = m_data->d->busyCount.load() > 0;
+    if (busy != m_data->d->busyCount.ref()) {
+        emit m_data->busyChanged();
+    }
+}
+
+RunnerSessionData::Busy::~Busy()
+{
+    if (m_data) {
+        bool busy = m_data->d->busyCount.load() > 0;
+        if (busy != m_data->d->busyCount.deref()) {
+            emit m_data->busyChanged();
+        }
+    }
+}
 
 RunnerSessionData::RunnerSessionData(AbstractRunner *runner)
     : QObject(0),
@@ -282,6 +303,11 @@ void RunnerSessionData::setResultsOffset(uint offset)
 uint RunnerSessionData::resultsOffset() const
 {
     return d->offset;
+}
+
+bool RunnerSessionData::isBusy() const
+{
+    return d->busyCount.load() > 0;
 }
 
 bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const

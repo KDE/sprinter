@@ -19,6 +19,7 @@
 #define RUNNERSESSIONDATA
 
 #include <QObject>
+#include <QPointer>
 
 #include "querymatch.h"
 
@@ -35,6 +36,14 @@ public:
     enum MatchState {
         SynchronizedMatches,
         PendingMatches
+    };
+
+    class Busy {
+        public:
+            Busy(RunnerSessionData *sessionData);
+            ~Busy();
+        private:
+            QPointer<RunnerSessionData> m_data;
     };
 
     RunnerSessionData(AbstractRunner *runner);
@@ -58,6 +67,11 @@ public:
 
     void setResultsOffset(uint page);
     uint resultsOffset() const;
+
+    bool isBusy() const;
+
+Q_SIGNALS:
+    void busyChanged();
 
 private:
     friend class RunnerManagerThread;
