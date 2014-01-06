@@ -36,6 +36,53 @@ public:
     };
     Q_ENUMS(DisplayRoles)
 
+    //TODO organize these in a more orderly fashion
+    enum MatchType {
+        UnknownType = 0,
+        ExecutableType,
+        FileType,
+        MathAndUnitsType,
+        DocumentType,
+        BookType,
+        AlbumType,
+        AudioType,
+        VideoType,
+        FilesystemLocationType,
+        NetworkLocationType,
+        ContactType,
+        EventType,
+        MessageType,
+        BookmarkType,
+        DesktopType,
+        WindowType,
+        HardwareType,
+        AppActionType,
+        AppSessionType,
+        LocationType,
+        LanguageType,
+        DateTimeType,
+        InstallableType
+    };
+    Q_ENUMS(MatchType)
+
+    enum MatchSource {
+        FromInternalSource = 0,
+        FromFilesystem,
+        FromLocalIndex, // file indexing, db, etc
+        FromLocalService, // o.s., middelware, user session, etc.
+        FromDesktopShell,
+        FromNetworkService
+    };
+    Q_ENUMS(MatchSource)
+
+    enum MatchPrecision {
+        UnrelatedMatch = 0,
+        FuzzyMatch,
+        CloseMatch,
+        ExactMatch
+    };
+    Q_ENUMS(MatchPrecision)
+
     RunnerManager(QObject *parent = 0);
     ~RunnerManager();
 

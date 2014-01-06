@@ -24,53 +24,11 @@
 
 class AbstractRunner;
 
+#include <runnermanager.h>
+
 class QueryMatch
 {
 public:
-    //TODO organize these in a more orderl fashion
-    enum Type {
-        UnknownType = 0,
-        ExecutableType,
-        FileType,
-        MathAndUnitsType,
-        DocumentType,
-        BookType,
-        AlbumType,
-        AudioType,
-        VideoType,
-        FilesystemLocationType,
-        NetworkLocationType,
-        ContactType,
-        EventType,
-        MessageType,
-        BookmarkType,
-        DesktopType,
-        WindowType,
-        HardwareType,
-        AppActionType,
-        AppSessionType,
-        LocationType,
-        LanguageType,
-        DateTimeType,
-        InstallableType
-    };
-
-    enum Source {
-        FromInternalSource = 0,
-        FromFilesystem,
-        FromLocalIndex, // file indexing, db, etc
-        FromLocalService, // o.s., middelware, user session, etc.
-        FromDesktopShell,
-        FromNetworkService
-    };
-
-    enum Precision {
-        UnrelatedMatch = 0,
-        FuzzyMatch,
-        CloseMatch,
-        ExactMatch
-    };
-
     QueryMatch();
     QueryMatch(AbstractRunner *runner);
     QueryMatch(const QueryMatch &other);
@@ -85,11 +43,11 @@ public:
     void setText(const QString &text);
     QString text() const;
 
-    void setType(Type type);
-    Type type() const;
+    void setType(RunnerManager::MatchType type);
+    RunnerManager::MatchType type() const;
 
-    void setSource(Source source);
-    Source source() const;
+    void setSource(RunnerManager::MatchSource source);
+    RunnerManager::MatchSource source() const;
 
     /**
      * User data is what ends up on e.g. the clipboard for the user to
@@ -105,8 +63,8 @@ public:
     void setData(const QVariant &data);
     QVariant data() const;
 
-    void setPrecision(Precision precision);
-    Precision precision() const;
+    void setPrecision(RunnerManager::MatchPrecision precision);
+    RunnerManager::MatchPrecision precision() const;
 
     void setInternalId(const QString &id);
     QString internalId() const;
