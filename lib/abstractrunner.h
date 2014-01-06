@@ -40,12 +40,14 @@ public:
     virtual RunnerSessionData *createSessionData();
 
     void startMatch(RunnerSessionData *sessionData, const QueryContext &context);
+    bool startExec(const QueryMatch &match);
 
     void setMinQueryLength(uint length);
     int minQueryLength() const;
 
 protected:
     virtual void match(RunnerSessionData *sessionData, const QueryContext &context);
+    virtual bool exec(const QueryMatch &match);
 
 private:
     class Private;

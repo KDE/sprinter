@@ -20,6 +20,7 @@
 #include "abstractrunner.h"
 
 #include <QDebug>
+#include <QPointer>
 
 class QueryMatch::Private : public QSharedData
 {
@@ -32,7 +33,7 @@ public:
     {
     }
 
-    AbstractRunner *runner;
+    QPointer<AbstractRunner> runner;
     QString title;
     QString text;
     QString id;
@@ -71,11 +72,9 @@ QueryMatch &QueryMatch::operator=(const QueryMatch &other)
 
 bool QueryMatch::isValid() const
 {
-    //FIXME: really the best way?
-    return !d->title.isEmpty();
+    return d->runner;
 }
 
-//FIXME: if the runner is deleted?
 void QueryMatch::setTitle(const QString &title)
 {
     d->title = title;
@@ -154,4 +153,9 @@ void QueryMatch::setInternalId(const QString &id)
 QString QueryMatch::internalId() const
 {
     return d->id;
+}
+
+AbstractRunner *QueryMatch::runner() const
+{
+    return d->runner;
 }

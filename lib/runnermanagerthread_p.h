@@ -23,7 +23,6 @@
 #include <QThread>
 #include <QTimer>
 #include <QVector>
-#include <QWeakPointer>
 #include <QUuid>
 
 #include "querycontext.h"
@@ -129,6 +128,20 @@ private:
     AbstractRunner *m_runner;
     QUuid m_sessionId;
     int m_index;
+};
+
+class ExecRunnable : public QObject, public QRunnable
+{
+    Q_OBJECT
+public:
+    ExecRunnable(const QueryMatch &match, QObject *parent = 0);
+    void run();
+
+Q_SIGNALS:
+    void finished(const QueryMatch &match, bool success);
+
+private:
+    QueryMatch m_match;
 };
 
 #endif

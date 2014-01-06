@@ -45,9 +45,6 @@ RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
       m_dummySessionData(new RunnerSessionData(0)),
       m_matchCount(-1)
 {
-    qRegisterMetaType<QUuid>("QUuid");
-    qRegisterMetaType<QUuid>("QueryContext");
-
     // to synchronize in the thread the manager lives in
     // the timer is created in this parent thread, rather than in
     // run() below
@@ -394,6 +391,25 @@ void SessionDataRetriever::run()
     //FIXME: session could be deleted at this point, and then this crashes?
     session->moveToThread(m_rmt);
     emit sessionDataRetrieved(m_sessionId, m_index, session);
+}
+
+ExecRunnable::ExecRunnable(const QueryMatch &match, QObject *parent)
+    : QObject(parent),
+      m_match(match)
+{
+}
+
+void ExecRunnable::run()
+{
+    bool success = false;
+    //TODO: another race condition with the runner being deleted between this call
+    //      and usage
+    AbstractRunner *runner = m_match.runner();
+    if (runner) {
+        success = runner->startExec(m_match);
+    }
+
+    emit finished(m_match, success);
 }
 
 #include "moc_runnermanagerthread_p.cpp"

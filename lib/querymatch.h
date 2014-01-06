@@ -69,6 +69,8 @@ public:
     void setInternalId(const QString &id);
     QString internalId() const;
 
+    AbstractRunner *runner() const;
+
     //TODO run match, icon, actions (sub-QueryMatches?), id (QUuid?)
 private:
     class Private;

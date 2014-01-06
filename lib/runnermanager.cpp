@@ -19,6 +19,7 @@
 
 #include <QDebug>
 #include <QMetaEnum>
+#include <QThreadPool>
 
 #include "runnermanagerthread_p.h"
 
@@ -28,7 +29,12 @@ public:
     Private(RunnerManager *q)
         : thread(new RunnerManagerThread(q))
     {
+        qRegisterMetaType<QUuid>("QUuid");
+        qRegisterMetaType<QUuid>("QueryContext");
+        qRegisterMetaType<QUuid>("QueryMatch");
     }
+
+    void executionFinished(const QueryMatch &match, bool success);
 
     RunnerManagerThread *thread;
     QString query;
@@ -64,6 +70,31 @@ void RunnerManager::setQuery(const QString &query)
     d->query = query;
     //QMetaObject::invokeMethod(d->thread, "startQuery", Qt::AutoConnection, Q_ARG(QString, query));
     emit queryChanged(query);
+}
+
+void RunnerManager::executeMatch(int index)
+{
+    QueryMatch match = d->thread->matchAt(index);
+
+    if (!match.isValid()) {
+        return;
+    }
+
+    ExecRunnable *exec = new ExecRunnable(match);
+    exec->setAutoDelete(true);
+    connect(exec, SIGNAL(finished(QueryMatch,bool)),
+            this, SLOT(executionFinished(QueryMatch,bool)));
+    QThreadPool::globalInstance()->start(exec);
+}
+
+void RunnerManager::executeMatch(const QModelIndex &index)
+{
+    executeMatch(index.row());
+}
+
+void RunnerManager::Private::executionFinished(const QueryMatch &match, bool success)
+{
+    //TODO tell the outside world that execution has completed
 }
 
 void RunnerManager::matchesArrived()

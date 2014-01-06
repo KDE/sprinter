@@ -10,11 +10,11 @@
     * automatic query construction
     * pre-threading query filtering (e.g. in RunnerSessionData::shouldStartMatching)
 * QueryMatch execution
-    * Pass into an AbstractRunner::exec type method
-    * Learning: record chosen QueryMatches, weight future matches with this information
     * QueryMatch::isSearchTerm() for re-searchables
+    * Learning: record chosen QueryMatches, weight future matches with this information
 * Query pre-processing (similar to Plasma::RunnerContext)
 * Design an implement an improved (relative to krunner) "single runner" mode
 * Runners advertise what kind of matches they return (source, type, ..?)
+* Move private methods in RunnerManager into Private class
 
 == Next milestone: 0.2

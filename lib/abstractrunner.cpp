@@ -17,6 +17,8 @@
 
 #include "abstractrunner.h"
 
+#include <QApplication>
+#include <QClipboard>
 #include <QDebug>
 
 #include "runnersessiondata.h"
@@ -69,6 +71,29 @@ void AbstractRunner::match(RunnerSessionData *sessionData, const QueryContext &c
 {
     Q_UNUSED(sessionData)
     Q_UNUSED(context)
+}
+
+bool AbstractRunner::startExec(const QueryMatch &match)
+{
+    if (match.runner() != this) {
+        return false;
+    }
+
+    exec(match);
+}
+
+bool AbstractRunner::exec(const QueryMatch &match)
+{
+    QString clipboardText = match.userData().toString();
+    if (!clipboardText.isEmpty()) {
+        QClipboard *clipboard = QApplication::clipboard();
+        if (clipboard) {
+            clipboard->setText(clipboardText);
+            return true;
+        }
+    }
+
+    return false;
 }
 
 #include "moc_abstractrunner.cpp"

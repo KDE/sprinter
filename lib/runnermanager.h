@@ -102,6 +102,8 @@ public:
 
 public Q_SLOTS:
     void setQuery(const QString &query);
+    void executeMatch(int index);
+    void executeMatch(const QModelIndex &index);
 
 Q_SIGNALS:
     void queryChanged(const QString &query);
@@ -118,6 +120,7 @@ private:
 
     class Private;
     Private * const d;
+    Q_PRIVATE_SLOT(d, void executionFinished(const QueryMatch &match, bool success));
 };
 
 #endif
