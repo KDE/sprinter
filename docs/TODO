@@ -3,7 +3,8 @@
 * Clear all TODOs/FIXMEs in code
 * RunnerSessionData::busy/setBusy
     * make visible in the model
-* RunnerSessionData::updateMatches
+* Improve RunnerSessionData::updateMatches
+* Implement proper merging in setMatches
 * Replacement for Plasma::QuerySyntax that is actually useful for:
     * run time help / hints for the user
     * automatic query construction
@@ -13,7 +14,7 @@
     * Learning: record chosen QueryMatches, weight future matches with this information
     * QueryMatch::isSearchTerm() for re-searchables
 * Query pre-processing (similar to Plasma::RunnerContext)
-* Improved "single runner" mode
+* Design an implement an improved (relative to krunner) "single runner" mode
 * Runners advertise what kind of matches they return (source, type, ..?)
 
 == Next milestone: 0.2
