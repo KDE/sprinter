@@ -53,6 +53,8 @@ int main(int argc, char** argv)
     QTreeView *view = new QTreeView(top);
     view->setModel(manager);
     view->setAllColumnsShowFocus(true);
+    QObject::connect(view, SIGNAL(doubleClicked(QModelIndex)),
+                     manager, SLOT(executeMatch(QModelIndex)));
 
     QVBoxLayout *layout = new QVBoxLayout(top);
     layout->addWidget(edit);
