@@ -1,8 +1,11 @@
 == Curent milestone: 0.1
 
 * Clear all TODOs/FIXMEs in code
-* RunnerSessionData::isBusy
-    * make visible via a model (QAbstractItemModel *RunnerManager::runnersModel()?)
+* QAbstractItemModel *RunnerManager::runnersModel(), with following info per runner (row):
+    * QString plugin ID/name
+    * QString user visible name
+    * bool loaded
+    * bool busy (this comes from the session data in the RunnerManagerThread)
 * Improve RunnerSessionData::updateMatches
 * Implement proper merging in setMatches
 * Replacement for Plasma::QuerySyntax that is actually useful for:
