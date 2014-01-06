@@ -1,14 +1,12 @@
-== Curent milestone: 0.1
+= Curent milestone: 0.1
 
-* Clear all TODOs/FIXMEs in code
+== Features
 * QAbstractItemModel *RunnerManager::runnersModel(), with following info per runner (row):
     * QString plugin ID/name
     * QString user visible name
     * bool loaded
     * bool busy (this comes from the session data in the RunnerManagerThread)
-* Improve RunnerSessionData::updateMatches
-* Implement proper merging in setMatches
-* Replacement for Plasma::QuerySyntax that is actually useful for:
+* Design and imlement an improved Plasma::QuerySyntax that is useful for:
     * run time help / hints for the user
     * automatic query construction
     * pre-threading query filtering (e.g. in RunnerSessionData::shouldStartMatching)
@@ -16,8 +14,16 @@
     * QueryMatch::isSearchTerm() for re-searchables
     * Learning: record chosen QueryMatches, weight future matches with this information
 * Query pre-processing (similar to Plasma::RunnerContext)
-* Design an implement an improved (relative to krunner) "single runner" mode
+* Design and implement an improved (relative to krunner) "single runner" mode
 * Runners advertise what kind of matches they return (source, type, ..?)
+
+== Improvements
+* Clear all TODOs/FIXMEs in code
+* Improve RunnerSessionData::updateMatches
+* Implement proper merging in setMatches
 * Move private methods in RunnerManager into Private class
 
-== Next milestone: 0.2
+== Bugfixes
+* Ensure all threads cleaned up before exit
+
+= Next milestone: 0.2
