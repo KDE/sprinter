@@ -13,7 +13,6 @@
     * Learning: record chosen QueryMatches, weight future matches with this information
     * QueryMatch::isSearchTerm() for re-searchables
 * Query pre-processing (similar to Plasma::RunnerContext)
-* move from QThreadPool::global to a private threadpool (so as not to interfere with host application usage of same)
 * Improved "single runner" mode
 * Runners advertise what kind of matches they return (source, type, ..?)
 

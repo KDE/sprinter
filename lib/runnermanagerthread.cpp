@@ -34,6 +34,7 @@
 
 RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
     : QThread(parent),
+      m_threadPool(new QThreadPool(this)),
       m_manager(parent),
       m_runnerBookmark(-1),
       m_currentRunner(-1),
@@ -221,7 +222,7 @@ void RunnerManagerThread::retrieveSessionData()
         rtrver->setAutoDelete(true);
         connect(rtrver, SIGNAL(sessionDataRetrieved(QUuid,int,RunnerSessionData*)),
                 this, SLOT(sessionDataRetrieved(QUuid,int,RunnerSessionData*)));
-        QThreadPool::globalInstance()->start(rtrver);
+        m_threadPool->start(rtrver);
     }
 }
 
@@ -283,7 +284,7 @@ bool RunnerManagerThread::startNextRunner()
         matcher = new MatchRunnable(runner, sessionData, m_context);
 
         //qDebug() << "          created a new matcher";
-        if (!QThreadPool::globalInstance()->tryStart(matcher)) {
+        if (!m_threadPool->tryStart(matcher)) {
             //qDebug() << "          threads be full";
             delete matcher;
             emit requestFurtherMatching();

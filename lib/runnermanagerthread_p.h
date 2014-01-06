@@ -29,10 +29,10 @@
 #include "querycontext.h"
 
 class AbstractRunner;
+class QThreadPool;
 class RunnableMatch;
 class RunnerManager;
 class RunnerSessionData;
-
 
 class NonRestartingTimer : public QTimer
 {
@@ -96,6 +96,7 @@ private:
     void retrieveSessionData();
     bool startNextRunner();
 
+    QThreadPool *m_threadPool;
     RunnerManager *m_manager;
     QVector<AbstractRunner *> m_runners;
     QVector<RunnerSessionData *> m_sessionData;
