@@ -20,20 +20,16 @@
 
 struct RunnerMetaData
 {
-    RunnerMetaData() {}
-
-    RunnerMetaData(const QString &visibleName,
-                   const QString pluginId,
-                   const QString desc)
-        : name(visibleName),
-          id(pluginId),
-          description(desc)
+    RunnerMetaData()
+        : loaded(false)
     {
     }
 
-    QString name;
+    QString library;
     QString id;
+    QString name;
     QString description;
+    bool loaded;
 };
 
 #endif
