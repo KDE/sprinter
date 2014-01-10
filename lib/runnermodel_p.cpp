@@ -148,7 +148,7 @@ int RunnerModel::columnCount(const QModelIndex &parent) const
 
 int RunnerModel::rowCount(const QModelIndex & parent) const
 {
-    if (!parent.isValid() || parent.parent().isValid()) {
+    if (parent.isValid()) {
         return 0;
     }
 
