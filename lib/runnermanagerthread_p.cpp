@@ -170,15 +170,35 @@ QueryMatch RunnerManagerThread::matchAt(int index)
     return QueryMatch();
 }
 
+QVector<RunnerMetaData> RunnerManagerThread::runnerMetaData() const
+{
+     return m_runnerMetaData;
+}
+
 void RunnerManagerThread::loadRunners()
 {
+    //TODO: this should all be loading from plugins
+    //TODO: instantiation should be triggered from RunnerModel
+    emit loadingRunnerMetaData();
+    m_runnerMetaData << RunnerMetaData("Date and Time",
+                                       "org.kde.sprinter.datetime",
+                                       "Date and time from around the world");
+    m_runnerMetaData << RunnerMetaData("Tester",
+                                       "org.kde.sprinter.c",
+                                       "Test AbstractRunner");
+    m_runnerMetaData << RunnerMetaData("Youtube",
+                                       "org.kde.sprinter.youtube",
+                                       "Youtube videos");
+    emit loadedRunnerMetaData();
+
     QTime t;
     t.start();
     m_sessionId = QUuid::createUuid();
 
-    //FIXME: will crash if matches are ungoing. reference count?
-    qDeleteAll(m_runners);
+    QVector<AbstractRunner *> runnersTmp = m_runners;
     m_runners.clear();
+    //FIXME will crash if matches are ongoing
+    qDeleteAll(runnersTmp);
 
     const int sessions = m_sessionData.size();
     RunnerSessionData *sessionData;
@@ -192,17 +212,18 @@ void RunnerManagerThread::loadRunners()
 
     m_matchers.clear();
 
-    //TODO: this should be loading from plugins, obviously
-    m_runners.append(new DateTimeRunner);
-    m_runners.append(new RunnerC);
-    m_runners.append(new YoutubeRunner);
+    runnersTmp.append(new DateTimeRunner);
+    runnersTmp.append(new RunnerC);
+    runnersTmp.append(new YoutubeRunner);
 
     QWriteLocker lock(&m_matchIndexLock);
+    m_runners = runnersTmp;
     m_currentRunner = m_runnerBookmark = m_runners.isEmpty() ? -1 : 0;
     m_sessionData.resize(m_runners.size());
     m_matchers.resize(m_runners.size());
 
     qDebug() << m_runners.count() << "runners loaded" << "in" << t.elapsed() << "ms";
+
 }
 
 void RunnerManagerThread::retrieveSessionData()

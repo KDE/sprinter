@@ -47,11 +47,16 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     QHash<int, QByteArray> roleNames() const;
 
+private Q_SLOTS:
+    void runnerMetaDataLoading();
+    void runnerMetaDataLoaded();
+
 //TODO: add slots to load/unload runners by index (int/QModelIndex)
 private:
     QPointer<RunnerManagerThread> m_thread;
     QHash<int, QByteArray> m_roles;
     QVector<int> m_roleColumns;
+    int m_count;
 };
 
 #endif

@@ -25,6 +25,7 @@
 #include <QVector>
 #include <QUuid>
 
+#include "runnermetadata_p.h"
 #include "querycontext.h"
 
 class AbstractRunner;
@@ -76,10 +77,13 @@ public:
     void syncMatches();
     int matchCount() const;
     QueryMatch matchAt(int index);
+    QVector<RunnerMetaData> runnerMetaData() const;
 
 Q_SIGNALS:
     void requestFurtherMatching();
     void requestSync();
+    void loadingRunnerMetaData();
+    void loadedRunnerMetaData();
 
 public Q_SLOTS:
     void sessionDataRetrieved(const QUuid &sessionId, int, RunnerSessionData *data);
@@ -97,6 +101,7 @@ private:
 
     QThreadPool *m_threadPool;
     RunnerManager *m_manager;
+    QVector<RunnerMetaData> m_runnerMetaData;
     QVector<AbstractRunner *> m_runners;
     QVector<RunnerSessionData *> m_sessionData;
     QVector<MatchRunnable *> m_matchers;

@@ -24,17 +24,21 @@
 
 RunnerModel::RunnerModel(RunnerManagerThread *thread, QObject *parent)
     : QAbstractItemModel(parent),
-      m_thread(thread)
+      m_thread(thread),
+      m_count(0)
 {
     Q_ASSERT(thread);
 
-    m_roles.insert(Qt::DisplayRole, "Title");
+    m_roles.insert(Qt::DisplayRole, "Name");
     m_roleColumns.append(Qt::DisplayRole);
     QMetaEnum e = metaObject()->enumerator(metaObject()->indexOfEnumerator("DisplayRoles"));
     for (int i = 0; i < e.keyCount(); ++i) {
         m_roles.insert(e.value(i), e.key(i));
         m_roleColumns.append(e.value(i));
     }
+
+    connect(thread, SIGNAL(loadingRunnerMetaData()), this, SIGNAL(runnerMetaDataLoading()));
+    connect(thread, SIGNAL(loadedRunnerMetaData()), this, SLOT(runnerMetaDataLoaded()));
 }
 
 RunnerModel::~RunnerModel()
@@ -52,7 +56,12 @@ int RunnerModel::columnCount(const QModelIndex &parent) const
 
 QVariant RunnerModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.parent().isValid()) {
+    if (!m_thread || !index.isValid() || index.parent().isValid()) {
+        return QVariant();
+    }
+
+    QVector<RunnerMetaData> info = m_thread->runnerMetaData();
+    if (index.row() >= info.count()) {
         return QVariant();
     }
 
@@ -64,18 +73,20 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
 
     switch (role) {
         case Qt::DisplayRole:
-            return QVariant();
+            return info[index.row()].name;
             break;
         case IdRole:
-            return QVariant();
+            return info[index.row()].id;
             break;
         case DescriptionRole:
-            return QVariant();
+            return info[index.row()].description;
             break;
         case IsLoadedRole:
-            return QVariant();
+            //FIXME implement
+            return true;
             break;
         case IsBusyRole:
+            //FIXME implement
             return QVariant();
             break;
         default:
@@ -137,14 +148,28 @@ QModelIndex RunnerModel::parent(const QModelIndex &index) const
 
 int RunnerModel::rowCount(const QModelIndex & parent) const
 {
-    //TODO
-    Q_UNUSED(parent)
-    return m_thread ? m_thread->matchCount() : 0;
+    if (!parent.isValid() || parent.parent().isValid()) {
+        return 0;
+    }
+
+    return m_thread ? m_count : 0;
 }
 
 QHash<int, QByteArray> RunnerModel::roleNames() const
 {
     return m_roles;
+}
+
+void RunnerModel::runnerMetaDataLoading()
+{
+    beginResetModel();
+    m_count = 0;
+}
+
+void RunnerModel::runnerMetaDataLoaded()
+{
+    m_count = m_thread ? m_thread->runnerMetaData().count() : 0;
+    emit endResetModel();
 }
 
 #include "moc_runnermodel_p.cpp"
