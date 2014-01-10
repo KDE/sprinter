@@ -37,7 +37,7 @@ RunnerModel::RunnerModel(RunnerManagerThread *thread, QObject *parent)
         m_roleColumns.append(e.value(i));
     }
 
-    connect(thread, SIGNAL(loadingRunnerMetaData()), this, SIGNAL(runnerMetaDataLoading()));
+    connect(thread, SIGNAL(loadingRunnerMetaData()), this, SLOT(runnerMetaDataLoading()));
     connect(thread, SIGNAL(loadedRunnerMetaData()), this, SLOT(runnerMetaDataLoaded()));
 }
 
