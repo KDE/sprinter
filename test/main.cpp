@@ -64,6 +64,8 @@ int main(int argc, char** argv)
     QTreeView *runnerView = new QTreeView(top);
     runnerView->setModel(manager->runnerModel());
     runnerView->setAllColumnsShowFocus(true);
+    QObject::connect(runnerView, SIGNAL(doubleClicked(QModelIndex)),
+                     manager->runnerModel(), SLOT(loadRunner(QModelIndex)));
 
     QGridLayout *topLayout = new QGridLayout(top);
     topLayout->addWidget(edit, 0, 0);
