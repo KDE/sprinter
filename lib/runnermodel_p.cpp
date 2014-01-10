@@ -45,15 +45,6 @@ RunnerModel::~RunnerModel()
 {
 }
 
-int RunnerModel::columnCount(const QModelIndex &parent) const
-{
-    if (parent.isValid()) {
-        return 0;
-    }
-
-    return m_roles.count();
-}
-
 QVariant RunnerModel::data(const QModelIndex &index, int role) const
 {
     if (!m_thread || !index.isValid() || index.parent().isValid()) {
@@ -144,6 +135,15 @@ QModelIndex RunnerModel::index(int row, int column, const QModelIndex &parent) c
 QModelIndex RunnerModel::parent(const QModelIndex &index) const
 {
     return QModelIndex();
+}
+
+int RunnerModel::columnCount(const QModelIndex &parent) const
+{
+    if (parent.isValid()) {
+        return 0;
+    }
+
+    return m_roles.count();
 }
 
 int RunnerModel::rowCount(const QModelIndex & parent) const
