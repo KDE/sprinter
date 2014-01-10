@@ -56,12 +56,21 @@ int main(int argc, char** argv)
     QObject::connect(view, SIGNAL(doubleClicked(QModelIndex)),
                      manager, SLOT(executeMatch(QModelIndex)));
 
-    QVBoxLayout *layout = new QVBoxLayout(top);
-    layout->addWidget(edit);
-    layout->addWidget(view);
-    top->resize(400, 700);
-    top->show();
-    edit->setFocus();
+
+    QVBoxLayout *matchLayout = new QVBoxLayout;
+    matchLayout->addWidget(edit);
+    matchLayout->addWidget(view);
+
+
+    QTreeView *runners = new QTreeView(top);
+    view->setModel(manager->runnerModel());
+    view->setAllColumnsShowFocus(true);
+    QVBoxLayout *runnerLayout = new QVBoxLayout;
+    runnerLayout->addWidget(runners);
+
+    QHBoxLayout *topLayout = new QHBoxLayout(top);
+    topLayout->addLayout(matchLayout);
+    topLayout->addLayout(runnerLayout);
 
     QAction *action = new QAction(top);
     action->setShortcut(Qt::CTRL + Qt::Key_Q);
@@ -69,6 +78,9 @@ int main(int argc, char** argv)
     QObject::connect(action, SIGNAL(triggered()), &app, SLOT(quit()));
 #endif
 
+    top->resize(800, 700);
+    top->show();
+    edit->setFocus();
 
     return app.exec();
 }
