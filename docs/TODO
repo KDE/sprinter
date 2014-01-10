@@ -1,9 +1,7 @@
 = Curent milestone: 0.1
 
 == Features
-* QAbstractItemModel *RunnerManager::runnersModel(), with following info per runner (row):
-    * QString plugin ID/name
-    * QString user visible name
+* RunnerModel:
     * bool loaded
     * bool busy (this comes from the session data in the RunnerManagerThread)
 * Design and imlement an improved Plasma::QuerySyntax that is useful for:
