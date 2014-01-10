@@ -84,6 +84,7 @@ Q_SIGNALS:
     void requestSync();
     void loadingRunnerMetaData();
     void loadedRunnerMetaData();
+    void busyChanged(int metaDataIndex);
 
 public Q_SLOTS:
     void sessionDataRetrieved(const QUuid &sessionId, int, RunnerSessionData *data);
@@ -93,6 +94,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void startSync();
+    void updateBusyStatus();
 
 private:
     void loadRunners();

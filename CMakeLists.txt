@@ -21,15 +21,8 @@ set(sprinterlib_SRCS
     lib/runnersessiondata.cpp
 )
 
-set(runners_SRCS
-    runners/datetime/datetime.cpp
-    runners/c/c.cpp
-    runners/youtube/youtube.cpp
-)
-
 set(sprinter_SRCS
     ${sprinterlib_SRCS}
-    ${runners_SRCS}
     test/main.cpp
     test/simulator.cpp
 )
@@ -50,3 +43,6 @@ install(TARGETS sprinter DESTINATION bin)
 
 install(TARGETS sprinterplugin DESTINATION ${QML_INSTALL_DIR}/org/kde/experimental/sprinter)
 install(FILES qml/qmldir DESTINATION ${QML_INSTALL_DIR}/org/kde/experimental/sprinter)
+
+set(SPRINTER_PLUGINS_PATH plugins/sprinter)
+add_subdirectory(runners)

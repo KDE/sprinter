@@ -32,6 +32,7 @@ public:
     }
 
     uint minQueryLength;
+    QString id;
 };
 
 AbstractRunner::AbstractRunner(QObject *parent)
@@ -43,6 +44,11 @@ AbstractRunner::AbstractRunner(QObject *parent)
 AbstractRunner::~AbstractRunner()
 {
     delete d;
+}
+
+QString AbstractRunner::id() const
+{
+    return d->id;
 }
 
 void AbstractRunner::setMinQueryLength(uint length)

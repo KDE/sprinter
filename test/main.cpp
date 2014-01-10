@@ -19,6 +19,7 @@
 #include <QTimer>
 
 #include <QAction>
+#include <QDebug>
 #include <QLabel>
 #include <QLineEdit>
 #include <QTreeView>

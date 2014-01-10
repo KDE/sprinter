@@ -17,7 +17,10 @@
 
 #include "runnermanagerthread_p.h"
 
+#include <QCoreApplication>
 #include <QDebug>
+#include <QDir>
+#include <QPluginLoader>
 #include <QReadLocker>
 #include <QThreadPool>
 #include <QTimer>
@@ -28,9 +31,9 @@
 #include "runnermanager.h"
 
 // temporary include for non-pluggable plugins
-#include "runners/datetime/datetime.h"
-#include "runners/c/c.h"
-#include "runners/youtube/youtube.h"
+// #include "runners/datetime/datetime.h"
+// #include "runners/c/c.h"
+// #include "runners/youtube/youtube.h"
 
 RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
     : QThread(parent),
@@ -180,16 +183,15 @@ void RunnerManagerThread::loadRunners()
     //TODO: this should all be loading from plugins
     //TODO: instantiation should be triggered from RunnerModel
     emit loadingRunnerMetaData();
-    m_runnerMetaData << RunnerMetaData("Date and Time",
-                                       "org.kde.sprinter.datetime",
-                                       "Date and time from around the world");
-    m_runnerMetaData << RunnerMetaData("Tester",
-                                       "org.kde.sprinter.c",
-                                       "Test AbstractRunner");
-    m_runnerMetaData << RunnerMetaData("Youtube",
-                                       "org.kde.sprinter.youtube",
-                                       "Youtube videos");
-    emit loadedRunnerMetaData();
+//     m_runnerMetaData << RunnerMetaData("Date and Time",
+//                                        "org.kde.sprinter.datetime",
+//                                        "Date and time from around the world");
+//     m_runnerMetaData << RunnerMetaData("Tester",
+//                                        "org.kde.sprinter.c",
+//                                        "Test AbstractRunner");
+//     m_runnerMetaData << RunnerMetaData("Youtube",
+//                                        "org.kde.sprinter.youtube",
+//                                        "Youtube videos");
 
     QTime t;
     t.start();
@@ -212,12 +214,38 @@ void RunnerManagerThread::loadRunners()
 
     m_matchers.clear();
 
-    runnersTmp.append(new DateTimeRunner);
-    runnersTmp.append(new RunnerC);
-    runnersTmp.append(new YoutubeRunner);
+    //TODO a little ugly, including the hardcoded "sprinter"
+    foreach (const QString &path, QCoreApplication::instance()->libraryPaths()) {
+        if (path.endsWith("plugins")) {
+            QDir pluginDir(path);
+            pluginDir.cd("sprinter");
+            foreach (const QString &fileName, pluginDir.entryList(QDir::Files)) {
+                QPluginLoader loader(pluginDir.absoluteFilePath(fileName));
+                QObject *plugin = loader.instance();
+                qDebug() << "METADATA" << loader.metaData();
+                AbstractRunner *runner = qobject_cast<AbstractRunner *>(plugin);
+                if (!runner) {
+                    qDebug() << "LOAD FAILURE" <<  pluginDir.absoluteFilePath(fileName) << ":" << loader.errorString();
+                    delete plugin;
+                    continue;
+                }
+
+                RunnerMetaData md;
+                md.id = loader.metaData()["IID"].toString();
+                QJsonObject json = loader.metaData()["MetaData"].toObject();
+                //TODO localization
+                md.name = json["name"].toString();
+                md.description = json["description"].toString();
+                m_runnerMetaData << md;
+                runnersTmp << runner;
+            }
+        }
+    }
+
+    m_runners = runnersTmp;
+    emit loadedRunnerMetaData();
 
     QWriteLocker lock(&m_matchIndexLock);
-    m_runners = runnersTmp;
     m_currentRunner = m_runnerBookmark = m_runners.isEmpty() ? -1 : 0;
     m_sessionData.resize(m_runners.size());
     m_matchers.resize(m_runners.size());
@@ -239,7 +267,7 @@ void RunnerManagerThread::retrieveSessionData()
         SessionDataRetriever *rtrver = new SessionDataRetriever(this, m_sessionId, i, runner);
         rtrver->setAutoDelete(true);
         connect(rtrver, SIGNAL(sessionDataRetrieved(QUuid,int,RunnerSessionData*)),
-                this, SLOT(sessionDataRetrieved(QUuid,int,RunnerSessionData*)));
+               this, SLOT(sessionDataRetrieved(QUuid,int,RunnerSessionData*)));
         m_threadPool->start(rtrver);
     }
 }
@@ -271,7 +299,29 @@ void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index
     m_sessionData[index] = data;
 
     if (data) {
+        connect(data, SIGNAL(busyChanged()), this, SLOT(updateBusyStatus()));
         emit requestFurtherMatching();
+    }
+}
+
+void RunnerManagerThread::updateBusyStatus()
+{
+    RunnerSessionData *sessionData = qobject_cast<RunnerSessionData *>(sender());
+    if (!sessionData) {
+        return;
+    }
+
+    AbstractRunner *runner = sessionData->runner();
+    if (!runner) {
+        return;
+    }
+
+    const QString id = runner->id();
+    for (int i = 0; i < m_runnerMetaData.count(); ++i) {
+        if (m_runnerMetaData[i].id == id) {
+            emit busyChanged(i);
+            return;
+        }
     }
 }
 

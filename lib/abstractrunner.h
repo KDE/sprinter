@@ -37,6 +37,8 @@ public:
     AbstractRunner(QObject *parent);
     ~AbstractRunner();
 
+    QString id() const;
+
     virtual RunnerSessionData *createSessionData();
 
     void startMatch(RunnerSessionData *sessionData, const QueryContext &context);
@@ -44,6 +46,7 @@ public:
 
     void setMinQueryLength(uint length);
     int minQueryLength() const;
+
 
 protected:
     virtual void match(RunnerSessionData *sessionData, const QueryContext &context);
