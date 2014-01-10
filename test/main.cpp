@@ -19,9 +19,10 @@
 #include <QTimer>
 
 #include <QAction>
+#include <QLabel>
 #include <QLineEdit>
 #include <QTreeView>
-#include <QVBoxLayout>
+#include <QGridLayout>
 
 #include "runnermanager.h"
 #include "simulator.h"
@@ -47,30 +48,27 @@ int main(int argc, char** argv)
     QWidget *top = new QWidget;
 
     QLineEdit *edit = new QLineEdit(top);
+    edit->setPlaceholderText("Enter search term");
     QObject::connect(edit, SIGNAL(textChanged(QString)),
                      manager, SLOT(setQuery(QString)));
 
-    QTreeView *view = new QTreeView(top);
-    view->setModel(manager);
-    view->setAllColumnsShowFocus(true);
-    QObject::connect(view, SIGNAL(doubleClicked(QModelIndex)),
+    QTreeView *matchView = new QTreeView(top);
+    matchView->setModel(manager);
+    matchView->setAllColumnsShowFocus(true);
+    QObject::connect(matchView, SIGNAL(doubleClicked(QModelIndex)),
                      manager, SLOT(executeMatch(QModelIndex)));
 
 
-    QVBoxLayout *matchLayout = new QVBoxLayout;
-    matchLayout->addWidget(edit);
-    matchLayout->addWidget(view);
 
+    QTreeView *runnerView = new QTreeView(top);
+    runnerView->setModel(manager->runnerModel());
+    runnerView->setAllColumnsShowFocus(true);
 
-    QTreeView *runners = new QTreeView(top);
-    view->setModel(manager->runnerModel());
-    view->setAllColumnsShowFocus(true);
-    QVBoxLayout *runnerLayout = new QVBoxLayout;
-    runnerLayout->addWidget(runners);
-
-    QHBoxLayout *topLayout = new QHBoxLayout(top);
-    topLayout->addLayout(matchLayout);
-    topLayout->addLayout(runnerLayout);
+    QGridLayout *topLayout = new QGridLayout(top);
+    topLayout->addWidget(edit, 0, 0);
+    topLayout->addWidget(matchView, 1, 0);
+    topLayout->addWidget(new QLabel("Runners"), 0, 1);
+    topLayout->addWidget(runnerView, 1, 1);
 
     QAction *action = new QAction(top);
     action->setShortcut(Qt::CTRL + Qt::Key_Q);
