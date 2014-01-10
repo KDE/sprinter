@@ -85,20 +85,24 @@ Q_SIGNALS:
     void loadingRunnerMetaData();
     void loadedRunnerMetaData();
     void busyChanged(int metaDataIndex);
+    void requestLoadRunner(int index);
+    void runnerLoaded(int index);
 
 public Q_SLOTS:
     void sessionDataRetrieved(const QUuid &sessionId, int, RunnerSessionData *data);
     void startQuery(const QString &query);
     void querySessionCompleted();
     void startMatching();
+    void loadRunner(int index);
+    void performLoadRunner(int index);
 
 private Q_SLOTS:
     void startSync();
     void updateBusyStatus();
 
 private:
-    void loadRunners();
-    void retrieveSessionData();
+    void loadRunnerMetaData();
+    void retrieveSessionData(int index);
     bool startNextRunner();
 
     QThreadPool *m_threadPool;

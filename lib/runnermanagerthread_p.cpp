@@ -100,8 +100,9 @@ void RunnerManagerThread::run()
             m_restartMatchingTimer, SLOT(start()));
     connect(m_restartMatchingTimer, SIGNAL(timeout()),
             this, SLOT(startMatching()));
-    loadRunners();
-    retrieveSessionData();
+    connect(this, SIGNAL(requestLoadRunner(int)),
+            this, SLOT(performLoadRunner(int)));
+    loadRunnerMetaData();
     startQuery(m_manager->query());
 
     exec();
@@ -130,7 +131,9 @@ void RunnerManagerThread::startSync()
 
     int offset = 0;
     foreach (RunnerSessionData *data, m_sessionData) {
-        offset += data->syncMatches(offset);
+        if (data) {
+            offset += data->syncMatches(offset);
+        }
     }
     m_matchCount = offset;
     qDebug() << "synchronization took" << t.elapsed();
@@ -142,7 +145,9 @@ int RunnerManagerThread::matchCount() const
         int count = 0;
 
         foreach (RunnerSessionData *data, m_sessionData) {
-            count += data->matches(RunnerSessionData::SynchronizedMatches).size();
+            if (data) {
+                count += data->matches(RunnerSessionData::SynchronizedMatches).size();
+            }
         }
 
         const_cast<RunnerManagerThread *>(this)->m_matchCount = count;
@@ -160,6 +165,10 @@ QueryMatch RunnerManagerThread::matchAt(int index)
     //qDebug() << "** matchAt" << index;
     QVector<QueryMatch> matches;
     foreach (RunnerSessionData *data, m_sessionData) {
+        if (!data) {
+            continue;
+        }
+
         matches = data->matches(RunnerSessionData::SynchronizedMatches);
         //qDebug() << "    " << matches.size() << index;
         if (matches.size() > index) {
@@ -178,20 +187,9 @@ QVector<RunnerMetaData> RunnerManagerThread::runnerMetaData() const
      return m_runnerMetaData;
 }
 
-void RunnerManagerThread::loadRunners()
+void RunnerManagerThread::loadRunnerMetaData()
 {
-    //TODO: this should all be loading from plugins
-    //TODO: instantiation should be triggered from RunnerModel
     emit loadingRunnerMetaData();
-//     m_runnerMetaData << RunnerMetaData("Date and Time",
-//                                        "org.kde.sprinter.datetime",
-//                                        "Date and time from around the world");
-//     m_runnerMetaData << RunnerMetaData("Tester",
-//                                        "org.kde.sprinter.c",
-//                                        "Test AbstractRunner");
-//     m_runnerMetaData << RunnerMetaData("Youtube",
-//                                        "org.kde.sprinter.youtube",
-//                                        "Youtube videos");
 
     QTime t;
     t.start();
@@ -220,56 +218,87 @@ void RunnerManagerThread::loadRunners()
             QDir pluginDir(path);
             pluginDir.cd("sprinter");
             foreach (const QString &fileName, pluginDir.entryList(QDir::Files)) {
-                QPluginLoader loader(pluginDir.absoluteFilePath(fileName));
-                QObject *plugin = loader.instance();
-                qDebug() << "METADATA" << loader.metaData();
-                AbstractRunner *runner = qobject_cast<AbstractRunner *>(plugin);
-                if (!runner) {
-                    qDebug() << "LOAD FAILURE" <<  pluginDir.absoluteFilePath(fileName) << ":" << loader.errorString();
-                    delete plugin;
+                const QString path = pluginDir.absoluteFilePath(fileName);
+                QPluginLoader loader(path);
+
+                //TODO: check for having the AbstractRunner interface?
+                RunnerMetaData md;
+                md.library = path;
+                md.id = loader.metaData()["IID"].toString();
+                if (md.id.isEmpty()) {
+                    qDebug() << "Invalid plugin, no metadata:" << path;
                     continue;
                 }
 
-                RunnerMetaData md;
-                md.id = loader.metaData()["IID"].toString();
                 QJsonObject json = loader.metaData()["MetaData"].toObject();
                 //TODO localization
                 md.name = json["name"].toString();
                 md.description = json["description"].toString();
                 m_runnerMetaData << md;
-                runnersTmp << runner;
             }
         }
     }
 
-    m_runners = runnersTmp;
     emit loadedRunnerMetaData();
 
     QWriteLocker lock(&m_matchIndexLock);
-    m_currentRunner = m_runnerBookmark = m_runners.isEmpty() ? -1 : 0;
-    m_sessionData.resize(m_runners.size());
-    m_matchers.resize(m_runners.size());
+    m_currentRunner = m_runnerBookmark = 0;
 
-    qDebug() << m_runners.count() << "runners loaded" << "in" << t.elapsed() << "ms";
+    m_runners.resize(m_runnerMetaData.size());
+    m_sessionData.resize(m_runnerMetaData.size());
+    m_matchers.resize(m_runnerMetaData.size());
+
+    qDebug() << m_runnerMetaData.count() << "runner plugins found" << "in" << t.elapsed() << "ms";
 
 }
 
-void RunnerManagerThread::retrieveSessionData()
+void RunnerManagerThread::loadRunner(int index)
 {
-    for (int i = 0; i < m_runners.size(); ++i) {
-        AbstractRunner *runner = m_runners.at(i);
+    emit requestLoadRunner(index);
+}
 
-        if (m_sessionData.at(i)) {
-            continue;
-        }
-
-        m_sessionData[i] = m_dummySessionData;
-        SessionDataRetriever *rtrver = new SessionDataRetriever(this, m_sessionId, i, runner);
-        rtrver->setAutoDelete(true);
-        connect(rtrver, SIGNAL(sessionDataRetrieved(QUuid,int,RunnerSessionData*)),
-               this, SLOT(sessionDataRetrieved(QUuid,int,RunnerSessionData*)));
-        m_threadPool->start(rtrver);
+void RunnerManagerThread::performLoadRunner(int index)
+{
+    if (index >= m_runnerMetaData.count() || index < 0) {
+        return;
     }
+
+    if (m_runnerMetaData[index].loaded) {
+        return;
+    }
+
+    const QString path = m_runnerMetaData[index].library;
+    QPluginLoader loader(path);
+    QObject *plugin = loader.instance();
+    AbstractRunner *runner = qobject_cast<AbstractRunner *>(plugin);
+    if (runner) {
+        m_runnerMetaData[index].loaded = true;
+        delete m_sessionData[index];
+        m_sessionData[index] = 0;
+        m_runners[index] = runner;
+        retrieveSessionData(index);
+        emit runnerLoaded(index);
+    } else {
+        qDebug() << "LOAD FAILURE" <<  path << ":" << loader.errorString();
+        delete plugin;
+    }
+}
+
+void RunnerManagerThread::retrieveSessionData(int index)
+{
+    AbstractRunner *runner = m_runners.at(index);
+
+    qDebug() << "**************************" << runner;
+    if (!runner || m_sessionData.at(index)) {
+        return;
+    }
+
+    m_sessionData[index] = m_dummySessionData;
+    SessionDataRetriever *rtrver = new SessionDataRetriever(this, m_sessionId, index, runner);
+    rtrver->setAutoDelete(true);
+    connect(rtrver, SIGNAL(sessionDataRetrieved(QUuid,int,RunnerSessionData*)),
+            this, SLOT(sessionDataRetrieved(QUuid,int,RunnerSessionData*)));
+    m_threadPool->start(rtrver);
 }
 
 void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index, RunnerSessionData *data)
@@ -300,6 +329,13 @@ void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index
 
     if (data) {
         connect(data, SIGNAL(busyChanged()), this, SLOT(updateBusyStatus()));
+        {
+            QWriteLocker lock(&m_matchIndexLock);
+            if (m_runnerBookmark == m_currentRunner) {
+                m_runnerBookmark = m_currentRunner == 0 ? m_runners.size() - 1 : m_currentRunner - 1;
+            }
+        }
+
         emit requestFurtherMatching();
     }
 }
@@ -381,6 +417,7 @@ void RunnerManagerThread::startMatching()
          m_currentRunner != m_runnerBookmark;
          m_currentRunner = (m_currentRunner + 1) % m_runners.size()) {
         if (!startNextRunner()) {
+            qDebug() << "STALLED!";
             m_matchIndexLock.unlock();
             return;
         }
