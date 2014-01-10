@@ -21,6 +21,7 @@
 class RunnerManager;
 class QueryMatch;
 class RunnerManagerThread;
+class RunnerModel;
 
 class RunnerManager::Private
 {
@@ -37,6 +38,7 @@ public:
 
     RunnerManager *q;
     RunnerManagerThread *thread;
+    RunnerModel *runnerModel;
     QString query;
     QHash<int, QByteArray> roles;
     QVector<int> roleColumns;

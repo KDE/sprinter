@@ -23,10 +23,12 @@
 #include <QThreadPool>
 
 #include "runnermanagerthread_p.h"
+#include "runnermodel_p.h"
 
 RunnerManager::Private::Private(RunnerManager *manager)
     : q(manager),
-        thread(new RunnerManagerThread(manager))
+      thread(new RunnerManagerThread(manager)),
+      runnerModel(new RunnerModel(thread, manager))
 {
     qRegisterMetaType<QUuid>("QUuid");
     qRegisterMetaType<QUuid>("QueryContext");
@@ -88,6 +90,11 @@ RunnerManager::~RunnerManager()
 {
     d->thread->exit();
     delete d;
+}
+
+QAbstractItemModel *RunnerManager::runnerModel() const
+{
+    return d->runnerModel;
 }
 
 void RunnerManager::setQuery(const QString &query)

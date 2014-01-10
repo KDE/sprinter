@@ -24,6 +24,7 @@ class RunnerManager : public QAbstractItemModel
 {
     Q_OBJECT
     Q_PROPERTY(QString query WRITE setQuery READ query NOTIFY queryChanged)
+    Q_PROPERTY(QAbstractItemModel *runnerModel READ runnerModel CONSTANT)
 
 public:
     enum DisplayRoles {
@@ -86,6 +87,12 @@ public:
     RunnerManager(QObject *parent = 0);
     ~RunnerManager();
 
+    /**
+     * A model containing a list of runners and their status
+     * Also provides access to loading and unloading them
+     **/
+    QAbstractItemModel *runnerModel() const;
+
     QString query() const;
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -95,8 +102,6 @@ public:
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     QHash<int, QByteArray> roleNames() const;
-    // setRunners
-    // listRunners
 
 public Q_SLOTS:
     void setQuery(const QString &query);
