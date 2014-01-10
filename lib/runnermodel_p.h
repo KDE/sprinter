@@ -47,9 +47,14 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     QHash<int, QByteArray> roleNames() const;
 
+public Q_SLOTS:
+    void loadRunner(int index);
+    void loadRunner(const QModelIndex &index);
+
 private Q_SLOTS:
     void runnerMetaDataLoading();
     void runnerMetaDataLoaded();
+    void runnerLoaded(int);
 
 //TODO: add slots to load/unload runners by index (int/QModelIndex)
 private:

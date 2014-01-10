@@ -39,6 +39,8 @@ RunnerModel::RunnerModel(RunnerManagerThread *thread, QObject *parent)
 
     connect(thread, SIGNAL(loadingRunnerMetaData()), this, SLOT(runnerMetaDataLoading()));
     connect(thread, SIGNAL(loadedRunnerMetaData()), this, SLOT(runnerMetaDataLoaded()));
+    connect(thread, SIGNAL(runnerLoaded(int)), this, SLOT(runnerLoaded(int)));
+
 }
 
 RunnerModel::~RunnerModel()
@@ -73,7 +75,7 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
             return info[index.row()].description;
             break;
         case IsLoadedRole:
-            //FIXME implement
+            return info[index.row()].loaded;
             return true;
             break;
         case IsBusyRole:
@@ -170,6 +172,24 @@ void RunnerModel::runnerMetaDataLoaded()
 {
     m_count = m_thread ? m_thread->runnerMetaData().count() : 0;
     emit endResetModel();
+}
+
+void RunnerModel::loadRunner(int index)
+{
+    if (m_thread) {
+        m_thread->loadRunner(index);
+    }
+}
+
+void RunnerModel::loadRunner(const QModelIndex &index)
+{
+    loadRunner(index.row());
+}
+
+void RunnerModel::runnerLoaded(int index)
+{
+
+    emit dataChanged(createIndex(index, 0), createIndex(index, m_roles.count()));
 }
 
 #include "moc_runnermodel_p.cpp"
