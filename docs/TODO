@@ -21,6 +21,7 @@
 * Implement proper merging in setMatches
 
 == Bugfixes
+* With just one runner loaded, m_currentRunner == m_runnerBookmark always (fail)
 * Ensure all threads cleaned up before exit
 
 = Next milestone: 0.2
