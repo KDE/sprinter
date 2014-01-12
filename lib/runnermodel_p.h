@@ -55,6 +55,7 @@ private Q_SLOTS:
     void runnerMetaDataLoading();
     void runnerMetaDataLoaded();
     void runnerLoaded(int);
+    void runnerBusy(int);
 
 //TODO: add slots to load/unload runners by index (int/QModelIndex)
 private:
@@ -62,6 +63,8 @@ private:
     QHash<int, QByteArray> m_roles;
     QVector<int> m_roleColumns;
     int m_count;
+    int m_loadedColumn;
+    int m_busyColumn;
 };
 
 #endif

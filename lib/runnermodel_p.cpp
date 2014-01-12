@@ -33,6 +33,11 @@ RunnerModel::RunnerModel(RunnerManagerThread *thread, QObject *parent)
     m_roleColumns.append(Qt::DisplayRole);
     QMetaEnum e = metaObject()->enumerator(metaObject()->indexOfEnumerator("DisplayRoles"));
     for (int i = 0; i < e.keyCount(); ++i) {
+        if (i == IsLoadedRole) {
+            m_loadedColumn = i + 1;
+        } else if (i == IsBusyRole) {
+            m_busyColumn = i + 1;
+        }
         m_roles.insert(e.value(i), e.key(i));
         m_roleColumns.append(e.value(i));
     }
@@ -40,7 +45,7 @@ RunnerModel::RunnerModel(RunnerManagerThread *thread, QObject *parent)
     connect(thread, SIGNAL(loadingRunnerMetaData()), this, SLOT(runnerMetaDataLoading()));
     connect(thread, SIGNAL(loadedRunnerMetaData()), this, SLOT(runnerMetaDataLoaded()));
     connect(thread, SIGNAL(runnerLoaded(int)), this, SLOT(runnerLoaded(int)));
-
+    connect(thread, SIGNAL(busyChanged(int)), this, SLOT(runnerBusyChanged(int)));
 }
 
 RunnerModel::~RunnerModel()
@@ -188,8 +193,12 @@ void RunnerModel::loadRunner(const QModelIndex &index)
 
 void RunnerModel::runnerLoaded(int index)
 {
+    emit dataChanged(createIndex(index, m_loadedColumn), createIndex(index, m_loadedColumn));
+}
 
-    emit dataChanged(createIndex(index, 0), createIndex(index, m_roles.count()));
+void RunnerModel::runnerBusy(int index)
+{
+    emit dataChanged(createIndex(index, m_busyColumn), createIndex(index, m_busyColumn));
 }
 
 #include "moc_runnermodel_p.cpp"
