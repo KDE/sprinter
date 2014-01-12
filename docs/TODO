@@ -4,12 +4,18 @@
 * Design and imlement an improved Plasma::QuerySyntax that is useful for:
     * run time help / hints for the user
     * automatic query construction
-    * pre-threading query filtering (e.g. in RunnerSessionData::shouldStartMatching)
+    * pre-threading query filtering
 * QueryMatch execution
     * Learning: record chosen QueryMatches, weight future matches with this information
-* Query pre-processing (similar to Plasma::RunnerContext)
 * Design and implement an improved (relative to krunner) "single runner" mode
 * Runners advertise what kind of matches they return (source, type, ..?)
+* Pre-threading runner filtering
+    * Based on:
+        * Runner's advertised matching types
+        * QuerySyntax
+    * Controlled by:
+        * A MatchType filter (from user, or UI component)
+        * Query pre-processing?
 
 == Improvements
 * Clear all TODOs/FIXMEs in code
@@ -20,3 +26,7 @@
 * Ensure all threads cleaned up before exit
 
 = Next milestone: 0.2
+
+= Unscheduled
+* Query pre-processing (similar to Plasma::RunnerContext::Private::determineType)
+    * this may actually be unecessary, or at least not as useful as was expected when krunner was in devel?
