@@ -35,11 +35,6 @@ RunnerManager::Private::Private(RunnerManager *manager)
     qRegisterMetaType<QUuid>("QueryMatch");
 }
 
-void RunnerManager::Private::executionFinished(const QueryMatch &match, bool success)
-{
-    //TODO tell the outside world that execution has completed
-}
-
 void RunnerManager::Private::addingMatches(int start, int end)
 {
     q->beginInsertRows(QModelIndex(), start, end);
@@ -117,10 +112,11 @@ void RunnerManager::executeMatch(int index)
         return;
     }
 
+    emit executionStarted(match);
     ExecRunnable *exec = new ExecRunnable(match);
     exec->setAutoDelete(true);
     connect(exec, SIGNAL(finished(QueryMatch,bool)),
-            this, SLOT(executionFinished(QueryMatch,bool)));
+            this, SIGNAL(executionFinished(QueryMatch,bool)));
     QThreadPool::globalInstance()->start(exec);
 }
 

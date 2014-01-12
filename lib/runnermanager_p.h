@@ -28,7 +28,6 @@ class RunnerManager::Private
 public:
     Private(RunnerManager *manager);
 
-    void executionFinished(const QueryMatch &match, bool success);
     void addingMatches(int start, int end);
     void matchesAdded();
     void removingMatches(int start, int end);

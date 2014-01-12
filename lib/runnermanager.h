@@ -20,6 +20,8 @@
 
 #include <QAbstractItemModel>
 
+class QueryMatch;
+
 class RunnerManager : public QAbstractItemModel
 {
     Q_OBJECT
@@ -109,6 +111,8 @@ public Q_SLOTS:
     void executeMatch(const QModelIndex &index);
 
 Q_SIGNALS:
+    void executionStarted(const QueryMatch &match);
+    void executionFinished(const QueryMatch &match, bool success);
     void queryChanged(const QString &query);
     void querySessionCompleted();
 
@@ -119,8 +123,6 @@ private:
     class Private;
     friend class Private;
     Private * const d;
-
-    Q_PRIVATE_SLOT(d, void executionFinished(const QueryMatch &match, bool success));
 };
 
 #endif
