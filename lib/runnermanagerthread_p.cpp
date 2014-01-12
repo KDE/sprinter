@@ -349,14 +349,9 @@ void RunnerManagerThread::updateBusyStatus()
         return;
     }
 
-    AbstractRunner *runner = sessionData->runner();
-    if (!runner) {
-        return;
-    }
-
-    const QString id = runner->id();
-    for (int i = 0; i < m_runnerMetaData.count(); ++i) {
-        if (m_runnerMetaData[i].id == id) {
+    for (int i = 0; i < m_sessionData.count(); ++i) {
+        if (m_sessionData[i] == sessionData) {
+            m_runnerMetaData[i].busy = sessionData->isBusy();
             emit busyChanged(i);
             return;
         }
