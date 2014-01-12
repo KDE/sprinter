@@ -24,6 +24,7 @@
 * Implement proper merging in setMatches
 * QueryMatch::isSearchTerm should allow setting whether to only run against same runner that generated it (relies on a single-runner mode)
 * RunnerSessionDAta: Use Q[Explicitly]SharedDataPointer for the dptr instead of doing ref counting manually
+* turn sources in lib/ into an actual shared lib
 
 == Bugfixes
 * Ensure all threads cleaned up before exit
