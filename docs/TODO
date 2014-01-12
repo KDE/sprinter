@@ -1,8 +1,6 @@
 = Curent milestone: 0.1
 
 == Features
-* RunnerModel:
-    * bool busy (this comes from the session data in the RunnerManagerThread)
 * Design and imlement an improved Plasma::QuerySyntax that is useful for:
     * run time help / hints for the user
     * automatic query construction
@@ -21,6 +19,5 @@
 
 == Bugfixes
 * Ensure all threads cleaned up before exit
-* Runner plugins loaded by multiple RunnerManagerThreads (multiple RunnerManagers) will end up with the same instances thanks to QLibrary's "1 library == 1 instance". Need to create a factory class.
 
 = Next milestone: 0.2
