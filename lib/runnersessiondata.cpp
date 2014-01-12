@@ -215,14 +215,8 @@ void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
 {
     Q_ASSERT(d->manager);
 
-    //TODO: make this safe against being called from another threading
-    //      probably requires a signal/slot call and Yet Another QVector
-    //      for the matches ... which leads me to believe it would be far
-    //      nicer to be able to update matches *directly* and have that
-    //      propogate to the model *directly*
     // FIXME: this is a truly horrible way of doing this: nested for loops,
     //        comparing data() .. *shudder*
-    int offset = 0; // FIXME: obviously wrong!
     QMutexLocker lock(&d->currentMatchesLock);
     qDebug() << "updating" << matches.count();
     bool updateModel = false;

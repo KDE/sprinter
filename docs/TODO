@@ -21,6 +21,7 @@
 * Clear all TODOs/FIXMEs in code
 * Improve RunnerSessionData::updateMatches
 * Implement proper merging in setMatches
+* QueryMatch::isSearchTerm should allow setting whether to only run against same runner that generated it (relies on a single-runner mode)
 
 == Bugfixes
 * Ensure all threads cleaned up before exit
@@ -30,3 +31,5 @@
 = Unscheduled
 * Query pre-processing (similar to Plasma::RunnerContext::Private::determineType)
     * this may actually be unecessary, or at least not as useful as was expected when krunner was in devel?
+* Actions on matches
+    * Could be done using QueryMatch::isSearchTerm to refine search?
