@@ -366,14 +366,12 @@ bool RunnerManagerThread::startNextRunner()
     //qDebug() << "    starting for" << m_currentRunner;
     RunnerSessionData *sessionData = m_sessionData.at(m_currentRunner);
     if (!sessionData) {
-        m_currentRunner = (m_currentRunner + 1) % m_runners.size();
-        //qDebug() << "         no session data";
+        //qDebug() << "         no session data" << m_currentRunner;
         return true;
     }
 
     MatchRunnable *matcher = m_matchers.at(m_currentRunner);
     if (matcher) {
-        m_currentRunner = (m_currentRunner + 1) % m_runners.size();
         //qDebug() << "          got a matcher already";
         return true;
     }
@@ -425,8 +423,9 @@ void RunnerManagerThread::startMatching()
     }
 
     for (;
-         m_currentRunner != m_runnerBookmark;
-         m_currentRunner = (m_currentRunner + 1) % m_runners.size()) {
+        m_currentRunner != m_runnerBookmark;
+        m_currentRunner = (m_currentRunner + 1) % m_runners.size()) {
+        qDebug() << "Trying with" << m_currentRunner << m_runners[m_currentRunner];
         if (!startNextRunner()) {
             qDebug() << "STALLED!";
             m_matchIndexLock.unlock();
