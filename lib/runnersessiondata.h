@@ -27,7 +27,6 @@ class AbstractRunner;
 class QueryContext;
 class RunnerManager;
 
-//TODO: use QExplicitlySharedDataPointer or QSharedDataPointer instead of doing ref counting manually?
 class RunnerSessionData : public QObject
 {
     Q_OBJECT

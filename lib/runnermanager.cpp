@@ -82,7 +82,6 @@ RunnerManager::RunnerManager(QObject *parent)
         d->roleColumns.append(e.value(i));
     }
 
-    //TODO set row names for model
     d->thread->start();
 }
 
@@ -267,8 +266,10 @@ QModelIndex RunnerManager::parent(const QModelIndex &index) const
 
 int RunnerManager::rowCount(const QModelIndex & parent) const
 {
-    //TODO
-    Q_UNUSED(parent)
+    if (parent.isValid()) {
+        return 0;
+    }
+
     return d->thread->matchCount();
 }
 
