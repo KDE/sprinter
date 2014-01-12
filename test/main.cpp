@@ -52,7 +52,8 @@ int main(int argc, char** argv)
     edit->setPlaceholderText("Enter search term");
     QObject::connect(edit, SIGNAL(textChanged(QString)),
                      manager, SLOT(setQuery(QString)));
-
+    QObject::connect(manager, SIGNAL(queryChanged(QString)),
+                     edit, SLOT(setText(QString)));
     QTreeView *matchView = new QTreeView(top);
     matchView->setModel(manager);
     matchView->setAllColumnsShowFocus(true);
