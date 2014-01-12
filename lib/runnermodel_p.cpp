@@ -85,7 +85,7 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
             break;
         case IsBusyRole:
             //FIXME implement
-            return QVariant();
+            return info[index.row()].loaded && info[index.row()].busy;
             break;
         default:
             break;
