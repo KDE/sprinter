@@ -57,7 +57,6 @@ private Q_SLOTS:
     void runnerLoaded(int);
     void runnerBusy(int);
 
-//TODO: add slots to load/unload runners by index (int/QModelIndex)
 private:
     QPointer<RunnerManagerThread> m_thread;
     QHash<int, QByteArray> m_roles;
