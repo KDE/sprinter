@@ -83,7 +83,6 @@ public:
 
     AbstractRunner *runner() const;
 
-    //TODO run match, icon, actions (sub-QueryMatches?), id (QUuid?)
 private:
     class Private;
     QExplicitlySharedDataPointer<Private> d;
