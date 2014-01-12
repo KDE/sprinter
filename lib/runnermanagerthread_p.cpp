@@ -403,11 +403,22 @@ bool RunnerManagerThread::startNextRunner()
 void RunnerManagerThread::startMatching()
 {
     qDebug() << "starting to match with" << m_context.query() << m_currentRunner << m_runnerBookmark;
+
     if (!m_matchIndexLock.tryLockForWrite()) {
         emit requestFurtherMatching();
         return;
     }
 
+    if (m_runners.size() == 1) {
+        // with just one runner we don't need to loop at all
+        m_currentRunner = 0;
+        startNextRunner();
+        m_matchIndexLock.unlock();
+        return;
+    }
+
+    // with multiple runners, we use the currentRunner/m_runnerBookmark
+    // state variables to treat the vector as a circular array
     if (m_currentRunner < 0) {
         m_matchIndexLock.unlock();
         return;

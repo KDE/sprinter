@@ -21,7 +21,6 @@
 * Implement proper merging in setMatches
 
 == Bugfixes
-* With just one runner loaded, m_currentRunner == m_runnerBookmark always (fail)
 * Ensure all threads cleaned up before exit
 * Runner plugins loaded by multiple RunnerManagerThreads (multiple RunnerManagers) will end up with the same instances thanks to QLibrary's "1 library == 1 instance". Need to create a factory class.
 
