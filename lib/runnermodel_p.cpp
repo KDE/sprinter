@@ -45,7 +45,7 @@ RunnerModel::RunnerModel(RunnerManagerThread *thread, QObject *parent)
     connect(thread, SIGNAL(loadingRunnerMetaData()), this, SLOT(runnerMetaDataLoading()));
     connect(thread, SIGNAL(loadedRunnerMetaData()), this, SLOT(runnerMetaDataLoaded()));
     connect(thread, SIGNAL(runnerLoaded(int)), this, SLOT(runnerLoaded(int)));
-    connect(thread, SIGNAL(busyChanged(int)), this, SLOT(runnerBusyChanged(int)));
+    connect(thread, SIGNAL(busyChanged(int)), this, SLOT(runnerBusy(int)));
 }
 
 RunnerModel::~RunnerModel()
