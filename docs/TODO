@@ -2,7 +2,6 @@
 
 == Features
 * RunnerModel:
-    * bool loaded
     * bool busy (this comes from the session data in the RunnerManagerThread)
 * Design and imlement an improved Plasma::QuerySyntax that is useful for:
     * run time help / hints for the user
