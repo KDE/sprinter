@@ -21,7 +21,8 @@
 struct RunnerMetaData
 {
     RunnerMetaData()
-        : loaded(false)
+        : loaded(false),
+          busy(false)
     {
     }
 
@@ -30,6 +31,7 @@ struct RunnerMetaData
     QString name;
     QString description;
     bool loaded;
+    bool busy;
 };
 
 #endif
