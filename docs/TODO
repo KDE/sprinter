@@ -6,7 +6,6 @@
     * automatic query construction
     * pre-threading query filtering (e.g. in RunnerSessionData::shouldStartMatching)
 * QueryMatch execution
-    * QueryMatch::isSearchTerm() for re-searchables
     * Learning: record chosen QueryMatches, weight future matches with this information
 * Query pre-processing (similar to Plasma::RunnerContext)
 * Design and implement an improved (relative to krunner) "single runner" mode

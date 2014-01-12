@@ -50,6 +50,18 @@ public:
     RunnerManager::MatchSource source() const;
 
     /**
+     * Sets if this match is a search term itself; when run
+     * it will replace the current query term with its data()
+     */
+    void setIsSearchTerm(bool searchTerm);
+
+    /**
+     * Returns whether or not this search term represents a
+     * search query term itself. Default is false
+     */
+    bool isSearchTerm() const;
+
+    /**
      * User data is what ends up on e.g. the clipboard for the user to
      * later reference
      */

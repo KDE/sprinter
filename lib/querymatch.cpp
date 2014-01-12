@@ -42,6 +42,7 @@ public:
     RunnerManager::MatchPrecision precision;
     QVariant data;
     QVariant userData;
+    bool isSearchTerm;
 };
 
 QueryMatch::QueryMatch()
@@ -158,4 +159,14 @@ QString QueryMatch::internalId() const
 AbstractRunner *QueryMatch::runner() const
 {
     return d->runner;
+}
+
+void QueryMatch::setIsSearchTerm(bool searchTerm)
+{
+    d->isSearchTerm = searchTerm;
+}
+
+bool QueryMatch::isSearchTerm() const
+{
+    return d->isSearchTerm;
 }

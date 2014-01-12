@@ -113,6 +113,11 @@ void RunnerManager::executeMatch(int index)
         return;
     }
 
+    if (match.isSearchTerm()) {
+        setQuery(match.data().toString());
+        return;
+    }
+
     ExecRunnable *exec = new ExecRunnable(match);
     exec->setAutoDelete(true);
     connect(exec, SIGNAL(finished(QueryMatch,bool)),
