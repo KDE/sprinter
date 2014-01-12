@@ -35,7 +35,6 @@ public:
     Private(AbstractRunner *r)
         : runner(r),
           manager(0),
-          modelOffset(0),
           matchesUnsynced(false),
           pageSize(10),
           offset(0)
@@ -49,7 +48,6 @@ public:
     QVector<QueryMatch> currentMatches;
     RunnerManager *manager;
     QMutex currentMatchesLock;
-    int modelOffset;
     bool matchesUnsynced;
     uint pageSize;
     uint offset;
@@ -103,8 +101,6 @@ int RunnerSessionData::syncMatches(int offset)
     Q_ASSERT(d->manager);
 
     QVector<QueryMatch> unsynced;
-    // TODO: do we need to syncronize this variable (threading)?
-    d->modelOffset = offset;
 
     {
         QMutexLocker lock(&d->currentMatchesLock);
