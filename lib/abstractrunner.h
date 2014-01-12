@@ -38,6 +38,7 @@ public:
     ~AbstractRunner();
 
     QString id() const;
+    void setId(const QString &newId);
 
     virtual RunnerSessionData *createSessionData();
 
@@ -55,6 +56,31 @@ protected:
 private:
     class Private;
     Private * const d;
+};
+
+class AbstractRunnerFactory : public QObject
+{
+    Q_OBJECT
+
+public:
+    AbstractRunnerFactory(QObject *parent = 0) : QObject(parent) {}
+    virtual AbstractRunner *create(const QString &id, QObject *parent = 0)
+    {
+        return 0;
+    }
+};
+
+#define RUNNER_FACTORY(type, id, json) \
+class RunnerFactory : public AbstractRunnerFactory { \
+    Q_OBJECT \
+    Q_PLUGIN_METADATA(IID #id FILE #json) \
+public: \
+    RunnerFactory(QObject *parent = 0) : AbstractRunnerFactory(parent) {} \
+    AbstractRunner *create(const QString &runnerId, QObject *parent = 0) {\
+        type *r = new type(parent);\
+        r->setId(runnerId);\
+        return r;\
+    }\
 };
 
 #endif

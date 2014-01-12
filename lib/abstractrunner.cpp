@@ -51,6 +51,15 @@ QString AbstractRunner::id() const
     return d->id;
 }
 
+void AbstractRunner::setId(const QString &newId)
+{
+    // only let it be set once; not in the ctor due to the fun of
+    // plugin loading
+    if (d->id.isEmpty()) {
+        d->id = newId;
+    }
+}
+
 void AbstractRunner::setMinQueryLength(uint length)
 {
     d->minQueryLength = length;

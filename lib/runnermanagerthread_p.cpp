@@ -270,7 +270,8 @@ void RunnerManagerThread::performLoadRunner(int index)
     const QString path = m_runnerMetaData[index].library;
     QPluginLoader loader(path);
     QObject *plugin = loader.instance();
-    AbstractRunner *runner = qobject_cast<AbstractRunner *>(plugin);
+    AbstractRunnerFactory *runnerFactory = qobject_cast<AbstractRunnerFactory *>(plugin);
+    AbstractRunner *runner = runnerFactory ? runnerFactory->create(m_runnerMetaData[index].id, this) : 0;
     if (runner) {
         m_runnerMetaData[index].loaded = true;
         delete m_sessionData[index];
@@ -279,6 +280,7 @@ void RunnerManagerThread::performLoadRunner(int index)
         retrieveSessionData(index);
         emit runnerLoaded(index);
     } else {
+        m_runnerMetaData[index].loaded = false;
         qDebug() << "LOAD FAILURE" <<  path << ":" << loader.errorString();
         delete plugin;
     }
