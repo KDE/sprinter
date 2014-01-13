@@ -26,26 +26,13 @@
 #include <QGridLayout>
 
 #include "runnermanager.h"
-#include "simulator.h"
-
-// #define SIMULATE
 
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
 
-    Simulator *simulator = new Simulator;
     RunnerManager *manager = new RunnerManager;
 
-#ifdef SIMULATE
-    QObject::connect(simulator, SIGNAL(query(QString)), manager, SLOT(setQuery(QString)));
-    //QObject::connect(simulator, SIGNAL(done()), manager, SIGNAL(querySessionCompleted()));
-    QTimer delayedQuit;
-    delayedQuit.setInterval(1000);
-    QObject::connect(simulator, SIGNAL(done()), &delayedQuit, SLOT(start()));
-    QObject::connect(&delayedQuit, SIGNAL(timeout()), manager, SLOT(deleteLater()));
-    QObject::connect(manager, SIGNAL(destroyed()), &app, SLOT(quit()));
-#else
     QWidget *top = new QWidget;
 
     QLineEdit *edit = new QLineEdit(top);
@@ -78,9 +65,8 @@ int main(int argc, char** argv)
     action->setShortcut(Qt::CTRL + Qt::Key_Q);
     top->addAction(action);
     QObject::connect(action, SIGNAL(triggered()), &app, SLOT(quit()));
-#endif
 
-    top->resize(800, 700);
+    top->resize(1000, 700);
     top->show();
     edit->setFocus();
 

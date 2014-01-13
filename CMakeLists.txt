@@ -24,7 +24,6 @@ set(sprinterlib_SRCS
 set(sprinter_SRCS
     ${sprinterlib_SRCS}
     test/main.cpp
-    test/simulator.cpp
 )
 
 set(sprinterplugin_SRCS
