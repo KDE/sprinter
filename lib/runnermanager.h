@@ -35,7 +35,8 @@ public:
         SourceRole,
         PrecisionRole,
         UserDataRole,
-        DataRole
+        DataRole,
+        SearchTermRole
     };
     Q_ENUMS(DisplayRoles)
 
@@ -61,7 +62,7 @@ public:
         HardwareType,
         AppActionType,
         AppSessionType,
-        LocationType,
+        GeolocationType,
         LanguageType,
         DateTimeType,
         InstallableType

@@ -201,6 +201,9 @@ QVariant RunnerManager::data(const QModelIndex &index, int role) const
         case DataRole:
             return match.data();
             break;
+        case SearchTermRole:
+            return match.isSearchTerm();
+            break;
         default:
             break;
     }
@@ -237,6 +240,9 @@ QVariant RunnerManager::headerData(int section, Qt::Orientation orientation, int
                 break;
             case DataRole:
                 return tr("Data");
+                break;
+            case SearchTermRole:
+                return tr("Search Term");
                 break;
             default:
                 break;
