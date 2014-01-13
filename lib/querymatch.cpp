@@ -29,7 +29,8 @@ public:
         : runner(r),
           type(RunnerManager::UnknownType),
           precision(RunnerManager::UnrelatedMatch),
-          source(RunnerManager::FromInternalSource)
+          source(RunnerManager::FromInternalSource),
+          isSearchTerm(false)
     {
     }
 
