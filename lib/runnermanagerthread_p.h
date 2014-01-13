@@ -78,6 +78,8 @@ public:
     int matchCount() const;
     QueryMatch matchAt(int index);
     QVector<RunnerMetaData> runnerMetaData() const;
+    void performLoadRunner(int index);
+    void startMatching();
 
 Q_SIGNALS:
     void requestFurtherMatching();
@@ -92,9 +94,7 @@ public Q_SLOTS:
     void sessionDataRetrieved(const QUuid &sessionId, int, RunnerSessionData *data);
     void startQuery(const QString &query);
     void querySessionCompleted();
-    void startMatching();
     void loadRunner(int index);
-    void performLoadRunner(int index);
 
 private Q_SLOTS:
     void startSync();
