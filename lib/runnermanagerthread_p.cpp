@@ -208,7 +208,6 @@ QVector<RunnerMetaData> RunnerManagerThread::runnerMetaData() const
 
 void RunnerManagerThread::loadRunnerMetaData()
 {
-//     sleep(3);
     emit loadingRunnerMetaData();
 
     QTime t;
