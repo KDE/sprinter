@@ -64,6 +64,10 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
+    // QML and QWidget handle viewing models a bit differently
+    // QML asks for a row and a role, basically ignoring roleColumns
+    // Default QWidget views as for the DisplayRole of a row/column
+    // so we adapt what data() returns based on what we are being asked for
     if (index.column() > 0 &&
         index.column() < m_roleColumns.count() &&
         role == Qt::DisplayRole) {
@@ -82,7 +86,6 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
             break;
         case IsLoadedRole:
             return info[index.row()].loaded;
-            return true;
             break;
         case IsBusyRole:
             return info[index.row()].loaded && info[index.row()].busy;

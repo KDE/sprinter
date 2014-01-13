@@ -114,7 +114,6 @@ void RunnerManager::executeMatch(int index)
 
     emit executionStarted(match);
     ExecRunnable *exec = new ExecRunnable(match);
-    exec->setAutoDelete(true);
     connect(exec, SIGNAL(finished(QueryMatch,bool)),
             this, SIGNAL(executionFinished(QueryMatch,bool)));
     QThreadPool::globalInstance()->start(exec);
@@ -159,6 +158,10 @@ QVariant RunnerManager::data(const QModelIndex &index, int role) const
 
     QueryMatch match = d->thread->matchAt(index.row());
 
+    // QML and QWidget handle viewing models a bit differently
+    // QML asks for a row and a role, basically ignoring roleColumns
+    // Default QWidget views as for the DisplayRole of a row/column
+    // so we adapt what data() returns based on what we are being asked for
     bool asText = false;
     if (index.column() > 0 &&
         index.column() < d->roleColumns.count() &&
