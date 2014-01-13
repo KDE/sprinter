@@ -17,11 +17,16 @@
         * A MatchType filter (from user, or UI component)
         * Query pre-processing?
 * icons for QueryMatches
+* RunnerManager model
+    * add a SourceRole to DisplayRoles that returns the runner ID for the match
+* Allow session start/finish be controlled by the user of the RunnerManager
+    * void RunnerManager::startSession()
+    * void RunnerManager::endSession()
 
 == Improvements
 * Clear all TODOs/FIXMEs in code
 * Improve RunnerSessionData::updateMatches
-* Implement proper merging in setMatches
+* Implement merging in setMatches
 * QueryMatch::isSearchTerm should allow setting whether to only run against same runner that generated it (relies on a single-runner mode)
 * RunnerSessionDAta: Use Q[Explicitly]SharedDataPointer for the dptr instead of doing ref counting manually
 * turn sources in lib/ into an actual shared lib
@@ -36,3 +41,9 @@
     * this may actually be unecessary, or at least not as useful as was expected when krunner was in devel?
 * Actions on matches
     * Could be done using QueryMatch::isSearchTerm to refine search?
+* MatchType specializations
+    * Allow QueryMatch to have a "free-form" QString that would represent an optional specialation to MatchType? (Only makes sense if this is a common requirement, as it incurs more overhead for all matches)
+* Runner plugin test harness that "tortures" runners to see how they perform
+    * Correctness of results
+    * Threading safety
+    * Speed
