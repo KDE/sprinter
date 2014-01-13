@@ -38,7 +38,7 @@
 // #include "runners/youtube/youtube.h"
 
 RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
-    : QThread(parent),
+    : QThread(0),
       m_threadPool(new QThreadPool(this)),
       m_manager(parent),
       m_runnerBookmark(-1),
