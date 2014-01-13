@@ -208,7 +208,7 @@ QVector<RunnerMetaData> RunnerManagerThread::runnerMetaData() const
 
 void RunnerManagerThread::loadRunnerMetaData()
 {
-    //sleep(3);
+//     sleep(3);
     emit loadingRunnerMetaData();
 
     QTime t;
@@ -280,7 +280,8 @@ void RunnerManagerThread::loadRunner(int index)
 
 void RunnerManagerThread::performLoadRunner(int index)
 {
-    qDebug() << "RUNNING LOADING OCCURING IN" << QThread::currentThread();    //sleep(3);
+    qDebug() << "RUNNING LOADING OCCURING IN" << QThread::currentThread();
+//     sleep(3);
     if (index >= m_runnerMetaData.count() || index < 0) {
         return;
     }
