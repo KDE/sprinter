@@ -27,6 +27,8 @@
 #include <QTime>
 #include <QWriteLocker>
 
+#include <unistd.h>
+
 #include "abstractrunner.h"
 #include "runnermanager.h"
 
@@ -62,12 +64,12 @@ RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
             m_startSyncTimer, SLOT(startIfStopped()));
     connect(m_startSyncTimer, SIGNAL(timeout()),
             this, SLOT(startSync()));
+    connect(m_manager, SIGNAL(queryChanged(QString)),
+            this, SLOT(startQuery(QString)));
 }
 
 RunnerManagerThread::~RunnerManagerThread()
 {
-    delete m_restartMatchingTimer;
-
     const int sessions = m_sessionData.size();
     RunnerSessionData *sessionData;
     for (int i = 0; i < sessions; ++i) {
@@ -82,35 +84,52 @@ RunnerManagerThread::~RunnerManagerThread()
     //TODO: this will break if there are threads running
     qDeleteAll(m_runners);
 
-    //TODO: wait for threads to complete?
+    //TODO: wait for all matching and sessiondata fetch threads to complete?
 }
 
 void RunnerManagerThread::run()
 {
-    connect(m_manager, SIGNAL(queryChanged(QString)),
-            this, SLOT(startQuery(QString)));
-    qDebug() << "should we do this query, then?" << m_manager->query();
-
+    qDebug() << "************** WORKER THREAD STARTING **************";
+    SignalForwarder *forwarder = new SignalForwarder(this);
     // can't create this with 'this' as the parent as we are in a different
     // thread at this point.
-    m_restartMatchingTimer = new QTimer();
-    m_restartMatchingTimer->setInterval(10);
-    m_restartMatchingTimer->setSingleShot(true);
-    connect(this, SIGNAL(requestFurtherMatching()),
-            m_restartMatchingTimer, SLOT(start()));
-    connect(m_restartMatchingTimer, SIGNAL(timeout()),
-            this, SLOT(startMatching()));
+    if (!m_restartMatchingTimer) {
+        // this timer gets started whenever requestFurtherMatching() is
+        // emitted; this may happen from various threads so needs to be
+        // triggered by a signal to take advantage of Qt's automagic
+        // queueing of signals between threads (you can't call a timer's
+        // start() directly from another thread)
+        //
+        // it gives a small delay to "compress" requests that come in
+        // from the UI thread; this way if this worker thread is busy doing
+        // something and multiple query updates come in, only the most
+        // recent one will be actually processed
+        m_restartMatchingTimer = new QTimer();
+        m_restartMatchingTimer->setInterval(50);
+        m_restartMatchingTimer->setSingleShot(true);
+        connect(this, SIGNAL(requestFurtherMatching()),
+                m_restartMatchingTimer, SLOT(start()));
+
+        // need to go through the forwarder, which lives in them
+        // worker thread, to call startMatching() from the worker thread
+        connect(m_restartMatchingTimer, SIGNAL(timeout()),
+                forwarder, SLOT(startMatching()));
+    }
+
+    // need to go through the forwarder, which lives in them
+    // worker thread, to call loadRunner() from the worker thread
     connect(this, SIGNAL(requestLoadRunner(int)),
-            this, SLOT(performLoadRunner(int)));
+            forwarder, SLOT(loadRunner(int)));
+
     loadRunnerMetaData();
-    startQuery(m_manager->query());
 
     exec();
 
     delete m_restartMatchingTimer;
     m_restartMatchingTimer = 0;
+    delete forwarder;
     deleteLater();
-    qDebug() << "leaving run";
+    qDebug() << "************** WORKER THREAD COMPLETE **************";
 }
 
 void RunnerManagerThread::syncMatches()
@@ -189,6 +208,7 @@ QVector<RunnerMetaData> RunnerManagerThread::runnerMetaData() const
 
 void RunnerManagerThread::loadRunnerMetaData()
 {
+    //sleep(3);
     emit loadingRunnerMetaData();
 
     QTime t;
@@ -254,11 +274,13 @@ void RunnerManagerThread::loadRunnerMetaData()
 
 void RunnerManagerThread::loadRunner(int index)
 {
+    qDebug() << "RUNNING LOADING REQUEST FROM" << QThread::currentThread();
     emit requestLoadRunner(index);
 }
 
 void RunnerManagerThread::performLoadRunner(int index)
 {
+    qDebug() << "RUNNING LOADING OCCURING IN" << QThread::currentThread();    //sleep(3);
     if (index >= m_runnerMetaData.count() || index < 0) {
         return;
     }
@@ -397,7 +419,8 @@ bool RunnerManagerThread::startNextRunner()
 
 void RunnerManagerThread::startMatching()
 {
-    qDebug() << "starting to match with" << m_context.query() << m_currentRunner << m_runnerBookmark;
+    qDebug() << "starting query in work thread..." << QThread::currentThread()
+             << m_context.query() << m_currentRunner << m_runnerBookmark;
 
     if (!m_matchIndexLock.tryLockForWrite()) {
         emit requestFurtherMatching();
@@ -436,13 +459,13 @@ void RunnerManagerThread::startMatching()
 
 void RunnerManagerThread::startQuery(const QString &query)
 {
-    if (m_query == query) {
+    if (m_context.query() == query) {
         return;
     }
 
-    qDebug() << "kicking off a query ..." << QThread::currentThread() << query;
-    m_query = query;
-    m_context.setQuery(m_query);
+    m_context.setQuery(query);
+    qDebug() << "requesting query from UI thread..."
+             << QThread::currentThread() << query;
 
     {
         QWriteLocker lock(&m_matchIndexLock);
@@ -450,7 +473,9 @@ void RunnerManagerThread::startQuery(const QString &query)
         m_matchers.fill(0);
     }
 
-    emit requestFurtherMatching();
+    if (!query.isEmpty()) {
+        emit requestFurtherMatching();
+    }
 }
 
 void RunnerManagerThread::querySessionCompleted()

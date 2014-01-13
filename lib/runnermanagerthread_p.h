@@ -115,13 +115,34 @@ private:
     int m_runnerBookmark;
     int m_currentRunner;
     QueryContext m_context;
-    QString m_query;
     QUuid m_sessionId;
     QTimer *m_restartMatchingTimer;
     NonRestartingTimer *m_startSyncTimer;
     MatchRunnable *m_dummyMatcher;
     RunnerSessionData *m_dummySessionData;
     int m_matchCount;
+};
+
+class SignalForwarder : public QObject
+{
+    Q_OBJECT
+public:
+    SignalForwarder(RunnerManagerThread *thread)
+        : QObject(0),
+          m_thread(thread)
+    {}
+
+public Q_SLOTS:
+    void loadRunner(int index) {
+        m_thread->performLoadRunner(index);
+    }
+
+    void startMatching() {
+        m_thread->startMatching();
+    }
+
+private:
+    RunnerManagerThread *m_thread;
 };
 
 class SessionDataRetriever : public QObject, public QRunnable
