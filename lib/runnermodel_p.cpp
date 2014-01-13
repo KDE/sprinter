@@ -33,13 +33,14 @@ RunnerModel::RunnerModel(RunnerManagerThread *thread, QObject *parent)
     m_roleColumns.append(Qt::DisplayRole);
     QMetaEnum e = metaObject()->enumerator(metaObject()->indexOfEnumerator("DisplayRoles"));
     for (int i = 0; i < e.keyCount(); ++i) {
-        if (i == IsLoadedRole) {
+        const int enumVal = e.value(i);
+        if (enumVal == IsLoadedRole) {
             m_loadedColumn = i + 1;
-        } else if (i == IsBusyRole) {
+        } else if (enumVal == IsBusyRole) {
             m_busyColumn = i + 1;
         }
-        m_roles.insert(e.value(i), e.key(i));
-        m_roleColumns.append(e.value(i));
+        m_roles.insert(enumVal, e.key(i));
+        m_roleColumns.append(enumVal);
     }
 
     connect(thread, SIGNAL(loadingRunnerMetaData()), this, SLOT(runnerMetaDataLoading()));
@@ -84,7 +85,6 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
             return true;
             break;
         case IsBusyRole:
-            //FIXME implement
             return info[index.row()].loaded && info[index.row()].busy;
             break;
         default:
