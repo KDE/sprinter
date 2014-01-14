@@ -5,8 +5,6 @@
     * run time help / hints for the user
     * automatic query construction
     * pre-threading query filtering
-* QueryMatch execution
-    * Learning: record chosen QueryMatches, weight future matches with this information
 * Design and implement an improved (relative to krunner) "single runner" mode
 * Runners advertise what kind of matches they return (source, type, ..?)
 * Pre-threading runner filtering
@@ -35,6 +33,8 @@
 * Ensure all threads cleaned up before exit
 
 = Next milestone: 0.2
+* QueryMatch execution
+    * Learning: record chosen QueryMatches, weight future matches with this information
 
 = Unscheduled
 * Tiered match run priorities on runners set by the user
