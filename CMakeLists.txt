@@ -21,24 +21,27 @@ set(sprinterlib_SRCS
     lib/runnersessiondata.cpp
 )
 
+add_library(sprinter SHARED ${sprinterlib_SRCS})
+qt5_use_modules(sprinter Widgets Network)
+install(TARGETS sprinter DESTINATION lib)
+
 set(sprinter_SRCS
-    ${sprinterlib_SRCS}
     test/main.cpp
 )
 
-set(sprinterplugin_SRCS
-    ${sprinterlib_SRCS}
-    ${runners_SRCS}
+set(qmlsprinterplugin_SRCS
     qml/sprinterplugin.cpp
 )
 
-add_executable(sprinter ${sprinter_SRCS})
-qt5_use_modules(sprinter Widgets Network)
+add_executable(sprintertest ${sprinter_SRCS})
+qt5_use_modules(sprintertest Widgets Network)
+target_link_libraries(sprintertest sprinter)
 
-add_library(sprinterplugin SHARED ${sprinterplugin_SRCS})
+add_library(sprinterplugin SHARED ${qmlsprinterplugin_SRCS})
 qt5_use_modules(sprinterplugin Widgets Network Declarative)
+target_link_libraries(sprinterplugin sprinter)
 
-install(TARGETS sprinter DESTINATION bin)
+install(TARGETS sprintertest DESTINATION bin)
 
 install(TARGETS sprinterplugin DESTINATION ${QML_INSTALL_DIR}/org/kde/experimental/sprinter)
 install(FILES qml/qmldir DESTINATION ${QML_INSTALL_DIR}/org/kde/experimental/sprinter)
