@@ -11,6 +11,7 @@ find_package(Qt5Declarative REQUIRED)
 set(CMAKE_AUTOMOC ON)
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/lib ${CMAKE_BINARY_DIR})
 
+### Main library
 set(sprinterlib_SRCS
     lib/abstractrunner.cpp
     lib/querymatch.cpp
@@ -25,17 +26,20 @@ add_library(sprinter SHARED ${sprinterlib_SRCS})
 qt5_use_modules(sprinter Widgets Network)
 install(TARGETS sprinter DESTINATION lib)
 
+### Test app - temporary, will be removed at some point
 set(sprinter_SRCS
     test/main.cpp
-)
-
-set(qmlsprinterplugin_SRCS
-    qml/sprinterplugin.cpp
 )
 
 add_executable(sprintertest ${sprinter_SRCS})
 qt5_use_modules(sprintertest Widgets Network)
 target_link_libraries(sprintertest sprinter)
+
+
+### QML plugins
+set(qmlsprinterplugin_SRCS
+    qml/sprinterplugin.cpp
+)
 
 add_library(sprinterplugin SHARED ${qmlsprinterplugin_SRCS})
 qt5_use_modules(sprinterplugin Widgets Network Declarative)
