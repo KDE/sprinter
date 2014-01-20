@@ -34,6 +34,7 @@ set(sprinter_SRCS
 add_executable(sprintertest ${sprinter_SRCS})
 qt5_use_modules(sprintertest Widgets Network)
 target_link_libraries(sprintertest sprinter)
+install(TARGETS sprintertest DESTINATION bin)
 
 
 ### QML plugins
@@ -45,10 +46,10 @@ add_library(sprinterplugin SHARED ${qmlsprinterplugin_SRCS})
 qt5_use_modules(sprinterplugin Widgets Network Declarative)
 target_link_libraries(sprinterplugin sprinter)
 
-install(TARGETS sprintertest DESTINATION bin)
-
 install(TARGETS sprinterplugin DESTINATION ${QML_INSTALL_DIR}/org/kde/experimental/sprinter)
 install(FILES qml/qmldir DESTINATION ${QML_INSTALL_DIR}/org/kde/experimental/sprinter)
 
 set(SPRINTER_PLUGINS_PATH plugins/sprinter)
+
+### Runners
 add_subdirectory(runners)
