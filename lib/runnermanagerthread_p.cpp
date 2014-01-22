@@ -490,6 +490,7 @@ void RunnerManagerThread::endQuerySession()
     clearSessionData();
     m_matchers.fill(0);
 
+    m_matchCount = -1;
     m_runnerBookmark = m_currentRunner = 0;
     emit resetModel();
 }
