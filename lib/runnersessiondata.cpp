@@ -169,7 +169,7 @@ void RunnerSessionData::ref()
 void RunnerSessionData::deref()
 {
     if (!d->ref.deref()) {
-        delete this;
+        deleteLater();
     }
 }
 
