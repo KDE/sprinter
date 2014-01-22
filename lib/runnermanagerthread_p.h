@@ -80,6 +80,7 @@ public:
     QVector<RunnerMetaData> runnerMetaData() const;
     void performLoadRunner(int index);
     void startMatching();
+    void endQuerySession();
 
 Q_SIGNALS:
     void requestFurtherMatching();
@@ -89,11 +90,12 @@ Q_SIGNALS:
     void busyChanged(int metaDataIndex);
     void requestLoadRunner(int index);
     void runnerLoaded(int index);
+    void requestEndQuerySession();
+    void resetModel();
 
 public Q_SLOTS:
     void sessionDataRetrieved(const QUuid &sessionId, int, RunnerSessionData *data);
     void startQuery(const QString &query);
-    void querySessionCompleted();
     void loadRunner(int index);
 
 private Q_SLOTS:
@@ -104,6 +106,7 @@ private:
     void loadRunnerMetaData();
     void retrieveSessionData(int index);
     bool startNextRunner();
+    void clearSessionData();
 
     QThreadPool *m_threadPool;
     RunnerManager *m_manager;
@@ -139,6 +142,10 @@ public Q_SLOTS:
 
     void startMatching() {
         m_thread->startMatching();
+    }
+
+    void endQuerySession() {
+        m_thread->endQuerySession();
     }
 
 private:

@@ -125,11 +125,27 @@ public Q_SLOTS:
     void executeMatch(int index);
     void executeMatch(const QModelIndex &index);
 
+    /**
+     * This method should be called when a query session is complete.
+     * It allows the manager to clean up unused resources created by
+     * runners when a search session is finished.
+     *
+     * A session is begun automatically when setQuery is called
+     * and no session has been started, so there is no startSession
+     * method.
+     *
+     * Calling this method before the query session is fully complete
+     * will result in any current matches being removed. Otherwise
+     * there are no negative side effects to calling this at the "wrong"
+     * time other than incuring additional overhead when setQuery is
+     * next called.
+     */
+    void endQuerySession();
+
 Q_SIGNALS:
     void executionStarted(const QueryMatch &match);
     void executionFinished(const QueryMatch &match, bool success);
     void queryChanged(const QString &query);
-    void querySessionCompleted();
 
 private:
     // these methods are for RunnserSessionData class (e.g. in syncMatches) only
@@ -138,6 +154,8 @@ private:
     class Private;
     friend class Private;
     Private * const d;
+
+    Q_PRIVATE_SLOT(d, void resetModel());
 };
 
 #endif

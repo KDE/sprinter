@@ -34,6 +34,14 @@ RunnerManager::Private::Private(RunnerManager *manager)
     qRegisterMetaType<QUuid>("QUuid");
     qRegisterMetaType<QUuid>("QueryContext");
     qRegisterMetaType<QUuid>("QueryMatch");
+
+    q->connect(thread, SIGNAL(resetModel()), q, SLOT(resetModel()));
+}
+
+void RunnerManager::Private::resetModel()
+{
+    q->beginResetModel();
+    q->endResetModel();
 }
 
 void RunnerManager::Private::addingMatches(int start, int end)
@@ -123,6 +131,11 @@ void RunnerManager::executeMatch(int index)
 void RunnerManager::executeMatch(const QModelIndex &index)
 {
     executeMatch(index.row());
+}
+
+void RunnerManager::endQuerySession()
+{
+    emit d->thread->requestEndQuerySession();
 }
 
 QString RunnerManager::query() const

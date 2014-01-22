@@ -34,6 +34,7 @@ public:
     void matchesRemoved();
     void matchesUpdated(int start, int end);
     void matchesArrived();
+    void resetModel();
 
     RunnerManager *q;
     RunnerManagerThread *thread;

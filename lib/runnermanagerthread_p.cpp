@@ -70,14 +70,7 @@ RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
 
 RunnerManagerThread::~RunnerManagerThread()
 {
-    const int sessions = m_sessionData.size();
-    RunnerSessionData *sessionData;
-    for (int i = 0; i < sessions; ++i) {
-        sessionData = m_sessionData.at(i);
-        if (sessionData) {
-            sessionData->deref();
-        }
-    }
+    clearSessionData();
 
     delete m_dummyMatcher;
 
@@ -120,6 +113,8 @@ void RunnerManagerThread::run()
     // worker thread, to call loadRunner() from the worker thread
     connect(this, SIGNAL(requestLoadRunner(int)),
             forwarder, SLOT(loadRunner(int)));
+    connect(this, SIGNAL(requestEndQuerySession()),
+            forwarder, SLOT(endQuerySession()));
 
     loadRunnerMetaData();
 
@@ -219,17 +214,12 @@ void RunnerManagerThread::loadRunnerMetaData()
     //FIXME will crash if matches are ongoing
     qDeleteAll(runnersTmp);
 
-    const int sessions = m_sessionData.size();
-    RunnerSessionData *sessionData;
-    for (int i = 0; i < sessions; ++i) {
-        sessionData = m_sessionData.at(i);
-        if (sessionData) {
-            sessionData->deref();
-        }
+    {
+        //TODO audit locking around clearSessionData
+        QWriteLocker lock(&m_matchIndexLock);
+        clearSessionData();
+        m_matchers.clear();
     }
-    m_sessionData.clear();
-
-    m_matchers.clear();
 
     //TODO a little ugly, including the hardcoded "sprinter"
     foreach (const QString &path, QCoreApplication::instance()->libraryPaths()) {
@@ -478,12 +468,8 @@ void RunnerManagerThread::startQuery(const QString &query)
     }
 }
 
-void RunnerManagerThread::querySessionCompleted()
+void RunnerManagerThread::clearSessionData()
 {
-    m_sessionId = QUuid::createUuid();
-
-    QWriteLocker lock(&m_matchIndexLock);
-
     const int sessions = m_sessionData.size();
     RunnerSessionData *sessionData;
     for (int i = 0; i < sessions; ++i) {
@@ -492,11 +478,22 @@ void RunnerManagerThread::querySessionCompleted()
             sessionData->deref();
         }
     }
+}
+
+void RunnerManagerThread::endQuerySession()
+{
+    qDebug() << "DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOWN";
+    m_sessionId = QUuid::createUuid();
+
+    QWriteLocker lock(&m_matchIndexLock);
+
+    clearSessionData();
 
     m_sessionData.fill(0);
     m_matchers.fill(0);
 
     m_runnerBookmark = m_currentRunner = 0;
+    emit resetModel();
 }
 
 MatchRunnable::MatchRunnable(AbstractRunner *runner, RunnerSessionData *sessionData, QueryContext &context)
