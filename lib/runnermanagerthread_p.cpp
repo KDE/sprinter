@@ -474,6 +474,7 @@ void RunnerManagerThread::clearSessionData()
     RunnerSessionData *sessionData;
     for (int i = 0; i < sessions; ++i) {
         sessionData = m_sessionData.at(i);
+        m_sessionData[i] = 0;
         if (sessionData) {
             sessionData->deref();
         }
@@ -482,14 +483,11 @@ void RunnerManagerThread::clearSessionData()
 
 void RunnerManagerThread::endQuerySession()
 {
-    qDebug() << "DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOWN";
     m_sessionId = QUuid::createUuid();
 
     QWriteLocker lock(&m_matchIndexLock);
 
     clearSessionData();
-
-    m_sessionData.fill(0);
     m_matchers.fill(0);
 
     m_runnerBookmark = m_currentRunner = 0;
