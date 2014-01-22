@@ -108,6 +108,19 @@ public:
     QHash<int, QByteArray> roleNames() const;
 
 public Q_SLOTS:
+    /**
+     * Sets the text to be used as the query string
+     * This may be called multiple times while querying, allowing
+     * for "search as you type" patterns.
+     *
+     * When called, this will create a query session internally:
+     * each active runner will be asked to create a RunnerSessionData
+     * object and they may initialize various data members and
+     * communication channels as needed to complete queries. To
+     * release these resources at the end of a query session
+     * (e.g. after the user dimisses the search UI) call
+     * @see endQuerySession
+     */
     void setQuery(const QString &query);
     void executeMatch(int index);
     void executeMatch(const QModelIndex &index);
