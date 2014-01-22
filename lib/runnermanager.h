@@ -36,7 +36,8 @@ public:
         PrecisionRole,
         UserDataRole,
         DataRole,
-        SearchTermRole
+        SearchTermRole,
+        RunnerRole
     };
     Q_ENUMS(DisplayRoles)
 

@@ -22,6 +22,7 @@
 #include <QMetaEnum>
 #include <QThreadPool>
 
+#include "abstractrunner.h"
 #include "runnermanagerthread_p.h"
 #include "runnermodel_p.h"
 
@@ -207,6 +208,13 @@ QVariant RunnerManager::data(const QModelIndex &index, int role) const
         case SearchTermRole:
             return match.isSearchTerm();
             break;
+        case RunnerRole: {
+            AbstractRunner *runner = match.runner();
+            if (runner) {
+                return runner->id();
+            }
+            break;
+        }
         default:
             break;
     }
@@ -246,6 +254,9 @@ QVariant RunnerManager::headerData(int section, Qt::Orientation orientation, int
                 break;
             case SearchTermRole:
                 return tr("Search Term");
+                break;
+            case RunnerRole:
+                return tr("Runner ID");
                 break;
             default:
                 break;
