@@ -66,6 +66,11 @@ int main(int argc, char** argv)
     top->addAction(action);
     QObject::connect(action, SIGNAL(triggered()), &app, SLOT(quit()));
 
+    action = new QAction(top);
+    action->setShortcut(Qt::Key_Escape);
+    top->addAction(action);
+    QObject::connect(action, SIGNAL(triggered()), manager, SLOT(endQuerySession()));
+
     top->resize(1000, 700);
     top->show();
     edit->setFocus();
