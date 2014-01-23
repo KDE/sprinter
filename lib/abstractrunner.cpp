@@ -31,6 +31,7 @@ public:
 
     uint minQueryLength;
     QString id;
+    QVector<RunnerManager::MatchType> matchTypes;
 };
 
 AbstractRunner::AbstractRunner(QObject *parent)
@@ -98,6 +99,16 @@ bool AbstractRunner::startExec(const QueryMatch &match)
 bool AbstractRunner::exec(const QueryMatch &match)
 {
     return match.sendUserDataToClipboard();
+}
+
+QVector<RunnerManager::MatchType> AbstractRunner::matchTypesGenerated() const
+{
+    return d->matchTypes;
+}
+
+void AbstractRunner::setMatchTypesGenerated(const QVector<RunnerManager::MatchType> types)
+{
+    d->matchTypes = types;
 }
 
 #include "moc_abstractrunner.cpp"

@@ -95,6 +95,15 @@ public:
      */
     int minQueryLength() const;
 
+    /*
+     * @return the types of results this runner may return
+     *
+     * If the list is empty, then the type must be considered as undeterminded
+     * and the runner should always be included in query matching. Otherwise,
+     * this runner may be excluded from matching based on this list.
+     */
+    QVector<RunnerManager::MatchType> matchTypesGenerated() const;
+
 protected:
     /**
      * Called when a match is to be made.
@@ -120,6 +129,19 @@ protected:
      * will not be passed to this method
      */
     virtual bool exec(const QueryMatch &match);
+
+    /**
+     * Sets the typs of matches this runner may generate in response to @see match
+     * being called. The runner may not always generate matches of all types in the
+     * list, but any matches generated should be of a type in the list set.
+     *
+     * An empty list simply means "unknown" and the runner may generate any sort of
+     * match. This is the default.
+     *
+     * It is highly recommended to set this to an accurate list of match types in the
+     * constructor of the runner.
+     */
+    void setMatchTypesGenerated(const QVector<RunnerManager::MatchType> types);
 
 private:
     friend class RunnerFactory;
