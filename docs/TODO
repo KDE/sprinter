@@ -15,9 +15,6 @@
         * A MatchType filter (from user, or UI component)
         * Query pre-processing?
 * icons for QueryMatches
-* Allow session start/finish be controlled by the user of the RunnerManager
-    * void RunnerManager::startSession()
-    * void RunnerManager::endSession()
 
 == Improvements
 * Clear all TODOs/FIXMEs in code
