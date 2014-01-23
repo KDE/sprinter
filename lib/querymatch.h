@@ -78,8 +78,6 @@ public:
     void setPrecision(RunnerManager::MatchPrecision precision);
     RunnerManager::MatchPrecision precision() const;
 
-    void setInternalId(const QString &id);
-    QString internalId() const;
 
     AbstractRunner *runner() const;
 

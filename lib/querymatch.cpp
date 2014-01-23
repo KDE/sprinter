@@ -39,7 +39,6 @@ public:
     QPointer<AbstractRunner> runner;
     QString title;
     QString text;
-    QString id;
     RunnerManager::MatchType type;
     RunnerManager::MatchSource source;
     RunnerManager::MatchPrecision precision;
@@ -147,16 +146,6 @@ void QueryMatch::setPrecision(RunnerManager::MatchPrecision precision)
 RunnerManager::MatchPrecision QueryMatch::precision() const
 {
     return d->precision;
-}
-
-void QueryMatch::setInternalId(const QString &id)
-{
-    d->id = id;
-}
-
-QString QueryMatch::internalId() const
-{
-    return d->id;
 }
 
 AbstractRunner *QueryMatch::runner() const
