@@ -83,6 +83,12 @@ public:
 
     AbstractRunner *runner() const;
 
+    /**
+     * Puts the contents of userData() on the clipboard.
+     * @return true on success
+     */
+    bool sendUserDataToClipboard() const;
+
 private:
     class Private;
     QExplicitlySharedDataPointer<Private> d;

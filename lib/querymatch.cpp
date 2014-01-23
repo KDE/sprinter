@@ -19,6 +19,8 @@
 
 #include "abstractrunner.h"
 
+#include <QApplication>
+#include <QClipboard>
 #include <QDebug>
 #include <QPointer>
 
@@ -170,4 +172,18 @@ void QueryMatch::setIsSearchTerm(bool searchTerm)
 bool QueryMatch::isSearchTerm() const
 {
     return d->isSearchTerm;
+}
+
+bool QueryMatch::sendUserDataToClipboard() const
+{
+    QString clipboardText = userData().toString();
+    if (!clipboardText.isEmpty()) {
+        QClipboard *clipboard = QApplication::clipboard();
+        if (clipboard) {
+            clipboard->setText(clipboardText);
+            return true;
+        }
+    }
+
+    return false;
 }
