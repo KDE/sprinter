@@ -318,8 +318,8 @@ bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
 /*
     TODO: should QueryContext have an optional matchTypes set which
     can be used to filter runners on a per-query/per-session basis?
-    if (!context.matchTypes.isEmpty() &&
-        !runner->matchTypes().isEmpty()) {
+    if (!context.matchTypesGenerated.isEmpty() &&
+        !runner->matchTypesGenerated().isEmpty()) {
 
     }
 */
