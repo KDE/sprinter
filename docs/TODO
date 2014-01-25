@@ -6,8 +6,6 @@
     * automatic query construction
     * pre-threading query filtering
 * Design and implement an improved (relative to krunner) "single runner" mode
-* Runners advertise what sources they use for matching
-    * Filter out runners based on network availability, e.g.
 * Pre-threading runner filtering
     * Based on:
         * Runner's advertised matching types
