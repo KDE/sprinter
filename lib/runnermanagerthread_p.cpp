@@ -263,14 +263,13 @@ void RunnerManagerThread::loadRunnerMetaData()
 
 void RunnerManagerThread::loadRunner(int index)
 {
-    qDebug() << "RUNNING LOADING REQUEST FROM" << QThread::currentThread();
+    //qDebug() << "RUNNING LOADING REQUEST FROM" << QThread::currentThread();
     emit requestLoadRunner(index);
 }
 
 void RunnerManagerThread::performLoadRunner(int index)
 {
-    qDebug() << "RUNNING LOADING OCCURING IN" << QThread::currentThread();
-//     sleep(3);
+    //qDebug() << "RUNNING LOADING OCCURING IN" << QThread::currentThread();
     if (index >= m_runnerMetaData.count() || index < 0) {
         return;
     }
@@ -293,7 +292,7 @@ void RunnerManagerThread::performLoadRunner(int index)
         emit runnerLoaded(index);
     } else {
         m_runnerMetaData[index].loaded = false;
-        qDebug() << "LOAD FAILURE" <<  path << ":" << loader.errorString();
+        qWarning() << "LOAD FAILURE" <<  path << ":" << loader.errorString();
         delete plugin;
     }
 }
@@ -302,7 +301,7 @@ void RunnerManagerThread::retrieveSessionData(int index)
 {
     AbstractRunner *runner = m_runners.at(index);
 
-    qDebug() << "**************************" << runner;
+    //qDebug() << runner;
     if (!runner || m_sessionData.at(index)) {
         return;
     }
@@ -414,8 +413,7 @@ bool RunnerManagerThread::startNextRunner()
 
 void RunnerManagerThread::startMatching()
 {
-    qDebug() << "starting query in work thread..." << QThread::currentThread()
-             << m_context.query() << m_currentRunner << m_runnerBookmark;
+    //qDebug() << "starting query in work thread..." << QThread::currentThread() << m_context.query() << m_currentRunner << m_runnerBookmark;
 
     if (!m_matchIndexLock.tryLockForWrite()) {
         emit requestFurtherMatching();
@@ -440,9 +438,9 @@ void RunnerManagerThread::startMatching()
     for (;
         m_currentRunner != m_runnerBookmark;
         m_currentRunner = (m_currentRunner + 1) % m_runners.size()) {
-        qDebug() << "Trying with" << m_currentRunner << m_runners[m_currentRunner];
+        //qDebug() << "Trying with" << m_currentRunner << m_runners[m_currentRunner];
         if (!startNextRunner()) {
-            qDebug() << "STALLED!";
+            //qDebug() << "STALLED!";
             m_matchIndexLock.unlock();
             return;
         }
@@ -459,8 +457,7 @@ void RunnerManagerThread::startQuery(const QString &query)
     }
 
     m_context.setQuery(query);
-    qDebug() << "requesting query from UI thread..."
-             << QThread::currentThread() << query;
+    //qDebug() << "requesting query from UI thread..." << QThread::currentThread() << query;
 
     {
         QWriteLocker lock(&m_matchIndexLock);
