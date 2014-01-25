@@ -217,7 +217,7 @@ void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
     // FIXME: this is a truly horrible way of doing this: nested for loops,
     //        comparing data() .. *shudder*
     QMutexLocker lock(&d->currentMatchesLock);
-    qDebug() << "updating" << matches.count();
+    //qDebug() << "updating" << matches.count();
     bool updateModel = false;
 
     foreach (const QueryMatch &match, matches) {
@@ -312,6 +312,13 @@ bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
     }
 
     if ((uint)context.query().length() < d->runner->minQueryLength()) {
+        return false;
+    }
+
+    // check if this runner requires network and if so deny it
+    if (d->runner->sourcesUsed().size() == 1 &&
+        d->runner->sourcesUsed()[0] == RunnerManager::FromNetworkService &&
+        !context.networkAccessible()) {
         return false;
     }
 
