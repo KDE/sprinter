@@ -6,7 +6,7 @@
     * automatic query construction
     * pre-threading query filtering
 * Design and implement an improved (relative to krunner) "single runner" mode
-* Pre-threading runner filtering
+* Pre-match() runner filtering
     * Based on:
         * Runner's advertised matching types
         * QuerySyntax
