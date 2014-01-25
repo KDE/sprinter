@@ -97,15 +97,11 @@ public:
      **/
     QAbstractItemModel *runnerModel() const;
 
+    /**
+     * Returns the current query string
+     * @see setQuery
+     */
     QString query() const;
-
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
-    QModelIndex parent(const QModelIndex &index) const;
-    int rowCount(const QModelIndex & parent = QModelIndex()) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    QHash<int, QByteArray> roleNames() const;
 
 public Q_SLOTS:
     /**
@@ -122,7 +118,19 @@ public Q_SLOTS:
      * @see endQuerySession
      */
     void setQuery(const QString &query);
+
+    /**
+     * Executes the match at the given index
+     * @see executionStarted @see executionFinished
+     * @param index the row number of the match to execute
+     */
     void executeMatch(int index);
+
+    /**
+     * Executes the match at the given index
+     * @see executionStarted @see executionFinished
+     * @param index the row number of the match to execute
+     */
     void executeMatch(const QModelIndex &index);
 
     /**
@@ -143,9 +151,63 @@ public Q_SLOTS:
     void endQuerySession();
 
 Q_SIGNALS:
+    /**
+     * When a match is executed, this signal is emitted. This gives
+     * applications the opportunity to provide user feedback when
+     * a match begins
+     */
     void executionStarted(const QueryMatch &match);
+
+    /**
+     * When a match has been executed, this signal is emitted. This
+     * gives applications the opportunity to provide user feedback when
+     * execution is complete as well as a way to know when to call
+     * @see endQuerySession
+     */
     void executionFinished(const QueryMatch &match, bool success);
+
+    /**
+     * This is emitted whenever the query string changes
+     * @see setQuery
+     */
     void queryChanged(const QString &query);
+
+public:
+    // The reimplemented model API follows below:
+    /**
+     * @reimp QAbstractItemModel
+     */
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+
+    /**
+     * @reimp QAbstractItemModel
+     */
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
+    /**
+     * @reimp QAbstractItemModel
+     */
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
+
+    /**
+     * @reimp QAbstractItemModel
+     */
+    QModelIndex parent(const QModelIndex &index) const;
+
+    /**
+     * @reimp QAbstractItemModel
+     */
+    int rowCount(const QModelIndex & parent = QModelIndex()) const;
+
+    /**
+     * @reimp QAbstractItemModel
+     */
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+
+    /**
+     * @reimp QAbstractItemModel
+     */
+    QHash<int, QByteArray> roleNames() const;
 
 private:
     // these methods are for RunnserSessionData class (e.g. in syncMatches) only
