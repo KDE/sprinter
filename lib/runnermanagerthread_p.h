@@ -156,14 +156,14 @@ class SessionDataRetriever : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    SessionDataRetriever(RunnerManagerThread *rmt, const QUuid &sessionId, int index, AbstractRunner *runner);
+    SessionDataRetriever(QThread *destinationThread, const QUuid &sessionId, int index, AbstractRunner *runner);
     void run();
 
 Q_SIGNALS:
     void sessionDataRetrieved(const QUuid &sessionId, int index, RunnerSessionData *data);
 
 private:
-    RunnerManagerThread *m_rmt;
+    QThread *m_destinationThread;
     AbstractRunner *m_runner;
     QUuid m_sessionId;
     int m_index;

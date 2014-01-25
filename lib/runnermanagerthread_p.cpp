@@ -514,8 +514,8 @@ void MatchRunnable::run()
     }
 }
 
-SessionDataRetriever::SessionDataRetriever(RunnerManagerThread *rmt, const QUuid &sessionId, int index, AbstractRunner *runner)
-    : m_rmt(rmt),
+SessionDataRetriever::SessionDataRetriever(QThread *destinationThread, const QUuid &sessionId, int index, AbstractRunner *runner)
+    : m_destinationThread(destinationThread),
       m_runner(runner),
       m_sessionId(sessionId),
       m_index(index)
@@ -526,7 +526,7 @@ void SessionDataRetriever::run()
 {
     RunnerSessionData *session = m_runner->createSessionData();
     //FIXME: session could be deleted at this point, and then this crashes?
-    session->moveToThread(m_rmt);
+    session->moveToThread(m_destinationThread);
     emit sessionDataRetrieved(m_sessionId, m_index, session);
 }
 
