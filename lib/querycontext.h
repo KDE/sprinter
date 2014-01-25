@@ -41,6 +41,8 @@ public:
     bool isValid() const;
     void reset();
 
+    bool networkAccessible() const;
+
 private:
     class Private;
     QExplicitlySharedDataPointer<Private> d;

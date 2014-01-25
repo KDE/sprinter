@@ -21,13 +21,15 @@
 
 #include <QDebug>
 #include <QReadWriteLock>
+#include <QNetworkAccessManager>
 
 class QueryContext::Private : public QSharedData
 {
 public:
     Private(QueryContext *context)
         : QSharedData(),
-          q(context)
+          q(context),
+          network(new QNetworkAccessManager)
     {
     }
 
@@ -40,9 +42,10 @@ public:
         //type;
     }
 
+    QueryContext *q;
     QString query;
     QReadWriteLock lock;
-    QueryContext *q;
+    QSharedPointer<QNetworkAccessManager> network;
 };
 
 QueryContext::QueryContext()
@@ -107,3 +110,9 @@ bool QueryContext::isValid() const
 {
     return d->q;
 }
+
+bool QueryContext::networkAccessible() const
+{
+    return d->network->networkAccessible() == QNetworkAccessManager::Accessible;
+}
+
