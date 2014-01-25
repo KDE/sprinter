@@ -6,6 +6,20 @@
     * automatic query construction
     * pre-threading query filtering
 * Design and implement an improved (relative to krunner) "single runner" mode
+* icons for QueryMatches
+
+== Improvements
+* Clear all TODOs/FIXMEs in code
+* QueryMatch::isSearchTerm should allow setting whether to only run against same runner that generated it (relies on a single-runner mode)
+
+== Bugfixes
+* Ensure all threads cleaned up before exit
+
+= Next milestone: 0.2
+
+== Features
+* QueryMatch execution
+    * Learning: record chosen QueryMatches, weight future matches with this information
 * Pre-match() runner filtering
     * Based on:
         * Runner's advertised matching types
@@ -13,22 +27,10 @@
     * Controlled by:
         * A MatchType filter (from user, or UI component)
         * Query pre-processing?
-* icons for QueryMatches
 
 == Improvements
-* Clear all TODOs/FIXMEs in code
 * Improve RunnerSessionData::updateMatches
 * Implement merging in setMatches
-* QueryMatch::isSearchTerm should allow setting whether to only run against same runner that generated it (relies on a single-runner mode)
-* RunnerSessionDAta: Use Q[Explicitly]SharedDataPointer for the dptr instead of doing ref counting manually
-* turn sources in lib/ into an actual shared lib
-
-== Bugfixes
-* Ensure all threads cleaned up before exit
-
-= Next milestone: 0.2
-* QueryMatch execution
-    * Learning: record chosen QueryMatches, weight future matches with this information
 
 = Unscheduled
 * Tiered match run priorities on runners set by the user
@@ -44,3 +46,13 @@
     * Correctness of results
     * Threading safety
     * Speed
+* Multiple query sesions in the same manager
+    * This would allow one RunnerManager to be used from multiple UIs simultaneously
+    * Requires multiplexing the RunnerSessionData (RSD) objects
+    * Probably implement with a RAII class called e.g. SessionToken
+        * Stores the RSD objects (RMT could touch its dptr)
+        * Stores the query text
+        * Stores the un-sync'd matches
+        * Basically, all the data held by RMT goes here instead and RMT has a collection of SessionToken classes
+        * RunnerSessionData, etc. are cleaned up in dtor
+    * Would remove need for the QUuid sesion id in RMT
