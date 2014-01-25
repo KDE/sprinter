@@ -27,7 +27,7 @@
 #include "runnermanager_p.h"
 #include "querycontext.h"
 
-#define DEBUG
+// #define DEBUG_SYNC
 
 class RunnerSessionData::Private
 {
@@ -112,7 +112,7 @@ int RunnerSessionData::syncMatches(int offset)
         }
     }
 
-#ifdef DEBUG
+#ifdef DEBUG_SYNC
     qDebug() << "SYNC offset, synced, unsynced:" << offset << d->syncedMatches.count() << unsynced.count();
 #endif
 
@@ -179,7 +179,7 @@ void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const Que
         return;
     }
 
-#ifdef DEBUG
+#ifdef DEBUG_SYNC
     qDebug() << "New matches from, to: " << d->currentMatches.count() << matches.count();
     int count = 0;
     foreach (const QueryMatch &match, matches) {
