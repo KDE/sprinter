@@ -307,8 +307,13 @@ void RunnerManagerThread::retrieveSessionData(int index)
         return;
     }
 
+    if (!m_sessionDataThread) {
+        m_sessionDataThread = new SessionDataThread(this);
+        m_sessionDataThread->start();
+    }
+
     m_sessionData[index] = m_dummySessionData;
-    SessionDataRetriever *rtrver = new SessionDataRetriever(this, m_sessionId, index, runner);
+    SessionDataRetriever *rtrver = new SessionDataRetriever(m_sessionDataThread, m_sessionId, index, runner);
     rtrver->setAutoDelete(true);
     connect(rtrver, SIGNAL(sessionDataRetrieved(QUuid,int,RunnerSessionData*)),
             this, SLOT(sessionDataRetrieved(QUuid,int,RunnerSessionData*)));
@@ -479,6 +484,10 @@ void RunnerManagerThread::clearSessionData()
             sessionData->deref();
         }
     }
+
+    if (m_sessionDataThread) {
+        m_sessionDataThread->exit();
+    }
 }
 
 void RunnerManagerThread::endQuerySession()
@@ -547,6 +556,17 @@ void ExecRunnable::run()
     }
 
     emit finished(m_match, success);
+}
+
+SessionDataThread::SessionDataThread(QObject *parent)
+    : QThread(parent)
+{
+}
+
+void SessionDataThread::run()
+{
+    exec();
+    deleteLater();
 }
 
 #include "moc_runnermanagerthread_p.cpp"

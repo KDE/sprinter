@@ -20,6 +20,7 @@
 
 #include <QReadWriteLock>
 #include <QRunnable>
+#include <QPointer>
 #include <QThread>
 #include <QTimer>
 #include <QVector>
@@ -63,6 +64,15 @@ private:
     AbstractRunner *m_runner;
     RunnerSessionData *m_sessionData;
     QueryContext &m_context;
+};
+
+class SessionDataThread : public QThread
+{
+    Q_OBJECT
+
+public:
+    SessionDataThread(QObject *parent);
+    void run();
 };
 
 class RunnerManagerThread : public QThread
@@ -124,6 +134,7 @@ private:
     MatchRunnable *m_dummyMatcher;
     RunnerSessionData *m_dummySessionData;
     int m_matchCount;
+    QPointer<SessionDataThread> m_sessionDataThread;
 };
 
 class SignalForwarder : public QObject
