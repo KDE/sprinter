@@ -104,6 +104,15 @@ public:
      */
     QVector<RunnerManager::MatchType> matchTypesGenerated() const;
 
+    /*
+     * @return the types of sources this runner uses to create mataches
+     *
+     * If the list is empty, then the source must be considered as undeterminded
+     * and the runner should always be included in query matching. Otherwise,
+     * this runner may be excluded from matching based on this list.
+     */
+    QVector<RunnerManager::MatchSource> sourcesUsed() const;
+
 protected:
     /**
      * Called when a match is to be made.
@@ -131,7 +140,7 @@ protected:
     virtual bool exec(const QueryMatch &match);
 
     /**
-     * Sets the typs of matches this runner may generate in response to @see match
+     * Sets the types of matches this runner may generate in response to @see match
      * being called. The runner may not always generate matches of all types in the
      * list, but any matches generated should be of a type in the list set.
      *
@@ -142,6 +151,13 @@ protected:
      * constructor of the runner.
      */
     void setMatchTypesGenerated(const QVector<RunnerManager::MatchType> types);
+
+    /**
+     * Sets the sources which this runner uses to generate its matches
+     * This allows things such as runners requiring network to be filtered out
+     * if there is no network available.
+     */
+    void setSourcesUsed(const QVector<RunnerManager::MatchSource> &sources);
 
 private:
     friend class RunnerFactory;
