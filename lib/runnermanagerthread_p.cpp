@@ -41,13 +41,13 @@ RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
     : QThread(0),
       m_threadPool(new QThreadPool(this)),
       m_manager(parent),
+      m_dummySessionData(new RunnerSessionData(0)),
       m_runnerBookmark(-1),
       m_currentRunner(-1),
       m_sessionId(QUuid::createUuid()),
       m_restartMatchingTimer(0),
       m_startSyncTimer(0),
-      m_dummyMatcher(new MatchRunnable(0, 0, m_context)),
-      m_dummySessionData(new RunnerSessionData(0)),
+      m_dummyMatcher(new MatchRunnable(0, QSharedPointer<RunnerSessionData>(), m_context)),
       m_matchCount(-1)
 {
     // to synchronize in the thread the manager lives in
@@ -144,7 +144,7 @@ void RunnerManagerThread::startSync()
     m_matchCount = -1;
 
     int offset = 0;
-    foreach (RunnerSessionData *data, m_sessionData) {
+    foreach (QSharedPointer<RunnerSessionData> data, m_sessionData) {
         if (data) {
             offset += data->syncMatches(offset);
         }
@@ -158,7 +158,7 @@ int RunnerManagerThread::matchCount() const
     if (m_matchCount < 0) {
         int count = 0;
 
-        foreach (RunnerSessionData *data, m_sessionData) {
+        foreach (QSharedPointer<RunnerSessionData> data, m_sessionData) {
             if (data) {
                 count += data->matches(RunnerSessionData::SynchronizedMatches).size();
             }
@@ -178,7 +178,7 @@ QueryMatch RunnerManagerThread::matchAt(int index)
 
     //qDebug() << "** matchAt" << index;
     QVector<QueryMatch> matches;
-    foreach (RunnerSessionData *data, m_sessionData) {
+    foreach (QSharedPointer<RunnerSessionData> data, m_sessionData) {
         if (!data) {
             continue;
         }
@@ -285,8 +285,7 @@ void RunnerManagerThread::performLoadRunner(int index)
     AbstractRunner *runner = runnerFactory ? runnerFactory->create(m_runnerMetaData[index].id, this) : 0;
     if (runner) {
         m_runnerMetaData[index].loaded = true;
-        delete m_sessionData[index];
-        m_sessionData[index] = 0;
+        m_sessionData[index].clear();
         m_runners[index] = runner;
         retrieveSessionData(index);
         emit runnerLoaded(index);
@@ -328,11 +327,6 @@ void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index
         return;
     }
 
-    RunnerSessionData *oldData = m_sessionData.at(index);
-    if (oldData && oldData != m_dummySessionData) {
-        oldData->deref();
-    }
-
     if (sessionId != m_sessionId) {
         delete data;
         data = 0;
@@ -340,10 +334,9 @@ void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index
 
     if (data) {
         data->associateManager(m_manager);
-        data->ref();
     }
 
-    m_sessionData[index] = data;
+    m_sessionData[index].reset(data);
 
     if (data) {
         connect(data, SIGNAL(busyChanged()), this, SLOT(updateBusyStatus()));
@@ -377,7 +370,7 @@ void RunnerManagerThread::updateBusyStatus()
 bool RunnerManagerThread::startNextRunner()
 {
     //qDebug() << "    starting for" << m_currentRunner;
-    RunnerSessionData *sessionData = m_sessionData.at(m_currentRunner);
+    QSharedPointer<RunnerSessionData> sessionData = m_sessionData.at(m_currentRunner);
     if (!sessionData) {
         //qDebug() << "         no session data" << m_currentRunner;
         return true;
@@ -472,14 +465,8 @@ void RunnerManagerThread::startQuery(const QString &query)
 
 void RunnerManagerThread::clearSessionData()
 {
-    const int sessions = m_sessionData.size();
-    RunnerSessionData *sessionData;
-    for (int i = 0; i < sessions; ++i) {
-        sessionData = m_sessionData.at(i);
-        m_sessionData[i] = 0;
-        if (sessionData) {
-            sessionData->deref();
-        }
+    for (int i = 0; i < m_sessionData.size(); ++i) {
+        m_sessionData[i].clear();
     }
 
     if (m_sessionDataThread) {
@@ -501,22 +488,18 @@ void RunnerManagerThread::endQuerySession()
     emit resetModel();
 }
 
-MatchRunnable::MatchRunnable(AbstractRunner *runner, RunnerSessionData *sessionData, QueryContext &context)
+MatchRunnable::MatchRunnable(AbstractRunner *runner, QSharedPointer<RunnerSessionData> sessionData, QueryContext &context)
     : m_runner(runner),
       m_sessionData(sessionData),
       m_context(context)
 {
-    if (m_sessionData) {
-        m_sessionData->ref();
-    }
 }
 
 void MatchRunnable::run()
 {
     if (m_sessionData) {
-        RunnerSessionData::Busy busy(m_sessionData);
-        m_runner->startMatch(m_sessionData, m_context);
-        m_sessionData->deref();
+        RunnerSessionData::Busy busy(m_sessionData.data());
+        m_runner->startMatch(m_sessionData.data(), m_context);
     }
 }
 

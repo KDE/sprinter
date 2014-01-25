@@ -57,12 +57,12 @@ public Q_SLOTS:
 class MatchRunnable : public QRunnable
 {
 public:
-    MatchRunnable(AbstractRunner *runner, RunnerSessionData *sessionData, QueryContext &context);
+    MatchRunnable(AbstractRunner *runner, QSharedPointer<RunnerSessionData> sessionData, QueryContext &context);
     void run();
 
 private:
     AbstractRunner *m_runner;
-    RunnerSessionData *m_sessionData;
+    QSharedPointer<RunnerSessionData> m_sessionData;
     QueryContext &m_context;
 };
 
@@ -122,7 +122,8 @@ private:
     RunnerManager *m_manager;
     QVector<RunnerMetaData> m_runnerMetaData;
     QVector<AbstractRunner *> m_runners;
-    QVector<RunnerSessionData *> m_sessionData;
+    QVector<QSharedPointer<RunnerSessionData> > m_sessionData;
+    QSharedPointer<RunnerSessionData> m_dummySessionData;
     QVector<MatchRunnable *> m_matchers;
     QReadWriteLock m_matchIndexLock;
     int m_runnerBookmark;
@@ -132,7 +133,6 @@ private:
     QTimer *m_restartMatchingTimer;
     NonRestartingTimer *m_startSyncTimer;
     MatchRunnable *m_dummyMatcher;
-    RunnerSessionData *m_dummySessionData;
     int m_matchCount;
     QPointer<SessionDataThread> m_sessionDataThread;
 };

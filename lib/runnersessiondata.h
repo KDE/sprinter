@@ -53,9 +53,6 @@ public:
 
     void associateManager(RunnerManager *manager);
 
-    void ref();
-    void deref();
-
     virtual bool shouldStartMatch(const QueryContext &context) const;
 
     void setMatches(const QVector<QueryMatch> &matches, const QueryContext &context);

@@ -42,7 +42,6 @@ public:
     }
 
     AbstractRunner *runner;
-    QAtomicInt ref;
     QAtomicInt busyCount;
     QVector<QueryMatch> syncedMatches;
     QVector<QueryMatch> currentMatches;
@@ -159,18 +158,6 @@ int RunnerSessionData::syncMatches(int offset)
 AbstractRunner *RunnerSessionData::runner() const
 {
     return d->runner;
-}
-
-void RunnerSessionData::ref()
-{
-    d->ref.ref();
-}
-
-void RunnerSessionData::deref()
-{
-    if (!d->ref.deref()) {
-        deleteLater();
-    }
 }
 
 void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const QueryContext &context)
