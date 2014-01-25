@@ -308,9 +308,9 @@ void RunnerManagerThread::retrieveSessionData(int index)
 
     if (!m_sessionDataThread) {
         m_sessionDataThread = new SessionDataThread(this);
-        m_sessionDataThread->start();
     }
 
+    m_sessionDataThread->start();
     m_sessionData[index] = m_dummySessionData;
     SessionDataRetriever *rtrver = new SessionDataRetriever(m_sessionDataThread, m_sessionId, index, runner);
     rtrver->setAutoDelete(true);
@@ -563,7 +563,6 @@ SessionDataThread::SessionDataThread(QObject *parent)
 void SessionDataThread::run()
 {
     exec();
-    deleteLater();
 }
 
 #include "moc_runnermanagerthread_p.cpp"
