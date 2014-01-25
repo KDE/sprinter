@@ -35,6 +35,7 @@ public:
     void matchesUpdated(int start, int end);
     void matchesArrived();
     void resetModel();
+    void executionFinished(const QueryMatch &match, bool success);
 
     RunnerManager *q;
     RunnerManagerThread *thread;
@@ -42,6 +43,8 @@ public:
     QString query;
     QHash<int, QByteArray> roles;
     QVector<int> roleColumns;
+    QVector<QPair<QueryMatch, int> > executingMatches;
+    bool matchesArrivedWhileExecuting;
 };
 
 #endif

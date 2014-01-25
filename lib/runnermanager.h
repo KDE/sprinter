@@ -156,7 +156,7 @@ Q_SIGNALS:
      * applications the opportunity to provide user feedback when
      * a match begins
      */
-    void executionStarted(const QueryMatch &match);
+    void executionStarted(int index);
 
     /**
      * When a match has been executed, this signal is emitted. This
@@ -164,7 +164,7 @@ Q_SIGNALS:
      * execution is complete as well as a way to know when to call
      * @see endQuerySession
      */
-    void executionFinished(const QueryMatch &match, bool success);
+    void executionFinished(int index, bool success);
 
     /**
      * This is emitted whenever the query string changes
@@ -218,6 +218,7 @@ private:
     Private * const d;
 
     Q_PRIVATE_SLOT(d, void resetModel());
+    Q_PRIVATE_SLOT(d, void executionFinished(const QueryMatch &match, bool success));
 };
 
 #endif

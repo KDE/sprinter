@@ -29,7 +29,8 @@
 RunnerManager::Private::Private(RunnerManager *manager)
     : q(manager),
       thread(new RunnerManagerThread(manager)),
-      runnerModel(new RunnerModel(thread, manager))
+      runnerModel(new RunnerModel(thread, manager)),
+      matchesArrivedWhileExecuting(false)
 {
     qRegisterMetaType<QUuid>("QUuid");
     qRegisterMetaType<QUuid>("QueryContext");
@@ -71,7 +72,34 @@ void RunnerManager::Private::matchesUpdated(int start, int end)
 
 void RunnerManager::Private::matchesArrived()
 {
-    thread->syncMatches();
+    matchesArrivedWhileExecuting = matchesArrivedWhileExecuting ||
+                                   !executingMatches.isEmpty();
+    if (!matchesArrivedWhileExecuting) {
+        thread->syncMatches();
+    }
+}
+
+void RunnerManager::Private::executionFinished(const QueryMatch &match, bool success)
+{
+    // remove the match from the list of matches being executed
+    int index = -1;
+    for (int i = 0; i < executingMatches.count(); ++i) {
+        if (executingMatches[i].first == match) {
+            index = i;
+            executingMatches.remove(i);
+            break;
+        }
+    }
+
+    // now emit the signal; the application may elect to end the session here
+    emit q->executionFinished(index, success);
+
+    // if we have no matches executing, check if there are matches waiting
+    // synchronization
+    if (executingMatches.isEmpty() && matchesArrivedWhileExecuting) {
+        matchesArrivedWhileExecuting = false;
+        matchesArrived();
+    }
 }
 
 RunnerManager::RunnerManager(QObject *parent)
@@ -121,10 +149,17 @@ void RunnerManager::executeMatch(int index)
         return;
     }
 
-    emit executionStarted(match);
+    for (int i = 0; i < d->executingMatches.count(); ++i) {
+        if (d->executingMatches[i].first == match) {
+            return;
+        }
+    }
+
+    d->executingMatches.append(qMakePair<QueryMatch, int>(match, index));
+    emit executionStarted(index);
     ExecRunnable *exec = new ExecRunnable(match);
     connect(exec, SIGNAL(finished(QueryMatch,bool)),
-            this, SIGNAL(executionFinished(QueryMatch,bool)));
+            this, SLOT(executionFinished(QueryMatch,bool)));
     QThreadPool::globalInstance()->start(exec);
 }
 
@@ -135,6 +170,7 @@ void RunnerManager::executeMatch(const QModelIndex &index)
 
 void RunnerManager::endQuerySession()
 {
+    d->matchesArrivedWhileExecuting = false;
     emit d->thread->requestEndQuerySession();
 }
 
