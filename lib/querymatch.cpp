@@ -30,8 +30,8 @@ public:
     Private(AbstractRunner *r)
         : runner(r),
           type(RunnerManager::UnknownType),
-          precision(RunnerManager::UnrelatedMatch),
           source(RunnerManager::FromInternalSource),
+          precision(RunnerManager::UnrelatedMatch),
           isSearchTerm(false)
     {
     }
