@@ -49,7 +49,6 @@ public:
     virtual ~RunnerSessionData();
 
     AbstractRunner *runner() const;
-    QVector<QueryMatch> matches(MatchState state) const;
 
     void associateManager(RunnerManager *manager);
 
@@ -57,6 +56,7 @@ public:
 
     void setMatches(const QVector<QueryMatch> &matches, const QueryContext &context);
     void updateMatches(const QVector<QueryMatch> &matches);
+    QVector<QueryMatch> matches(MatchState state) const;
 
     void setResultsPageSize(uint pageSize);
     uint resultsPageSize() const;

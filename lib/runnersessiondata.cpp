@@ -82,6 +82,11 @@ RunnerSessionData::~RunnerSessionData()
 {
 }
 
+AbstractRunner *RunnerSessionData::runner() const
+{
+    return d->runner;
+}
+
 void RunnerSessionData::associateManager(RunnerManager *manager)
 {
     if (manager == d->manager) {
@@ -92,6 +97,39 @@ void RunnerSessionData::associateManager(RunnerManager *manager)
     if (d->manager && !d->currentMatches.isEmpty()) {
         d->manager->d->matchesArrived();
     }
+}
+
+bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
+{
+    if (!d->runner) {
+        return false;
+    }
+
+    if (!context.isValid()) {
+        return false;
+    }
+
+    if ((uint)context.query().length() < d->runner->minQueryLength()) {
+        return false;
+    }
+
+    // check if this runner requires network and if so deny it
+    if (d->runner->sourcesUsed().size() == 1 &&
+        d->runner->sourcesUsed()[0] == RunnerManager::FromNetworkService &&
+        !context.networkAccessible()) {
+        return false;
+    }
+
+/*
+    TODO: should QueryContext have an optional matchTypes set which
+    can be used to filter runners on a per-query/per-session basis?
+    if (!context.matchTypesGenerated.isEmpty() &&
+        !runner->matchTypesGenerated().isEmpty()) {
+
+    }
+*/
+
+    return true;
 }
 
 int RunnerSessionData::syncMatches(int offset)
@@ -153,11 +191,6 @@ int RunnerSessionData::syncMatches(int offset)
     }
 
     return d->syncedMatches.count();
-}
-
-AbstractRunner *RunnerSessionData::runner() const
-{
-    return d->runner;
 }
 
 void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const QueryContext &context)
@@ -286,39 +319,6 @@ uint RunnerSessionData::resultsOffset() const
 bool RunnerSessionData::isBusy() const
 {
     return d->busyCount.load() > 0;
-}
-
-bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
-{
-    if (!d->runner) {
-        return false;
-    }
-
-    if (!context.isValid()) {
-        return false;
-    }
-
-    if ((uint)context.query().length() < d->runner->minQueryLength()) {
-        return false;
-    }
-
-    // check if this runner requires network and if so deny it
-    if (d->runner->sourcesUsed().size() == 1 &&
-        d->runner->sourcesUsed()[0] == RunnerManager::FromNetworkService &&
-        !context.networkAccessible()) {
-        return false;
-    }
-
-/*
-    TODO: should QueryContext have an optional matchTypes set which
-    can be used to filter runners on a per-query/per-session basis?
-    if (!context.matchTypesGenerated.isEmpty() &&
-        !runner->matchTypesGenerated().isEmpty()) {
-
-    }
-*/
-
-    return true;
 }
 
 #include "moc_runnersessiondata.cpp"
