@@ -40,6 +40,9 @@ public:
 
     bool networkAccessible() const;
 
+    void setFetchMore(bool fetchMore);
+    bool fetchMore() const;
+
     template<typename Func>
     bool ifValid(Func algorithm) const {
         readLock();

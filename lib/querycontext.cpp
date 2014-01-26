@@ -28,7 +28,8 @@ public:
     Private(QueryContext *context)
         : QSharedData(),
           q(context),
-          network(new QNetworkAccessManager)
+          network(new QNetworkAccessManager),
+          fetchMore(false)
     {
     }
 
@@ -45,6 +46,7 @@ public:
     QString query;
     QReadWriteLock lock;
     QSharedPointer<QNetworkAccessManager> network;
+    bool fetchMore;
 };
 
 QueryContext::QueryContext()
@@ -97,6 +99,10 @@ void QueryContext::reset()
 
 void QueryContext::setQuery(const QString &query)
 {
+    if (d->query != query) {
+        d->fetchMore = false;
+    }
+
     d->query = query;
 }
 
@@ -113,6 +119,16 @@ bool QueryContext::isValid() const
 bool QueryContext::networkAccessible() const
 {
     return d->network->networkAccessible() == QNetworkAccessManager::Accessible;
+}
+
+void QueryContext::setFetchMore(bool fetchMore)
+{
+    d->fetchMore = fetchMore;
+}
+
+bool QueryContext::fetchMore() const
+{
+    return d->fetchMore;
 }
 
 void QueryContext::readLock() const
