@@ -11,6 +11,8 @@ find_package(Qt5Declarative REQUIRED)
 set(CMAKE_AUTOMOC ON)
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/lib ${CMAKE_BINARY_DIR})
 
+add_definitions("-Wall -std=c++0x")
+
 ### Main library
 set(sprinterlib_SRCS
     lib/abstractrunner.cpp
