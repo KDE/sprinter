@@ -186,6 +186,11 @@ int RunnerSessionData::syncMatches(int offset)
     qDebug() << "SYNC offset, synced, unsynced:" << offset << d->syncedMatches.count() << unsynced.count();
 #endif
 
+    // only accept pagesize matches
+    if (unsynced.size() > d->pageSize) {
+        unsynced.resize(d->pageSize);
+    }
+
     if (d->syncedMatches.isEmpty()) {
         // no sync'd matches, so we only need to do something if we now do have matches
         if (!unsynced.isEmpty()) {
@@ -278,7 +283,6 @@ void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
         if (match.data().isNull()) {
             continue;
         }
-
 
         QMutableVectorIterator<QueryMatch> cit (d->currentMatches);
         int count = 0;
