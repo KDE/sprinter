@@ -187,7 +187,7 @@ int RunnerSessionData::syncMatches(int offset)
 #endif
 
     // only accept pagesize matches
-    if (unsynced.size() > d->pageSize) {
+    if ((uint)unsynced.size() > d->pageSize) {
         unsynced.resize(d->pageSize);
     }
 
