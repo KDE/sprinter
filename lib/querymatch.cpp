@@ -73,7 +73,7 @@ QueryMatch &QueryMatch::operator=(const QueryMatch &other)
     return *this;
 }
 
-bool QueryMatch::operator==(const QueryMatch &rhs)
+bool QueryMatch::operator==(const QueryMatch &rhs) const
 {
     return d == rhs.d;
 }

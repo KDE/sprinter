@@ -35,7 +35,7 @@ public:
     ~QueryMatch();
 
     QueryMatch &operator=(const QueryMatch &other);
-    bool operator==(const QueryMatch &rhs);
+    bool operator==(const QueryMatch &rhs) const;
     bool isValid() const;
 
     void setTitle(const QString &title);
