@@ -68,12 +68,12 @@ QueryContext &QueryContext::operator=(const QueryContext &other)
         return *this;
     }
 
-    QWriteLocker writeLock(&d->lock);
-
-    {
-        QReadLocker readLock(&other.d->lock);
-        d = other.d;
-    }
+    QExplicitlySharedDataPointer<QueryContext::Private> oldD = d;
+    d->lock.lockForWrite();
+    other.d->lock.lockForRead();
+    d = other.d;
+    other.d->lock.unlock();
+    oldD->lock.unlock();
 
     return *this;
 }
