@@ -43,7 +43,7 @@ public:
     QString query;
     QHash<int, QByteArray> roles;
     QVector<int> roleColumns;
-    QVector<QPair<QueryMatch, int> > executingMatches;
+    QHash<int, QueryMatch> executingMatches;
     bool matchesArrivedWhileExecuting;
 };
 

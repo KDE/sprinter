@@ -67,7 +67,7 @@ void RunnerManager::Private::matchesRemoved()
 
 void RunnerManager::Private::matchesUpdated(int start, int end)
 {
-    emit q->dataChanged(q->createIndex(start, 0), q->createIndex(end, 0));
+    emit q->dataChanged(q->createIndex(start, 0), q->createIndex(end, roleColumns.count()));
 }
 
 void RunnerManager::Private::matchesArrived()
@@ -82,17 +82,17 @@ void RunnerManager::Private::matchesArrived()
 void RunnerManager::Private::executionFinished(const QueryMatch &match, bool success)
 {
     // remove the match from the list of matches being executed
-    int index = -1;
-    for (int i = 0; i < executingMatches.count(); ++i) {
-        if (executingMatches[i].first == match) {
-            index = i;
-            executingMatches.remove(i);
+    QMutableHashIterator<int, QueryMatch> it(executingMatches);
+    while (it.hasNext()) {
+        it.next();
+        if (it.value() == match) {
+            const int index = it.key();
+            qDebug() << "EXECUTION FINISHED FOR" << index;
+            it.remove();
+            matchesUpdated(index, index);
             break;
         }
     }
-
-    // now emit the signal; the application may elect to end the session here
-    emit q->executionFinished(index, success);
 
     // if we have no matches executing, check if there are matches waiting
     // synchronization
@@ -149,14 +149,17 @@ void RunnerManager::executeMatch(int index)
         return;
     }
 
-    for (int i = 0; i < d->executingMatches.count(); ++i) {
-        if (d->executingMatches[i].first == match) {
+    QHashIterator<int, QueryMatch> it(d->executingMatches);
+    while (it.hasNext()) {
+        it.next();
+        if (it.value() == match) {
             return;
         }
     }
 
-    d->executingMatches.append(qMakePair<QueryMatch, int>(match, index));
-    emit executionStarted(index);
+    d->executingMatches.insert(index, match);
+    qDebug() << "EXECUTING MATCH AT" << index << match.title();
+    d->matchesUpdated(index, index);
     ExecRunnable *exec = new ExecRunnable(match);
     connect(exec, SIGNAL(finished(QueryMatch,bool)),
             this, SLOT(executionFinished(QueryMatch,bool)));
@@ -206,8 +209,6 @@ QVariant RunnerManager::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    QueryMatch match = d->thread->matchAt(index.row());
-
     // QML and QWidget handle viewing models a bit differently
     // QML asks for a row and a role, basically ignoring roleColumns
     // Default QWidget views as for the DisplayRole of a row/column
@@ -219,6 +220,14 @@ QVariant RunnerManager::data(const QModelIndex &index, int role) const
         asText = true;
         role = d->roleColumns[index.column()];
     }
+
+    // short circuit for execution; don't need the QueryMatch object
+    if (role == ExecutingRole) {
+        qDebug() << "ROLE IS EXECUTING!!!!!" << d->executingMatches.contains(index.row());
+        return d->executingMatches.contains(index.row());
+    }
+
+    QueryMatch match = d->thread->matchAt(index.row());
 
     switch (role) {
         case Qt::DisplayRole:
@@ -307,6 +316,8 @@ QVariant RunnerManager::headerData(int section, Qt::Orientation orientation, int
             case RunnerRole:
                 return tr("Runner ID");
                 break;
+            case ExecutingRole:
+                return tr("Executing");
             default:
                 break;
         }

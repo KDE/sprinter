@@ -37,7 +37,8 @@ public:
         UserDataRole,
         DataRole,
         SearchTermRole,
-        RunnerRole
+        RunnerRole,
+        ExecutingRole
     };
     Q_ENUMS(DisplayRoles)
 
@@ -151,21 +152,6 @@ public Q_SLOTS:
     void endQuerySession();
 
 Q_SIGNALS:
-    /**
-     * When a match is executed, this signal is emitted. This gives
-     * applications the opportunity to provide user feedback when
-     * a match begins
-     */
-    void executionStarted(int index);
-
-    /**
-     * When a match has been executed, this signal is emitted. This
-     * gives applications the opportunity to provide user feedback when
-     * execution is complete as well as a way to know when to call
-     * @see endQuerySession
-     */
-    void executionFinished(int index, bool success);
-
     /**
      * This is emitted whenever the query string changes
      * @see setQuery
