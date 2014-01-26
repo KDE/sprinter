@@ -65,7 +65,7 @@ void AbstractRunner::setMinQueryLength(uint length)
     d->minQueryLength = length;
 }
 
-int AbstractRunner::minQueryLength() const
+uint AbstractRunner::minQueryLength() const
 {
     return d->minQueryLength;
 }
@@ -94,7 +94,7 @@ bool AbstractRunner::startExec(const QueryMatch &match)
         return false;
     }
 
-    exec(match);
+    return exec(match);
 }
 
 bool AbstractRunner::exec(const QueryMatch &match)

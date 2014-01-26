@@ -93,7 +93,7 @@ public:
      * @return the  number of characters a query term must have
      * minimally to be of interest to the runner. Defaults to 3.
      */
-    int minQueryLength() const;
+    uint minQueryLength() const;
 
     /*
      * @return the types of results this runner may return
