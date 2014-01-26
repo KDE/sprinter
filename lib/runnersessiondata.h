@@ -69,6 +69,8 @@ public:
     void setCanFetchMoreMatches(bool hasMore, const QueryContext &context);
     bool canFetchMoreMatches() const;
 
+    void startMatch(const QueryContext &context);
+
 Q_SIGNALS:
     void busyChanged();
 

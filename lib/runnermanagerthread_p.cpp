@@ -499,7 +499,7 @@ void MatchRunnable::run()
 {
     if (m_sessionData) {
         RunnerSessionData::Busy busy(m_sessionData.data());
-        m_runner->startMatch(m_sessionData.data(), m_context);
+        m_sessionData.data()->startMatch(m_context);
     }
 }
 

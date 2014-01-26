@@ -107,9 +107,6 @@ bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
         return false;
     }
 
-    if (!context.isValid()) {
-        return false;
-    }
 
     if ((uint)context.query().length() < d->runner->minQueryLength()) {
         return false;
@@ -122,16 +119,50 @@ bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
         return false;
     }
 
-/*
-    TODO: should QueryContext have an optional matchTypes set which
-    can be used to filter runners on a per-query/per-session basis?
-    if (!context.matchTypesGenerated.isEmpty() &&
-        !runner->matchTypesGenerated().isEmpty()) {
+    /*
+        TODO: should QueryContext have an optional matchTypes set which
+        can be used to filter runners on a per-query/per-session basis?
+        if (!context.matchTypesGenerated.isEmpty() &&
+            !runner->matchTypesGenerated().isEmpty()) {
 
+        }
+    */
+
+    return context.isValid();
+}
+
+void RunnerSessionData::startMatch(const QueryContext &context)
+{
+    if (!shouldStartMatch(context)) {
+        return;
     }
-*/
 
-    return true;
+    auto updatePaging = [&]() {
+            if (context.fetchMore()) {
+                // this is the minimum number of matches we need to already
+                // have to care about ggetting more
+                const uint minSize = d->offset + d->pageSize;
+                if (d->currentMatches.isEmpty()) {
+                    if ((uint)d->syncedMatches.size() >= minSize) {
+                        d->offset += d->pageSize;
+                    }
+                } else if ((uint)d->currentMatches.size() >= minSize) {
+                    d->offset += d->pageSize;
+                } else {
+                    return false;
+                }
+            } else {
+                d->offset = 0;
+            }
+            return true;
+    };
+
+    // now we set up the paging
+    if (!context.ifValid(updatePaging)) {
+        return;
+    }
+
+    d->runner->match(this, context);
 }
 
 int RunnerSessionData::syncMatches(int offset)
@@ -327,6 +358,7 @@ void RunnerSessionData::setCanFetchMoreMatches(bool hasMore, const QueryContext 
 {
     context.ifValid([&]() {
         d->canFetchMoreMatches = hasMore;
+        return true;
     });
 }
 

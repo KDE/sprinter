@@ -75,13 +75,6 @@ RunnerSessionData *AbstractRunner::createSessionData()
     return new RunnerSessionData(this);
 }
 
-void AbstractRunner::startMatch(RunnerSessionData *sessionData, const QueryContext &context)
-{
-    if (sessionData && sessionData->shouldStartMatch(context)) {
-        match(sessionData, context);
-    }
-}
-
 void AbstractRunner::match(RunnerSessionData *sessionData, const QueryContext &context)
 {
     Q_UNUSED(sessionData)

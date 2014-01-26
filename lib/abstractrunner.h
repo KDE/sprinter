@@ -62,16 +62,18 @@ public:
     virtual RunnerSessionData *createSessionData();
 
     /**
-     * This method will start a match. A number of pre-match
-     * checks are done and if they pass then the runner's implementation
-     * of @see match is called.
-     *
-     * @param sessionData the RunnerSessionData object from the query
-     * session for this runner. This object must have come from an
-     * earlier call to @see createSessionData.
-     * @param context the current search query data
+     * Called when a match is to be made. Generally this should not be
+     * called directly, but instead RunnerSessionData::startMatch should
+     * be called which will check if the match should be run and do additional
+     * session related bookkeeping.
+     * 
+     * @param sessionData this is the RunnerSessionData created by
+     * the runner (or on behalf of it) when the match session was
+     * initiated. Guaranteed to never be null; must not be deleted.
+     * @param context this object contains the query text itself and
+     * additional metadata. @see QueryContext
      */
-    void startMatch(RunnerSessionData *sessionData, const QueryContext &context);
+    virtual void match(RunnerSessionData *sessionData, const QueryContext &context);
 
     /**
      * When a match is to be exec'd, this method can be called.
@@ -114,16 +116,6 @@ public:
     QVector<RunnerManager::MatchSource> sourcesUsed() const;
 
 protected:
-    /**
-     * Called when a match is to be made.
-     * @param sessionData this is the RunnerSessionData created by
-     * the runner (or on behalf of it) when the match session was
-     * initiated. Guaranteed to never be null; must not be deleted.
-     * @param context this object contains the query text itself and
-     * additional metadata. @see QueryContext
-     */
-    virtual void match(RunnerSessionData *sessionData, const QueryContext &context);
-
     /**
      * Called when a match is to be executed. What that means
      * precisely is up to the runner. The match is guaranteed
