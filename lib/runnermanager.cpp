@@ -87,7 +87,6 @@ void RunnerManager::Private::executionFinished(const QueryMatch &match, bool suc
         it.next();
         if (it.value() == match) {
             const int index = it.key();
-            qDebug() << "EXECUTION FINISHED FOR" << index;
             it.remove();
             matchesUpdated(index, index);
             break;
@@ -158,7 +157,6 @@ void RunnerManager::executeMatch(int index)
     }
 
     d->executingMatches.insert(index, match);
-    qDebug() << "EXECUTING MATCH AT" << index << match.title();
     d->matchesUpdated(index, index);
     ExecRunnable *exec = new ExecRunnable(match);
     connect(exec, SIGNAL(finished(QueryMatch,bool)),
@@ -223,7 +221,6 @@ QVariant RunnerManager::data(const QModelIndex &index, int role) const
 
     // short circuit for execution; don't need the QueryMatch object
     if (role == ExecutingRole) {
-        qDebug() << "ROLE IS EXECUTING!!!!!" << d->executingMatches.contains(index.row());
         return d->executingMatches.contains(index.row());
     }
 
