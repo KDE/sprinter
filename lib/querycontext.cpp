@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "querycontext.h"
 
 
@@ -116,3 +115,12 @@ bool QueryContext::networkAccessible() const
     return d->network->networkAccessible() == QNetworkAccessManager::Accessible;
 }
 
+void QueryContext::readLock() const
+{
+    d->lock.lockForRead();
+}
+
+void QueryContext::readUnlock() const
+{
+    d->lock.unlock();
+}

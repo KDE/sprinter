@@ -23,9 +23,6 @@
 #include <QExplicitlySharedDataPointer>
 #include <QString>
 
-class QueryMatch;
-
-
 class QueryContext
 {
 public:
@@ -43,7 +40,17 @@ public:
 
     bool networkAccessible() const;
 
+    template<typename Func>
+    void ifValid(Func algorithm) const {
+        readLock();
+        algorithm();
+        readUnlock();
+    }
+
 private:
+    void readLock() const;
+    void readUnlock() const;
+
     class Private;
     QExplicitlySharedDataPointer<Private> d;
 };
