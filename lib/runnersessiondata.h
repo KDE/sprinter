@@ -66,6 +66,9 @@ public:
 
     bool isBusy() const;
 
+    void setCanFetchMoreMatches(bool hasMore, const QueryContext &context);
+    bool canFetchMoreMatches() const;
+
 Q_SIGNALS:
     void busyChanged();
 

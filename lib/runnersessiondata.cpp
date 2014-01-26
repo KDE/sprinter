@@ -36,6 +36,7 @@ public:
         : runner(r),
           manager(0),
           matchesUnsynced(false),
+          canFetchMoreMatches(false),
           pageSize(10),
           offset(0)
     {
@@ -48,6 +49,7 @@ public:
     RunnerManager *manager;
     QMutex currentMatchesLock;
     bool matchesUnsynced;
+    bool canFetchMoreMatches;
     uint pageSize;
     uint offset;
 };
@@ -319,6 +321,18 @@ uint RunnerSessionData::resultsOffset() const
 bool RunnerSessionData::isBusy() const
 {
     return d->busyCount.load() > 0;
+}
+
+void RunnerSessionData::setCanFetchMoreMatches(bool hasMore, const QueryContext &context)
+{
+    context.ifValid([&]() {
+        d->canFetchMoreMatches = hasMore;
+    });
+}
+
+bool RunnerSessionData::canFetchMoreMatches() const
+{
+    return d->canFetchMoreMatches;
 }
 
 #include "moc_runnersessiondata.cpp"
