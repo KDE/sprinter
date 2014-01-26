@@ -41,10 +41,16 @@ public:
     bool networkAccessible() const;
 
     template<typename Func>
-    void ifValid(Func algorithm) const {
+    bool ifValid(Func algorithm) const {
         readLock();
-        algorithm();
+        bool rv = false;
+
+        if (isValid()) {
+            rv = algorithm();
+        }
+
         readUnlock();
+        return rv;
     }
 
 private:
