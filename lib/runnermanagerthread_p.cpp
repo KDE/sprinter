@@ -287,8 +287,7 @@ void RunnerManagerThread::performLoadRunner(int index)
     const QString path = m_runnerMetaData[index].library;
     QPluginLoader loader(path);
     QObject *plugin = loader.instance();
-    AbstractRunnerFactory *runnerFactory = qobject_cast<AbstractRunnerFactory *>(plugin);
-    AbstractRunner *runner = runnerFactory ? runnerFactory->create(m_runnerMetaData[index].id, this) : 0;
+    AbstractRunner *runner = qobject_cast<AbstractRunner *>(plugin);
     if (runner) {
         m_runnerMetaData[index].loaded = true;
         m_sessionData[index].clear();
