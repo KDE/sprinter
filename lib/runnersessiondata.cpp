@@ -148,6 +148,9 @@ void RunnerSessionData::startMatch(const QueryContext &context)
         return;
     }
 
+    // reset if we can fetch more matches; the runner must
+    // set this again after each match
+    d->canFetchMoreMatches = false;
     d->runner->match(this, context);
 }
 
