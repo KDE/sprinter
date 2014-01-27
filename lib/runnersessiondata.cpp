@@ -154,70 +154,70 @@ void RunnerSessionData::startMatch(const QueryContext &context)
     d->runner->match(this, context);
 }
 
-int RunnerSessionData::syncMatches(int offset)
+int RunnerSessionData::Private::syncMatches(int offset)
 {
-    Q_ASSERT(d->manager);
+    Q_ASSERT(manager);
 
     QVector<QueryMatch> unsynced;
 
     {
-        QMutexLocker lock(&d->currentMatchesLock);
-        if (d->matchesUnsynced) {
-            d->matchesUnsynced = false;
-            unsynced = d->currentMatches;
-            d->currentMatches.clear();
+        QMutexLocker lock(&currentMatchesLock);
+        if (matchesUnsynced) {
+            matchesUnsynced = false;
+            unsynced = currentMatches;
+            currentMatches.clear();
         } else {
-            return d->syncedMatches.count();
+            return syncedMatches.count();
         }
     }
 
 #ifdef DEBUG_SYNC
-    qDebug() << "SYNC offset, synced, unsynced:" << offset << d->syncedMatches.count() << unsynced.count();
+    qDebug() << "SYNC offset, synced, unsynced:" << offset << syncedMatches.count() << unsynced.count();
 #endif
 
     // only accept pagesize matches
-    if ((uint)unsynced.size() > d->pageSize) {
-        unsynced.resize(d->pageSize);
+    if ((uint)unsynced.size() > pageSize) {
+        unsynced.resize(pageSize);
     }
 
-    if (d->syncedMatches.isEmpty()) {
+    if (syncedMatches.isEmpty()) {
         // no sync'd matches, so we only need to do something if we now do have matches
         if (!unsynced.isEmpty()) {
             // we had no matches, now we do
-            d->manager->d->addingMatches(offset, offset + unsynced.size());
-            d->syncedMatches = unsynced;
-            d->manager->d->matchesAdded();
+            manager->d->addingMatches(offset, offset + unsynced.size());
+            syncedMatches = unsynced;
+            manager->d->matchesAdded();
         }
     } else if (unsynced.isEmpty()) {
         // we had matches, and now we don't
-        d->manager->d->removingMatches(offset, offset + d->syncedMatches.size());
-        d->syncedMatches.clear();
-        d->manager->d->matchesRemoved();
+        manager->d->removingMatches(offset, offset + syncedMatches.size());
+        syncedMatches.clear();
+        manager->d->matchesRemoved();
     } else {
         // now the more complex situation: we have both synced and new matches
         // these need to be merged with the correct add/remove/update rows
         // methods called in the manager (the model)
         //TODO: implement merging; this implementation is naive and does not
         // allow for updating results
-        const int oldCount = d->syncedMatches.count();
+        const int oldCount = syncedMatches.count();
         const int newCount = unsynced.count();
         if (oldCount == newCount) {
-            d->syncedMatches = unsynced;
-            d->manager->d->matchesUpdated(offset, offset + newCount);
+            syncedMatches = unsynced;
+            manager->d->matchesUpdated(offset, offset + newCount);
         } else if (oldCount < newCount) {
-            d->manager->d->addingMatches(offset + oldCount, offset + newCount);
-            d->syncedMatches = unsynced;
-            d->manager->d->matchesAdded();
-            d->manager->d->matchesUpdated(offset, offset + newCount);
+            manager->d->addingMatches(offset + oldCount, offset + newCount);
+            syncedMatches = unsynced;
+            manager->d->matchesAdded();
+            manager->d->matchesUpdated(offset, offset + newCount);
         } else {
-            d->manager->d->removingMatches(offset + newCount, offset + oldCount);
-            d->syncedMatches = unsynced;
-            d->manager->d->matchesAdded();
-            d->manager->d->matchesUpdated(offset, offset + newCount);
+            manager->d->removingMatches(offset + newCount, offset + oldCount);
+            syncedMatches = unsynced;
+            manager->d->matchesAdded();
+            manager->d->matchesUpdated(offset, offset + newCount);
         }
     }
 
-    return d->syncedMatches.count();
+    return syncedMatches.count();
 }
 
 void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const QueryContext &context)
