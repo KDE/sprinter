@@ -76,7 +76,6 @@ Q_SIGNALS:
 
 private:
     friend class RunnerManagerThread;
-    int syncMatches(int offset);
 
     class Private;
     Private * const d;

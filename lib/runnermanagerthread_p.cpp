@@ -31,6 +31,7 @@
 
 #include "abstractrunner.h"
 #include "runnermanager.h"
+#include "runnersessiondata_p.h"
 
 // temporary include for non-pluggable plugins
 // #include "runners/datetime/datetime.h"
@@ -146,7 +147,7 @@ void RunnerManagerThread::startSync()
     int offset = 0;
     foreach (QSharedPointer<RunnerSessionData> data, m_sessionData) {
         if (data) {
-            offset += data->syncMatches(offset);
+            offset += data->d->syncMatches(offset);
         }
     }
     m_matchCount = offset;

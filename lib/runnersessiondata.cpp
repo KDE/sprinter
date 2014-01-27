@@ -16,11 +16,9 @@
  */
 
 #include "runnersessiondata.h"
+#include "runnersessiondata_p.h"
 
-#include <QAtomicInt>
 #include <QDebug>
-#include <QMutex>
-#include <QMutexLocker>
 
 #include "abstractrunner.h"
 #include "runnermanager.h"
@@ -28,31 +26,6 @@
 #include "querycontext.h"
 
 // #define DEBUG_SYNC
-
-class RunnerSessionData::Private
-{
-public:
-    Private(AbstractRunner *r)
-        : runner(r),
-          manager(0),
-          matchesUnsynced(false),
-          canFetchMoreMatches(false),
-          pageSize(10),
-          offset(0)
-    {
-    }
-
-    AbstractRunner *runner;
-    QAtomicInt busyCount;
-    QVector<QueryMatch> syncedMatches;
-    QVector<QueryMatch> currentMatches;
-    RunnerManager *manager;
-    QMutex currentMatchesLock;
-    bool matchesUnsynced;
-    bool canFetchMoreMatches;
-    uint pageSize;
-    uint offset;
-};
 
 RunnerSessionData::Busy::Busy(RunnerSessionData *data)
     : m_data(data)
