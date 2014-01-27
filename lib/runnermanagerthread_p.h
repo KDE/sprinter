@@ -91,6 +91,8 @@ public:
     void performLoadRunner(int index);
     void startMatching();
     void endQuerySession();
+    void setEnabledRunners(const QStringList &runnerIds);
+    QStringList enabledRunners() const;
 
 Q_SIGNALS:
     void requestFurtherMatching();

@@ -214,6 +214,8 @@ void RunnerManagerThread::loadRunnerMetaData()
 
     QVector<AbstractRunner *> runnersTmp = m_runners;
     m_runners.clear();
+    m_enabledRunnerIds.clear();
+
     //FIXME will crash if matches are ongoing
     qDeleteAll(runnersTmp);
 
@@ -247,6 +249,7 @@ void RunnerManagerThread::loadRunnerMetaData()
                 md.name = json["name"].toString();
                 md.description = json["description"].toString();
                 m_runnerMetaData << md;
+                m_enabledRunnerIds << md.id;
             }
         }
     }
@@ -489,6 +492,27 @@ void RunnerManagerThread::endQuerySession()
     m_matchCount = -1;
     m_runnerBookmark = m_currentRunner = 0;
     emit resetModel();
+}
+
+void RunnerManagerThread::setEnabledRunners(const QStringList &runnerIds)
+{
+    m_enabledRunnerIds = runnerIds;
+    // this loop relies on the (valid) assumption that the session data
+    // and metadata vectors are the same size
+    const int runnerCount = m_runnerMetaData.count();
+    for (int i = 0; i < runnerCount; ++i) {
+        QSharedPointer<RunnerSessionData> sessionData = m_sessionData[i];
+        if (!sessionData) {
+            continue;
+        }
+
+        sessionData->setEnabled(m_enabledRunnerIds.contains(m_runnerMetaData[i].id));
+    }
+}
+
+QStringList RunnerManagerThread::enabledRunners() const
+{
+    return m_enabledRunnerIds;
 }
 
 MatchRunnable::MatchRunnable(AbstractRunner *runner, QSharedPointer<RunnerSessionData> sessionData, QueryContext &context)
