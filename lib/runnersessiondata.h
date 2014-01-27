@@ -48,6 +48,9 @@ public:
     RunnerSessionData(AbstractRunner *runner);
     virtual ~RunnerSessionData();
 
+    void setEnabled(bool enabled);
+    bool enabled() const;
+
     AbstractRunner *runner() const;
 
     void associateManager(RunnerManager *manager);

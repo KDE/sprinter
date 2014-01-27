@@ -57,6 +57,16 @@ RunnerSessionData::~RunnerSessionData()
 {
 }
 
+void RunnerSessionData::setEnabled(bool enabled)
+{
+    d->enabled = enabled;
+}
+
+bool RunnerSessionData::enabled() const
+{
+    return d->enabled;
+}
+
 AbstractRunner *RunnerSessionData::runner() const
 {
     return d->runner;
@@ -76,12 +86,9 @@ void RunnerSessionData::associateManager(RunnerManager *manager)
 
 bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
 {
-    if (!d->runner) {
-        return false;
-    }
-
-
-    if ((uint)context.query().length() < d->runner->minQueryLength()) {
+    if (!d->runner ||
+        !d->enabled ||
+        (uint)context.query().length() < d->runner->minQueryLength()) {
         return false;
     }
 
