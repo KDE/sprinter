@@ -22,7 +22,7 @@
 
 class QueryMatch;
 
-class RunnerManager : public QAbstractItemModel
+class QuerySession : public QAbstractItemModel
 {
     Q_OBJECT
     Q_PROPERTY(QString query WRITE setQuery READ query NOTIFY queryChanged)
@@ -89,8 +89,8 @@ public:
     };
     Q_ENUMS(MatchPrecision)
 
-    RunnerManager(QObject *parent = 0);
-    ~RunnerManager();
+    QuerySession(QObject *parent = 0);
+    ~QuerySession();
 
     /**
      * A model containing a list of runners and their status

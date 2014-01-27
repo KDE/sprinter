@@ -25,7 +25,7 @@
 
 class AbstractRunner;
 class QueryContext;
-class RunnerManager;
+class QuerySession;
 
 class RunnerSessionData : public QObject
 {
@@ -53,7 +53,7 @@ public:
 
     AbstractRunner *runner() const;
 
-    void associateManager(RunnerManager *manager);
+    void associateManager(QuerySession *manager);
 
     void setMatches(const QVector<QueryMatch> &matches, const QueryContext &context);
     void updateMatches(const QVector<QueryMatch> &matches);
@@ -77,7 +77,7 @@ Q_SIGNALS:
     void busyChanged();
 
 private:
-    friend class RunnerManagerThread;
+    friend class QuerySessionThread;
 
     class Private;
     Private * const d;

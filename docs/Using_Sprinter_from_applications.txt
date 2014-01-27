@@ -11,23 +11,23 @@ Behind this simplicity is a slightly more complex machinery in action, but from 
 
 This document describes how to use Sprinter from an application or component.
 
-== RunnerManager: Model and Control Interface
+== QuerySession: Model and Control Interface
 
-RunnerManager is the most important class for applications; in fact, it is the only class needed for applications using Sprinter. RunnerManager is both a model (QAbstractItemModel) which can be used with both QWidget and QML GUIs.
+QuerySession is the most important class for applications; in fact, it is the only class needed for applications using Sprinter. QuerySession is both a model (QAbstractItemModel) which can be used with both QWidget and QML GUIs.
 
-From C++ code, the application can simply create a RunnerManager:
+From C++ code, the application can simply create a QuerySession:
 
-    RunnerManager *manager = new RunnerManager(parentObject);
+    QuerySession *manager = new QuerySession(parentObject);
 
 In QML, it can be loaded via an import:
 
     import org.kde.experimental.sprinter
 
-Any number of RunnerManager objects may be created as they do not interact with each other.
+Any number of QuerySession objects may be created as they do not interact with each other.
 
 == Queries ==
 
-Queries are fed to RunnerManager by calling setQuery(QString) from C++ or setting the query property from QML. Queries may be progressively updated (e.g. as the user types). Sprinter will update the matches for a query as it changes. Matching on new query text happens with a very small built-in delay so if multiple queries are set in rapid succession (as is common when users type queries) only the most recent query will be processed.
+Queries are fed to QuerySession by calling setQuery(QString) from C++ or setting the query property from QML. Queries may be progressively updated (e.g. as the user types). Sprinter will update the matches for a query as it changes. Matching on new query text happens with a very small built-in delay so if multiple queries are set in rapid succession (as is common when users type queries) only the most recent query will be processed.
 
 Queries may be any style of free-form text. The individual plugins (runners) handle parsing and processing the query text to decide how to respond. So when the user types "video sprinters" an online video plugin may query Youtube for results while other plugins do nothing; similarly if the user types "time CEST" the online video plugin will do nothing while the date and time plugin will return the current time in the CEST timezone.
 
@@ -35,7 +35,7 @@ Queries are generally processed in a case-insensitive way.
 
 == Query Sessions
 
-A query session starts when the first query text is provided to the RunnerManager object and it ends when the application tells the RunnerManager that the session is finished by calling endQuerySession(). Sessions allow runner plugins to prepare and set up whatever they require to process queries and then to release these resources when the querying is complete.
+A query session starts when the first query text is provided to the QuerySession object and it ends when the application tells the QuerySession that the session is finished by calling endQuerySession(). Sessions allow runner plugins to prepare and set up whatever they require to process queries and then to release these resources when the querying is complete.
 
 Note that any matches you wish to execute must be started before calling endQuerySession(), as that also clears all the matches as part of releasing resources.
 Since execution of matches is asynchronous, there is an executionFinished signal that the application can use to know when to call endQuerySession().
@@ -53,9 +53,9 @@ It is not required to end query sessions, but not doing so may leave resources a
 
 == Displaying Matches
 
-As matches are found in response to the query, the RunnerManager model gets populated with information on each match. Matches may be updated by Sprinter after first appearing in the model (e.g. when requesting the current time, it will update once per second to keep the time updated) and new matches may appear at any time.
+As matches are found in response to the query, the QuerySession model gets populated with information on each match. Matches may be updated by Sprinter after first appearing in the model (e.g. when requesting the current time, it will update once per second to keep the time updated) and new matches may appear at any time.
 
-Since RunenrManager is a model the application may sort and filter the results as it desires by using a SortFilterModelProxy. The results, however, are not sorted or filtered in any way by RunnerManager itself.
+Since RunenrManager is a model the application may sort and filter the results as it desires by using a SortFilterModelProxy. The results, however, are not sorted or filtered in any way by QuerySession itself.
 
 The model exports quite a bit of information about each match, including:
 
@@ -83,15 +83,15 @@ The model exports quite a bit of information about each match, including:
 
 Some matches are merely informational, but most represent a further action that can be taken: open a web site, launch an application, start a file manager, open a document, send a command to a running process, etc. The plugin that generated the match will also know how to perform this action. This is called "executing the match". Even purely informational matches can be executed: their UserDataRole will be placed onto the clipboard so the user may paste it elsewhere.
 
-Matches can be started by calling RunnerManager's executeMatch with either the row number (aka index) or a full QModelIndex. Execution is asynchronous (so as not to interupt the main application and GUI thread) so the executionStarted and executionFinished signals are provided. Applications may use these signals to show user feedback as well as to know when to end the query session.
+Matches can be started by calling QuerySession's executeMatch with either the row number (aka index) or a full QModelIndex. Execution is asynchronous (so as not to interupt the main application and GUI thread) so the executionStarted and executionFinished signals are provided. Applications may use these signals to show user feedback as well as to know when to end the query session.
 
 == Runners
 
 The matching capabilities are provided by plugins called "runners". Each runner specializes in a specific type of match and during matching the runners are run in separate threads. This "swarm" approach to finding as many relevant matches for a given query can therefore happen as quickly as possible.
 
-An application can control which runners are available, which are active and which are busy processing a query by accessing the runner model from the RunnerManager by calling the runnerModel() method from C++ or using the runnerModel property from QML.
+An application can control which runners are available, which are active and which are busy processing a query by accessing the runner model from the QuerySession by calling the runnerModel() method from C++ or using the runnerModel property from QML.
 
-The runner model is a QAbstractItemModel (just like RunnerManager). It exports the following information about runners:
+The runner model is a QAbstractItemModel (just like QuerySession). It exports the following information about runners:
 
         Role name           Function
         =========           ========

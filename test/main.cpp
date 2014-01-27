@@ -25,13 +25,13 @@
 #include <QTreeView>
 #include <QGridLayout>
 
-#include "runnermanager.h"
+#include "querysession.h"
 
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
 
-    RunnerManager *manager = new RunnerManager;
+    QuerySession *manager = new QuerySession;
 
     QWidget *top = new QWidget;
 

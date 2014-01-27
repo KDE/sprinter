@@ -20,7 +20,7 @@
 #include <QtQml/qqml.h>
 #include <QtQml/QQmlContext>
 
-#include <runnermanager.h>
+#include <querysession.h>
 
 
 
@@ -32,7 +32,7 @@ void SprinterPlugin::registerTypes(const char *uri)
 {
     Q_ASSERT(uri == QLatin1String("org.kde.experimental.sprinter"));
 
-    qmlRegisterType<RunnerManager>(uri, 0, 1, "RunnerManager");
+    qmlRegisterType<QuerySession>(uri, 0, 1, "QuerySession");
 
 }
 

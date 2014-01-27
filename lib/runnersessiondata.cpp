@@ -21,8 +21,8 @@
 #include <QDebug>
 
 #include "abstractrunner.h"
-#include "runnermanager.h"
-#include "runnermanager_p.h"
+#include "querysession.h"
+#include "querysession_p.h"
 #include "querycontext.h"
 
 // #define DEBUG_SYNC
@@ -72,7 +72,7 @@ AbstractRunner *RunnerSessionData::runner() const
     return d->runner;
 }
 
-void RunnerSessionData::associateManager(RunnerManager *manager)
+void RunnerSessionData::associateManager(QuerySession *manager)
 {
     if (manager == d->manager) {
         return;
@@ -94,7 +94,7 @@ bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
 
     // check if this runner requires network and if so deny it
     if (d->runner->sourcesUsed().size() == 1 &&
-        d->runner->sourcesUsed()[0] == RunnerManager::FromNetworkService &&
+        d->runner->sourcesUsed()[0] == QuerySession::FromNetworkService &&
         !context.networkAccessible()) {
         return false;
     }

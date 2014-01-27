@@ -24,7 +24,7 @@
 
 class AbstractRunner;
 
-#include <runnermanager.h>
+#include <querysession.h>
 
 class QueryMatch
 {
@@ -44,11 +44,11 @@ public:
     void setText(const QString &text);
     QString text() const;
 
-    void setType(RunnerManager::MatchType type);
-    RunnerManager::MatchType type() const;
+    void setType(QuerySession::MatchType type);
+    QuerySession::MatchType type() const;
 
-    void setSource(RunnerManager::MatchSource source);
-    RunnerManager::MatchSource source() const;
+    void setSource(QuerySession::MatchSource source);
+    QuerySession::MatchSource source() const;
 
     /**
      * Sets if this match is a search term itself; when exec'd
@@ -91,16 +91,16 @@ public:
     QVariant data() const;
 
     /**
-     * Sets the precision of this match. @see RunnerManager
+     * Sets the precision of this match. @see QuerySession
      *
      * @param precision the precision
      */
-    void setPrecision(RunnerManager::MatchPrecision precision);
+    void setPrecision(QuerySession::MatchPrecision precision);
 
     /**
      * @return the precision of this match, e.g. ExactMatch
      */
-    RunnerManager::MatchPrecision precision() const;
+    QuerySession::MatchPrecision precision() const;
 
     /**
      * @return a pointer to the runner that created this match. May return

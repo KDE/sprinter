@@ -22,7 +22,7 @@
 #include <QDebug>
 #include <QMetaEnum>
 
-RunnerModel::RunnerModel(RunnerManagerThread *thread, QObject *parent)
+RunnerModel::RunnerModel(QuerySessionThread *thread, QObject *parent)
     : QAbstractItemModel(parent),
       m_thread(thread),
       m_count(0)

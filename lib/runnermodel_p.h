@@ -22,7 +22,7 @@
 #include <QPointer>
 #include <QStringList>
 
-class RunnerManagerThread;
+class QuerySessionThread;
 
 class RunnerModel : public QAbstractItemModel
 {
@@ -43,7 +43,7 @@ public:
     };
     Q_ENUMS(DisplayRoles)
 
-    RunnerModel(RunnerManagerThread *thread, QObject *parent = 0);
+    RunnerModel(QuerySessionThread *thread, QObject *parent = 0);
     ~RunnerModel();
 
     QStringList enabledRunners() const;
@@ -66,7 +66,7 @@ private Q_SLOTS:
     void runnerBusy(int);
 
 private:
-    QPointer<RunnerManagerThread> m_thread;
+    QPointer<QuerySessionThread> m_thread;
     QHash<int, QByteArray> m_roles;
     QVector<int> m_roleColumns;
     QStringList m_runnerIds;

@@ -18,15 +18,15 @@
 #ifndef RUNNERMANAGER_PRIVATE
 #define RUNNERMANAGER_PRIVATE
 
-class RunnerManager;
+class QuerySession;
 class QueryMatch;
-class RunnerManagerThread;
+class QuerySessionThread;
 class RunnerModel;
 
-class RunnerManager::Private
+class QuerySession::Private
 {
 public:
-    Private(RunnerManager *manager);
+    Private(QuerySession *manager);
 
     void addingMatches(int start, int end);
     void matchesAdded();
@@ -37,8 +37,8 @@ public:
     void resetModel();
     void executionFinished(const QueryMatch &match, bool success);
 
-    RunnerManager *q;
-    RunnerManagerThread *thread;
+    QuerySession *q;
+    QuerySessionThread *thread;
     RunnerModel *runnerModel;
     QString query;
     QHash<int, QByteArray> roles;

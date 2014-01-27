@@ -104,7 +104,7 @@ public:
      * and the runner should always be included in query matching. Otherwise,
      * this runner may be excluded from matching based on this list.
      */
-    QVector<RunnerManager::MatchType> matchTypesGenerated() const;
+    QVector<QuerySession::MatchType> matchTypesGenerated() const;
 
     /*
      * @return the types of sources this runner uses to create mataches
@@ -113,7 +113,7 @@ public:
      * and the runner should always be included in query matching. Otherwise,
      * this runner may be excluded from matching based on this list.
      */
-    QVector<RunnerManager::MatchSource> sourcesUsed() const;
+    QVector<QuerySession::MatchSource> sourcesUsed() const;
 
 protected:
     /**
@@ -142,14 +142,14 @@ protected:
      * It is highly recommended to set this to an accurate list of match types in the
      * constructor of the runner.
      */
-    void setMatchTypesGenerated(const QVector<RunnerManager::MatchType> types);
+    void setMatchTypesGenerated(const QVector<QuerySession::MatchType> types);
 
     /**
      * Sets the sources which this runner uses to generate its matches
      * This allows things such as runners requiring network to be filtered out
      * if there is no network available.
      */
-    void setSourcesUsed(const QVector<RunnerManager::MatchSource> &sources);
+    void setSourcesUsed(const QVector<QuerySession::MatchSource> &sources);
 
 private:
     friend class RunnerFactory;

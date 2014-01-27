@@ -42,7 +42,7 @@ public:
     QAtomicInt busyCount;
     QVector<QueryMatch> syncedMatches;
     QVector<QueryMatch> currentMatches;
-    RunnerManager *manager;
+    QuerySession *manager;
     QMutex currentMatchesLock;
     bool matchesUnsynced;
     bool canFetchMoreMatches;

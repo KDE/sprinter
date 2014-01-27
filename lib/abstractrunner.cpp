@@ -31,8 +31,8 @@ public:
 
     uint minQueryLength;
     QString id;
-    QVector<RunnerManager::MatchType> matchTypes;
-    QVector<RunnerManager::MatchSource> matchSources;
+    QVector<QuerySession::MatchType> matchTypes;
+    QVector<QuerySession::MatchSource> matchSources;
 };
 
 AbstractRunner::AbstractRunner(QObject *parent)
@@ -95,22 +95,22 @@ bool AbstractRunner::exec(const QueryMatch &match)
     return match.sendUserDataToClipboard();
 }
 
-QVector<RunnerManager::MatchType> AbstractRunner::matchTypesGenerated() const
+QVector<QuerySession::MatchType> AbstractRunner::matchTypesGenerated() const
 {
     return d->matchTypes;
 }
 
-void AbstractRunner::setMatchTypesGenerated(const QVector<RunnerManager::MatchType> types)
+void AbstractRunner::setMatchTypesGenerated(const QVector<QuerySession::MatchType> types)
 {
     d->matchTypes = types;
 }
 
-QVector<RunnerManager::MatchSource> AbstractRunner::sourcesUsed() const
+QVector<QuerySession::MatchSource> AbstractRunner::sourcesUsed() const
 {
     return d->matchSources;
 }
 
-void AbstractRunner::setSourcesUsed(const QVector<RunnerManager::MatchSource> &sources)
+void AbstractRunner::setSourcesUsed(const QVector<QuerySession::MatchSource> &sources)
 {
     d->matchSources = sources;
 }

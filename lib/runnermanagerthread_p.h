@@ -32,7 +32,7 @@
 class AbstractRunner;
 class QThreadPool;
 class RunnableMatch;
-class RunnerManager;
+class QuerySession;
 class RunnerSessionData;
 
 class NonRestartingTimer : public QTimer
@@ -75,13 +75,13 @@ public:
     void run();
 };
 
-class RunnerManagerThread : public QThread
+class QuerySessionThread : public QThread
 {
     Q_OBJECT
 
 public:
-    RunnerManagerThread(RunnerManager *parent = 0);
-    ~RunnerManagerThread();
+    QuerySessionThread(QuerySession *parent = 0);
+    ~QuerySessionThread();
 
     void run();
     void syncMatches();
@@ -121,7 +121,7 @@ private:
     void clearSessionData();
 
     QThreadPool *m_threadPool;
-    RunnerManager *m_manager;
+    QuerySession *m_manager;
     QStringList m_enabledRunnerIds;
     // these vectors are all the same size at all times
     QVector<RunnerMetaData> m_runnerMetaData;
@@ -148,7 +148,7 @@ class SignalForwarder : public QObject
 {
     Q_OBJECT
 public:
-    SignalForwarder(RunnerManagerThread *thread)
+    SignalForwarder(QuerySessionThread *thread)
         : QObject(0),
           m_thread(thread)
     {}
@@ -167,7 +167,7 @@ public Q_SLOTS:
     }
 
 private:
-    RunnerManagerThread *m_thread;
+    QuerySessionThread *m_thread;
 };
 
 class SessionDataRetriever : public QObject, public QRunnable

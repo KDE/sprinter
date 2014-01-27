@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "runnermanager.h"
-#include "runnermanager_p.h"
+#include "querysession.h"
+#include "querysession_p.h"
 
 #include <QDebug>
 #include <QMetaEnum>
@@ -26,9 +26,9 @@
 #include "runnermanagerthread_p.h"
 #include "runnermodel_p.h"
 
-RunnerManager::Private::Private(RunnerManager *manager)
+QuerySession::Private::Private(QuerySession *manager)
     : q(manager),
-      thread(new RunnerManagerThread(manager)),
+      thread(new QuerySessionThread(manager)),
       runnerModel(new RunnerModel(thread, manager)),
       matchesArrivedWhileExecuting(false)
 {
@@ -39,38 +39,38 @@ RunnerManager::Private::Private(RunnerManager *manager)
     q->connect(thread, SIGNAL(resetModel()), q, SLOT(resetModel()));
 }
 
-void RunnerManager::Private::resetModel()
+void QuerySession::Private::resetModel()
 {
     q->beginResetModel();
     q->endResetModel();
 }
 
-void RunnerManager::Private::addingMatches(int start, int end)
+void QuerySession::Private::addingMatches(int start, int end)
 {
     q->beginInsertRows(QModelIndex(), start, end);
 }
 
-void RunnerManager::Private::matchesAdded()
+void QuerySession::Private::matchesAdded()
 {
     q->endInsertRows();
 }
 
-void RunnerManager::Private::removingMatches(int start, int end)
+void QuerySession::Private::removingMatches(int start, int end)
 {
     q->beginRemoveRows(QModelIndex(), start, end);
 }
 
-void RunnerManager::Private::matchesRemoved()
+void QuerySession::Private::matchesRemoved()
 {
     q->endRemoveRows();
 }
 
-void RunnerManager::Private::matchesUpdated(int start, int end)
+void QuerySession::Private::matchesUpdated(int start, int end)
 {
     emit q->dataChanged(q->createIndex(start, 0), q->createIndex(end, roleColumns.count()));
 }
 
-void RunnerManager::Private::matchesArrived()
+void QuerySession::Private::matchesArrived()
 {
     matchesArrivedWhileExecuting = matchesArrivedWhileExecuting ||
                                    !executingMatches.isEmpty();
@@ -79,7 +79,7 @@ void RunnerManager::Private::matchesArrived()
     }
 }
 
-void RunnerManager::Private::executionFinished(const QueryMatch &match, bool success)
+void QuerySession::Private::executionFinished(const QueryMatch &match, bool success)
 {
     // remove the match from the list of matches being executed
     QMutableHashIterator<int, QueryMatch> it(executingMatches);
@@ -101,7 +101,7 @@ void RunnerManager::Private::executionFinished(const QueryMatch &match, bool suc
     }
 }
 
-RunnerManager::RunnerManager(QObject *parent)
+QuerySession::QuerySession(QObject *parent)
     : QAbstractItemModel(parent),
       d(new Private(this))
 {
@@ -116,18 +116,18 @@ RunnerManager::RunnerManager(QObject *parent)
     d->thread->start();
 }
 
-RunnerManager::~RunnerManager()
+QuerySession::~QuerySession()
 {
     d->thread->exit();
     delete d;
 }
 
-QAbstractItemModel *RunnerManager::runnerModel() const
+QAbstractItemModel *QuerySession::runnerModel() const
 {
     return d->runnerModel;
 }
 
-void RunnerManager::setQuery(const QString &query)
+void QuerySession::setQuery(const QString &query)
 {
     qDebug() << "Manager:" << QThread::currentThread() << query;
     d->query = query;
@@ -135,7 +135,7 @@ void RunnerManager::setQuery(const QString &query)
     emit queryChanged(query);
 }
 
-void RunnerManager::executeMatch(int index)
+void QuerySession::executeMatch(int index)
 {
     QueryMatch match = d->thread->matchAt(index);
 
@@ -164,23 +164,23 @@ void RunnerManager::executeMatch(int index)
     QThreadPool::globalInstance()->start(exec);
 }
 
-void RunnerManager::executeMatch(const QModelIndex &index)
+void QuerySession::executeMatch(const QModelIndex &index)
 {
     executeMatch(index.row());
 }
 
-void RunnerManager::endQuerySession()
+void QuerySession::endQuerySession()
 {
     d->matchesArrivedWhileExecuting = false;
     emit d->thread->requestEndQuerySession();
 }
 
-QString RunnerManager::query() const
+QString QuerySession::query() const
 {
     return d->query;
 }
 
-int RunnerManager::columnCount(const QModelIndex &parent) const
+int QuerySession::columnCount(const QModelIndex &parent) const
 {
     if (parent.isValid()) {
         return 0;
@@ -201,7 +201,7 @@ QString textForEnum(const QObject *obj, const char *enumName, int value)
     return "Unknown";
 }
 
-QVariant RunnerManager::data(const QModelIndex &index, int role) const
+QVariant QuerySession::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.parent().isValid()) {
         return QVariant();
@@ -277,7 +277,7 @@ QVariant RunnerManager::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-QVariant RunnerManager::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant QuerySession::headerData(int section, Qt::Orientation orientation, int role) const {
     if (section > 0 &&
         section < d->roleColumns.count() &&
         role == Qt::DisplayRole) {
@@ -323,7 +323,7 @@ QVariant RunnerManager::headerData(int section, Qt::Orientation orientation, int
     return QAbstractItemModel::headerData(section, orientation, role);
 }
 
-QModelIndex RunnerManager::index(int row, int column, const QModelIndex &parent) const
+QModelIndex QuerySession::index(int row, int column, const QModelIndex &parent) const
 {
     if (parent.isValid()) {
         return QModelIndex();
@@ -332,12 +332,12 @@ QModelIndex RunnerManager::index(int row, int column, const QModelIndex &parent)
     return createIndex(row, column);
 }
 
-QModelIndex RunnerManager::parent(const QModelIndex &index) const
+QModelIndex QuerySession::parent(const QModelIndex &index) const
 {
     return QModelIndex();
 }
 
-int RunnerManager::rowCount(const QModelIndex & parent) const
+int QuerySession::rowCount(const QModelIndex & parent) const
 {
     if (parent.isValid()) {
         return 0;
@@ -346,9 +346,9 @@ int RunnerManager::rowCount(const QModelIndex & parent) const
     return d->thread->matchCount();
 }
 
-QHash<int, QByteArray> RunnerManager::roleNames() const
+QHash<int, QByteArray> QuerySession::roleNames() const
 {
     return d->roles;
 }
 
-#include "moc_runnermanager.cpp"
+#include "moc_querysession.cpp"

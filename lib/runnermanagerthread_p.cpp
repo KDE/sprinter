@@ -30,7 +30,7 @@
 #include <unistd.h>
 
 #include "abstractrunner.h"
-#include "runnermanager.h"
+#include "querysession.h"
 #include "runnersessiondata_p.h"
 
 // temporary include for non-pluggable plugins
@@ -38,7 +38,7 @@
 // #include "runners/c/c.h"
 // #include "runners/youtube/youtube.h"
 
-RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
+QuerySessionThread::QuerySessionThread(QuerySession *parent)
     : QThread(0),
       m_threadPool(new QThreadPool(this)),
       m_manager(parent),
@@ -71,7 +71,7 @@ RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
             this, SLOT(startQuery(QString)));
 }
 
-RunnerManagerThread::~RunnerManagerThread()
+QuerySessionThread::~QuerySessionThread()
 {
     clearSessionData();
 
@@ -83,7 +83,7 @@ RunnerManagerThread::~RunnerManagerThread()
     //TODO: wait for all matching and sessiondata fetch threads to complete?
 }
 
-void RunnerManagerThread::run()
+void QuerySessionThread::run()
 {
     qDebug() << "************** WORKER THREAD STARTING **************";
     SignalForwarder *forwarder = new SignalForwarder(this);
@@ -130,14 +130,14 @@ void RunnerManagerThread::run()
     qDebug() << "************** WORKER THREAD COMPLETE **************";
 }
 
-void RunnerManagerThread::syncMatches()
+void QuerySessionThread::syncMatches()
 {
     // this looks quite round-about, but allows the timer to
     // be moved to any thread and the right thing happen
     emit requestSync();
 }
 
-void RunnerManagerThread::startSync()
+void QuerySessionThread::startSync()
 {
     // TODO: do we need to do the sync in chunks?
     // for large numbers of runners and matches, doing them
@@ -156,7 +156,7 @@ void RunnerManagerThread::startSync()
     qDebug() << "synchronization took" << t.elapsed();
 }
 
-int RunnerManagerThread::matchCount() const
+int QuerySessionThread::matchCount() const
 {
     if (m_matchCount < 0) {
         int count = 0;
@@ -167,13 +167,13 @@ int RunnerManagerThread::matchCount() const
             }
         }
 
-        const_cast<RunnerManagerThread *>(this)->m_matchCount = count;
+        const_cast<QuerySessionThread *>(this)->m_matchCount = count;
     }
 
     return m_matchCount;
 }
 
-QueryMatch RunnerManagerThread::matchAt(int index)
+QueryMatch QuerySessionThread::matchAt(int index)
 {
     if (index < 0 || index >= matchCount()) {
         return QueryMatch();
@@ -199,12 +199,12 @@ QueryMatch RunnerManagerThread::matchAt(int index)
     return QueryMatch();
 }
 
-QVector<RunnerMetaData> RunnerManagerThread::runnerMetaData() const
+QVector<RunnerMetaData> QuerySessionThread::runnerMetaData() const
 {
      return m_runnerMetaData;
 }
 
-void RunnerManagerThread::loadRunnerMetaData()
+void QuerySessionThread::loadRunnerMetaData()
 {
     emit loadingRunnerMetaData();
 
@@ -267,13 +267,13 @@ void RunnerManagerThread::loadRunnerMetaData()
 
 }
 
-void RunnerManagerThread::loadRunner(int index)
+void QuerySessionThread::loadRunner(int index)
 {
     //qDebug() << "RUNNING LOADING REQUEST FROM" << QThread::currentThread();
     emit requestLoadRunner(index);
 }
 
-void RunnerManagerThread::performLoadRunner(int index)
+void QuerySessionThread::performLoadRunner(int index)
 {
     //qDebug() << "RUNNING LOADING OCCURING IN" << QThread::currentThread();
     if (index >= m_runnerMetaData.count() || index < 0) {
@@ -301,7 +301,7 @@ void RunnerManagerThread::performLoadRunner(int index)
     }
 }
 
-void RunnerManagerThread::retrieveSessionData(int index)
+void QuerySessionThread::retrieveSessionData(int index)
 {
     AbstractRunner *runner = m_runners.at(index);
 
@@ -323,7 +323,7 @@ void RunnerManagerThread::retrieveSessionData(int index)
     m_threadPool->start(rtrver);
 }
 
-void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index, RunnerSessionData *data)
+void QuerySessionThread::sessionDataRetrieved(const QUuid &sessionId, int index, RunnerSessionData *data)
 {
     qDebug() << "got session data for runner at index " << index;
 
@@ -357,7 +357,7 @@ void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index
     }
 }
 
-void RunnerManagerThread::updateBusyStatus()
+void QuerySessionThread::updateBusyStatus()
 {
     RunnerSessionData *sessionData = qobject_cast<RunnerSessionData *>(sender());
     if (!sessionData) {
@@ -373,7 +373,7 @@ void RunnerManagerThread::updateBusyStatus()
     }
 }
 
-bool RunnerManagerThread::startNextRunner()
+bool QuerySessionThread::startNextRunner()
 {
     //qDebug() << "    starting for" << m_currentRunner;
     QSharedPointer<RunnerSessionData> sessionData = m_sessionData.at(m_currentRunner);
@@ -410,7 +410,7 @@ bool RunnerManagerThread::startNextRunner()
     return true;
 }
 
-void RunnerManagerThread::startMatching()
+void QuerySessionThread::startMatching()
 {
     //qDebug() << "starting query in work thread..." << QThread::currentThread() << m_context.query() << m_currentRunner << m_runnerBookmark;
 
@@ -449,7 +449,7 @@ void RunnerManagerThread::startMatching()
     m_matchIndexLock.unlock();
 }
 
-void RunnerManagerThread::startQuery(const QString &query)
+void QuerySessionThread::startQuery(const QString &query)
 {
     if (m_context.query() == query) {
         return;
@@ -469,7 +469,7 @@ void RunnerManagerThread::startQuery(const QString &query)
     }
 }
 
-void RunnerManagerThread::clearSessionData()
+void QuerySessionThread::clearSessionData()
 {
     for (int i = 0; i < m_sessionData.size(); ++i) {
         m_sessionData[i].clear();
@@ -480,7 +480,7 @@ void RunnerManagerThread::clearSessionData()
     }
 }
 
-void RunnerManagerThread::endQuerySession()
+void QuerySessionThread::endQuerySession()
 {
     m_sessionId = QUuid::createUuid();
 
@@ -494,7 +494,7 @@ void RunnerManagerThread::endQuerySession()
     emit resetModel();
 }
 
-void RunnerManagerThread::setEnabledRunners(const QStringList &runnerIds)
+void QuerySessionThread::setEnabledRunners(const QStringList &runnerIds)
 {
     m_enabledRunnerIds = runnerIds;
     // this loop relies on the (valid) assumption that the session data
@@ -510,7 +510,7 @@ void RunnerManagerThread::setEnabledRunners(const QStringList &runnerIds)
     }
 }
 
-QStringList RunnerManagerThread::enabledRunners() const
+QStringList QuerySessionThread::enabledRunners() const
 {
     return m_enabledRunnerIds;
 }

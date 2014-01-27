@@ -29,9 +29,9 @@ class QueryMatch::Private : public QSharedData
 public:
     Private(AbstractRunner *r)
         : runner(r),
-          type(RunnerManager::UnknownType),
-          source(RunnerManager::FromInternalSource),
-          precision(RunnerManager::UnrelatedMatch),
+          type(QuerySession::UnknownType),
+          source(QuerySession::FromInternalSource),
+          precision(QuerySession::UnrelatedMatch),
           isSearchTerm(false)
     {
     }
@@ -39,9 +39,9 @@ public:
     QPointer<AbstractRunner> runner;
     QString title;
     QString text;
-    RunnerManager::MatchType type;
-    RunnerManager::MatchSource source;
-    RunnerManager::MatchPrecision precision;
+    QuerySession::MatchType type;
+    QuerySession::MatchSource source;
+    QuerySession::MatchPrecision precision;
     QVariant data;
     QVariant userData;
     bool isSearchTerm;
@@ -103,17 +103,17 @@ QString QueryMatch::text() const
     return d->text;
 }
 
-void QueryMatch::setType(RunnerManager::MatchType type)
+void QueryMatch::setType(QuerySession::MatchType type)
 {
     d->type = type;
 }
 
-void QueryMatch::setSource(RunnerManager::MatchSource source)
+void QueryMatch::setSource(QuerySession::MatchSource source)
 {
     d->source = source;
 }
 
-RunnerManager::MatchSource QueryMatch::source() const
+QuerySession::MatchSource QueryMatch::source() const
 {
     return d->source;
 }
@@ -138,17 +138,17 @@ QVariant QueryMatch::data() const
     return d->data;
 }
 
-RunnerManager::MatchType QueryMatch::type() const
+QuerySession::MatchType QueryMatch::type() const
 {
     return d->type;
 }
 
-void QueryMatch::setPrecision(RunnerManager::MatchPrecision precision)
+void QueryMatch::setPrecision(QuerySession::MatchPrecision precision)
 {
     d->precision = precision;
 }
 
-RunnerManager::MatchPrecision QueryMatch::precision() const
+QuerySession::MatchPrecision QueryMatch::precision() const
 {
     return d->precision;
 }
