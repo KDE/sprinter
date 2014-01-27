@@ -339,7 +339,8 @@ void RunnerManagerThread::sessionDataRetrieved(const QUuid &sessionId, int index
     }
 
     if (data) {
-        data->associateManager(m_manager);
+        data->d->manager = m_manager;
+        data->d->enabled = m_enabledRunnerIds.contains(m_runnerMetaData[index].id);
     }
 
     m_sessionData[index].reset(data);
