@@ -35,10 +35,10 @@ Queries are generally processed in a case-insensitive way.
 
 == Query Sessions
 
-A query session starts when the first query text is provided to the QuerySession object and it ends when the application tells the QuerySession that the session is finished by calling endQuerySession(). Sessions allow runner plugins to prepare and set up whatever they require to process queries and then to release these resources when the querying is complete.
+A query session starts when the first query text is provided to the QuerySession object and it ends when the application tells the QuerySession that the session is completed by calling halt(). Sessions allow runner plugins to prepare and set up whatever they require to process queries and then to release these resources when the querying is complete.
 
-Note that any matches you wish to execute must be started before calling endQuerySession(), as that also clears all the matches as part of releasing resources.
-Since execution of matches is asynchronous, there is an executionFinished signal that the application can use to know when to call endQuerySession().
+Note that any matches you wish to execute must be started before calling halt(), as that also clears all the matches as part of releasing resources.
+Since execution of matches is asynchronous, there is an executionFinished signal that the application can use to know when to call halt().
 
 Sessions allow applications to provide usage patterns such as:
 

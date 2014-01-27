@@ -69,7 +69,7 @@ int main(int argc, char** argv)
     action = new QAction(top);
     action->setShortcut(Qt::Key_Escape);
     top->addAction(action);
-    QObject::connect(action, SIGNAL(triggered()), manager, SLOT(endQuerySession()));
+    QObject::connect(action, SIGNAL(triggered()), manager, SLOT(halt()));
 
     top->resize(1000, 700);
     top->show();

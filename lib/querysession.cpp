@@ -169,7 +169,7 @@ void QuerySession::executeMatch(const QModelIndex &index)
     executeMatch(index.row());
 }
 
-void QuerySession::endQuerySession()
+void QuerySession::halt()
 {
     d->matchesArrivedWhileExecuting = false;
     emit d->thread->requestEndQuerySession();

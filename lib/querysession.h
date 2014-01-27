@@ -116,7 +116,7 @@ public Q_SLOTS:
      * communication channels as needed to complete queries. To
      * release these resources at the end of a query session
      * (e.g. after the user dimisses the search UI) call
-     * @see endQuerySession
+     * @see halt
      */
     void setQuery(const QString &query);
 
@@ -149,7 +149,7 @@ public Q_SLOTS:
      * time other than incuring additional overhead when setQuery is
      * next called.
      */
-    void endQuerySession();
+    void halt();
 
 Q_SIGNALS:
     /**
