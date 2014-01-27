@@ -108,6 +108,12 @@ bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
         }
     */
 
+    // if we are fetching more results, make sure that the runner
+    // can actually do so
+    if (context.fetchMore() && !d->canFetchMoreMatches) {
+        return false;
+    }
+
     return context.isValid();
 }
 
