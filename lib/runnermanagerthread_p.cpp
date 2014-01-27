@@ -43,12 +43,14 @@ RunnerManagerThread::RunnerManagerThread(RunnerManager *parent)
       m_threadPool(new QThreadPool(this)),
       m_manager(parent),
       m_dummySessionData(new RunnerSessionData(0)),
+      m_dummyMatcher(new MatchRunnable(0,
+                                       QSharedPointer<RunnerSessionData>(),
+                                       m_context)),
       m_runnerBookmark(-1),
       m_currentRunner(-1),
       m_sessionId(QUuid::createUuid()),
       m_restartMatchingTimer(0),
       m_startSyncTimer(0),
-      m_dummyMatcher(new MatchRunnable(0, QSharedPointer<RunnerSessionData>(), m_context)),
       m_matchCount(-1)
 {
     // to synchronize in the thread the manager lives in

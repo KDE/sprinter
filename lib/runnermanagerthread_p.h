@@ -120,11 +120,16 @@ private:
 
     QThreadPool *m_threadPool;
     RunnerManager *m_manager;
+    QStringList m_enabledRunnerIds;
+    // these vectors are all the same size at all times
     QVector<RunnerMetaData> m_runnerMetaData;
     QVector<AbstractRunner *> m_runners;
     QVector<QSharedPointer<RunnerSessionData> > m_sessionData;
-    QSharedPointer<RunnerSessionData> m_dummySessionData;
     QVector<MatchRunnable *> m_matchers;
+
+    QSharedPointer<RunnerSessionData> m_dummySessionData;
+    MatchRunnable *m_dummyMatcher;
+
     QReadWriteLock m_matchIndexLock;
     int m_runnerBookmark;
     int m_currentRunner;
@@ -132,8 +137,8 @@ private:
     QUuid m_sessionId;
     QTimer *m_restartMatchingTimer;
     NonRestartingTimer *m_startSyncTimer;
-    MatchRunnable *m_dummyMatcher;
     int m_matchCount;
+
     QPointer<SessionDataThread> m_sessionDataThread;
 };
 
