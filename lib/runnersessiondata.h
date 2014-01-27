@@ -55,8 +55,6 @@ public:
 
     void associateManager(RunnerManager *manager);
 
-    virtual bool shouldStartMatch(const QueryContext &context) const;
-
     void setMatches(const QVector<QueryMatch> &matches, const QueryContext &context);
     void updateMatches(const QVector<QueryMatch> &matches);
     QVector<QueryMatch> matches(MatchState state) const;
@@ -73,6 +71,7 @@ public:
     bool canFetchMoreMatches() const;
 
     void startMatch(const QueryContext &context);
+    virtual bool shouldStartMatch(const QueryContext &context) const;
 
 Q_SIGNALS:
     void busyChanged();
