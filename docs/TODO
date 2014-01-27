@@ -4,8 +4,8 @@
 * Design and imlement an improved Plasma::QuerySyntax that is useful for:
     * run time help / hints for the user
     * automatic query construction
-    * pre-threading query filtering
-* Design and implement an improved (relative to krunner) "single runner" mode
+    * use in shouldStartMatch
+    * provide setting in RunnerManager that controls whether or not a default syntax is passed to the runner
 * icons for QueryMatches
 * add paging suppot to setMatches / updateMatches
 
