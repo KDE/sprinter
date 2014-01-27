@@ -12,6 +12,7 @@
 == Improvements
 * Clear all TODOs/FIXMEs in code
 * QueryMatch::isSearchTerm should allow setting whether to only run against same runner that generated it (relies on a single-runner mode)
+* currently AbstractRunner plugins hang out in memory once access the first time; should probably be ref counted and deleted when no longer used
 
 == Bugfixes
 * Ensure all threads cleaned up before exit
@@ -47,13 +48,3 @@
     * Correctness of results
     * Threading safety
     * Speed
-* Multiple query sesions in the same manager
-    * This would allow one RunnerManager to be used from multiple UIs simultaneously
-    * Requires multiplexing the RunnerSessionData (RSD) objects
-    * Probably implement with a RAII class called e.g. SessionToken
-        * Stores the RSD objects (RMT could touch its dptr)
-        * Stores the query text
-        * Stores the un-sync'd matches
-        * Basically, all the data held by RMT goes here instead and RMT has a collection of SessionToken classes
-        * RunnerSessionData, etc. are cleaned up in dtor
-    * Would remove need for the QUuid sesion id in RMT
