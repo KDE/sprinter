@@ -2,6 +2,20 @@
 
 Regardless of the type of information a runner is matching queries against, there are  a small number of patterns for getting from raw query to match set. These are outlined below.
 
+
+== Plugins
+
+To make a plugin, add this to your object delcaration, replacing the IID and FILE values with proper values:
+
+    Q_PLUGIN_METADATA(IID "org.name.pluginname" FILE "pluginname.json")
+
+Add the json file in the same directory with the following contents:
+
+    {
+        "name": "User-visible name",
+        "description": "A short description"
+    }
+
 == Statelesness
 
 The runner itself must be stateless. The methods that process queries and matches must all be self contained and not reference any data members in the runner itself. Instead, all state must be stored in the RunnerSessionData object (which can be subclassed and returned from createSessionData; see below for more on this).
