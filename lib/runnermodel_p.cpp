@@ -53,6 +53,24 @@ RunnerModel::~RunnerModel()
 {
 }
 
+QStringList RunnerModel::enabledRunners() const
+{
+    return m_thread ? m_thread->enabledRunners() : QStringList();
+}
+
+void RunnerModel::setEnabledRunners(const QStringList &runnerIds)
+{
+    if (m_thread) {
+        m_thread->setEnabledRunners(runnerIds);
+        emit enabledRunnersChanged();
+    }
+}
+
+QStringList RunnerModel::runnerIds() const
+{
+    return m_runnerIds;
+}
+
 QVariant RunnerModel::data(const QModelIndex &index, int role) const
 {
     if (!m_thread || !index.isValid() || index.parent().isValid()) {
@@ -178,8 +196,20 @@ void RunnerModel::runnerMetaDataLoading()
 
 void RunnerModel::runnerMetaDataLoaded()
 {
-    m_count = m_thread ? m_thread->runnerMetaData().count() : 0;
-    emit endResetModel();
+    m_runnerIds.clear();
+    m_count = 0;
+
+    if (m_thread) {
+        QVector<RunnerMetaData> runners = m_thread->runnerMetaData();
+        m_count = runners.count();
+
+        for (int i = 0; i < m_count; ++i) {
+            m_runnerIds << runners[i].id;
+        }
+    }
+
+    emit runnerIdsChanged();
+    endResetModel();
 }
 
 void RunnerModel::loadRunner(int index)

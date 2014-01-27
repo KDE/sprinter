@@ -20,12 +20,19 @@
 
 #include <QAbstractItemModel>
 #include <QPointer>
+#include <QStringList>
 
 class RunnerManagerThread;
 
 class RunnerModel : public QAbstractItemModel
 {
     Q_OBJECT
+
+    Q_PROPERTY(QStringList enabledRunners WRITE setEnabledRunners
+                                          READ enabledRunners
+                                          NOTIFY enabledRunnersChanged)
+    Q_PROPERTY(QStringList runnerIds READ runnerIds
+                                     NOTIFY runnerIdsChanged)
 
 public:
     enum DisplayRoles {
@@ -39,17 +46,18 @@ public:
     RunnerModel(RunnerManagerThread *thread, QObject *parent = 0);
     ~RunnerModel();
 
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
-    QModelIndex parent(const QModelIndex &index) const;
-    int rowCount(const QModelIndex & parent = QModelIndex()) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    QHash<int, QByteArray> roleNames() const;
+    QStringList enabledRunners() const;
+    void setEnabledRunners(const QStringList &runnerIds);
+
+    QStringList runnerIds() const;
 
 public Q_SLOTS:
     void loadRunner(int index);
     void loadRunner(const QModelIndex &index);
+
+Q_SIGNALS:
+    void enabledRunnersChanged();
+    void runnerIdsChanged();
 
 private Q_SLOTS:
     void runnerMetaDataLoading();
@@ -61,9 +69,20 @@ private:
     QPointer<RunnerManagerThread> m_thread;
     QHash<int, QByteArray> m_roles;
     QVector<int> m_roleColumns;
+    QStringList m_runnerIds;
     int m_count;
     int m_loadedColumn;
     int m_busyColumn;
+
+public:
+    // All the QAbstractItemModel reimp's
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
+    QModelIndex parent(const QModelIndex &index) const;
+    int rowCount(const QModelIndex & parent = QModelIndex()) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    QHash<int, QByteArray> roleNames() const;
 };
 
 #endif
