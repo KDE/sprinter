@@ -8,6 +8,7 @@
     * provide setting in RunnerManager that controls whether or not a default syntax is passed to the runner
 * icons for QueryMatches
 * add paging suppot to setMatches / updateMatches
+* expose the sources and match types via the RunnerModel
 
 == Improvements
 * Clear all TODOs/FIXMEs in code
