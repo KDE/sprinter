@@ -2,22 +2,52 @@
 
 Regardless of the type of information a runner is matching queries against, there are  a small number of patterns for getting from raw query to match set. These are outlined below.
 
+== Statelesness
+
+The runner itself must be stateless. The methods that process queries and matches must all be self contained and not reference any data members in the runner itself. Instead, all state must be stored in the RunnerSessionData object (which can be subclassed and returned from createSessionData; see below for more on this).
+
+The startExec method must operate solely on the match handed in; match similarly must rely only on the RunnerSessionData and QueryContext objects passed in.
+
+The other methods all describe the runner's properties: the minimum query length, the types of matches generated, the sources of those matches, etc. These are not stateful and so are found in the runner itself.
+
 == When To Subclass RunnerSessionData
 
 A runner should create a subclass of RunnerSessionData and return it from a reimplementation of AbstractRunner::createSessionData when one or more of the following is true:
 
  * there is shareable, non-trivial data or session set up needed to perform AbstractRunner::match. Putting this into RunnerSessionData and doing the initialization in creationSessionData allows this to happens once per query session and in a separate thread (therefore non-blocking)
  * the runner produces matches asynchronously
+ * the runner may not always be ready to perform matches
+
+The last point deserves more attention: if a runner relies on a service being available or some other external dependency may prevent it from performing successful query processing then the runner should subclass RunnerSessionData and reimplement shouldStartMatch in this manner:
+
+    bool shouldStartMatch(const QueryContext &context) const
+    {
+        if (!RunnerSessionData::shouldStartMatch()) {
+            return false;
+        }
+
+        // further checks go here
+        // return false if the matching should not be performed
+    }
+
+Note that RunnerSessionData::shouldStartMatch already checks to see if network is available in the case that AbstractRunner::sourcesUsed() returns a single value of FromNetworkService. So in the common case of requiring network availability, a runner can simply do this in its constructor:
+
+    setSourcesUsed(QVector<RunnerManager::MatchSource>()
+                    << RunnerManager::FromNetworkService);
+
+In that case, a subclass of RunnerSessionData is not required as this common case is checked for by the base implementation of RunnerSessionData::shouldStartMatch.
+
+You may notice that there is an "enabled" property in RunnerSessionData. However, a runner should never set this. It is reserved for use by the application which creates the RunnerManager, and as such may be reset at any time. The proper way for a runner to say it is able to match or not is through RunnerSessionData::shouldStartMatch.
 
 == Fast Synchronous Matching
 
 Runners whose query matching is necessarily synchronous, either because a library they are using only offers a synchronous API or because the matching is fast (e.g. sub-100ms), can take the easiest approach: reimplement AbstractRunner::match and call RunnerSessionData::setMatches at least once, even on failure (this will clear the set of matches).
 
-== Slow Synchronous
+== Slow Synchronous Matching
 
 (fill in once there is at least one clean working example)
 
-== Asynchronous
+== Asynchronous Matching
 
 To achieve proper asynchronous matching the following steps must be followed:
 
@@ -33,3 +63,5 @@ To achieve proper asynchronous matching the following steps must be followed:
 == Paging
 
 When matchng, a runner should never return more than RunnerSessionData::resultsPageSize() matches and should always start at RunnerSessionData::resultsOffset() into the dataset.
+
+If it can retrieve more results, then it must call sessionData->setCanFetchMoreMatches(true) when it has populated the matches for a given request.
