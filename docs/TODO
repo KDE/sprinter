@@ -35,6 +35,8 @@
 * Implement merging in setMatches
 
 = Unscheduled
+* Add application affiliation to the json & export to RunnerModel
+    * With model filtering, it becomes easy to get plugins relevant to a specific application
 * Tiered match run priorities on runners set by the user
     * 0 - in worker thread; 1 launched first in threadpool; 2 launch last in threadpool
     * a launcher might request app launchers in tier 0, e.g.
