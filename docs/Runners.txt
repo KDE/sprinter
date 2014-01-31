@@ -78,4 +78,4 @@ To achieve proper asynchronous matching the following steps must be followed:
 
 When matchng, a runner should never return more than RunnerSessionData::resultsPageSize() matches and should always start at RunnerSessionData::resultsOffset() into the dataset.
 
-If it can retrieve more results, then it must call sessionData->setCanFetchMoreMatches(true) when it has populated the matches for a given request.
+If it can retrieve more results, then it must call sessionData->setCanFetchMoreMatches(true, context) when it has populated the matches for a given request. The canFetchMoreMatches property is reset to false before every call to match().

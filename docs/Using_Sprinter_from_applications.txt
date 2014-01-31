@@ -100,5 +100,21 @@ The runner model is a QAbstractItemModel (just like QuerySession). It exports th
         DescriptionRole     A description of the runner (translated)
         IsLoadedRole        True if the runner is loaded, false if not
         IsBusyRole          True if the runner is processing a query, false if not
+        IsEnabledRole       True if the runner is enabled
 
 To load a specific runner simply call loadRunner with either the numeric (int) row number of the plugin or with its QModelIndex from the model.
+
+The QuerySession can also be made to temporarily limit the runners that are used in matching by setting the enabledRunners property on the runnerModel() object:
+
+    QStringList enabledIds;
+    enabledIds << "org.kde.datetime";
+    session->runnerModel()->setProperty("enabledRunners", enabledIds);
+
+To enable all runners, do:
+
+    QStringList allIds = session->runnerModel()->property("runnerIds").toStringList()
+    session->runnerModel()->setProperty("enabledRunners", allIds);
+
+From QML this is a simple matter of setting the properties, e.g.:
+
+    session.runnerModel.enabledRunners = session.runnerModel.runnerIds;
