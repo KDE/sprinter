@@ -484,9 +484,7 @@ void QuerySessionThread::startQuery()
         m_matchers.fill(0);
     }
 
-    if (m_context.isDefaultMatchesRequest() || !m_context.query().isEmpty()) {
-        emit requestFurtherMatching();
-    }
+    emit requestFurtherMatching();
 }
 
 void QuerySessionThread::clearSessionData()
