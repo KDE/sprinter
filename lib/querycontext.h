@@ -36,9 +36,9 @@ public:
     QString query() const;
 
     bool isDefaultMatchesRequest() const;
+    void setIsDefaultMatchesRequest(bool requestDefaults);
 
     bool isValid() const;
-    void reset();
 
     bool networkAccessible() const;
 

@@ -29,7 +29,8 @@ public:
         : QSharedData(),
           q(context),
           network(new QNetworkAccessManager),
-          fetchMore(false)
+          fetchMore(false),
+          isDefaultMatchesRequest(false)
     {
     }
 
@@ -42,12 +43,32 @@ public:
         //type;
     }
 
+    void reset(QExplicitlySharedDataPointer<Private> toDetach, QueryContext *newQ);
+
     QueryContext *q;
     QString query;
     QReadWriteLock lock;
     QSharedPointer<QNetworkAccessManager> network;
     bool fetchMore;
+    bool isDefaultMatchesRequest;
 };
+
+void QueryContext::Private::reset(QExplicitlySharedDataPointer<Private> toDetach, QueryContext *newQ)
+{
+    // We will detach if we are a copy of someone. But we will reset
+    // if we are the 'main' context others copied from. Resetting
+    // one QueryContext makes all the copies obsolete.
+
+    // We need to mark the q pointer of the detached QueryContextPrivate
+    // as dirty on detach to avoid receiving results for old queries
+    q = 0;
+
+    toDetach.detach();
+    query.clear();
+
+    // Now that we detached the d pointer we need to reset its q pointer
+    q = newQ;
+}
 
 QueryContext::QueryContext()
     : d(new Private(this))
@@ -80,29 +101,14 @@ QueryContext &QueryContext::operator=(const QueryContext &other)
     return *this;
 }
 
-void QueryContext::reset()
-{
-    // We will detach if we are a copy of someone. But we will reset
-    // if we are the 'main' context others copied from. Resetting
-    // one QueryContext makes all the copies obsolete.
-
-    // We need to mark the q pointer of the detached QueryContextPrivate
-    // as dirty on detach to avoid receiving results for old queries
-    d->q = 0;
-
-    d.detach();
-    d->query.clear();
-
-    // Now that we detached the d pointer we need to reset its q pointer
-    d->q = this;
-}
-
 void QueryContext::setQuery(const QString &query)
 {
-    if (d->query != query) {
-        d->fetchMore = false;
-    }
+    const bool fetchMore = d->query == query;
 
+    d->reset(d, this);
+
+    d->fetchMore = fetchMore;
+    d->isDefaultMatchesRequest = false;
     d->query = query;
 }
 
@@ -113,7 +119,15 @@ QString QueryContext::query() const
 
 bool QueryContext::isDefaultMatchesRequest() const
 {
-    return d->query.isEmpty();
+    return d->isDefaultMatchesRequest;
+}
+
+void QueryContext::setIsDefaultMatchesRequest(bool requestDefaults)
+{
+    d->reset(d, this);
+    d->fetchMore = false;
+    d->query = QString();
+    d->isDefaultMatchesRequest = requestDefaults;
 }
 
 bool QueryContext::isValid() const

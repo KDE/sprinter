@@ -94,6 +94,7 @@ bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
     // if the query is too short return, unless
     // the runner does default matches and the context is a
     // request for default matches
+
     if (!(d->runner->generatesDefaultMatches() &&
           context.isDefaultMatchesRequest()) &&
         (uint)context.query().length() < d->runner->minQueryLength()) {
@@ -119,7 +120,7 @@ bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
     // if we are fetching more results, make sure that the runner
     // can actually do so
     if (context.fetchMore() && !d->canFetchMoreMatches) {
-        return false;
+         return false;
     }
 
     return context.isValid();
