@@ -58,6 +58,8 @@ int main(int argc, char** argv)
 
     QPushButton *defaultMatchButton = new QPushButton(top);
     defaultMatchButton->setText("Default matches");
+    QObject::connect(defaultMatchButton, SIGNAL(clicked()),
+                     manager, SLOT(requestDefaultMatches()));
 
     QGridLayout *topLayout = new QGridLayout(top);
     topLayout->addWidget(edit, 0, 0);
