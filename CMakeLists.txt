@@ -19,7 +19,7 @@ set(sprinterlib_SRCS
     lib/querymatch.cpp
     lib/querycontext.cpp
     lib/querysession.cpp
-    lib/runnermanagerthread_p.cpp
+    lib/querysessionthread_p.cpp
     lib/runnermodel_p.cpp
     lib/runnersessiondata.cpp
 )

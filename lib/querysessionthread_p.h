@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef RUNNERMANAGERTHREAD
-#define RUNNERMANAGERTHREAD
+#ifndef QUERYSESSIONTHREAD
+#define QUERYSESSIONTHREAD
 
 #include <QReadWriteLock>
 #include <QRunnable>

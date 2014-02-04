@@ -18,7 +18,7 @@
 #include "runnermodel_p.h"
 
 #include "abstractrunner.h"
-#include "runnermanagerthread_p.h"
+#include "querysessionthread_p.h"
 
 #include <QDebug>
 #include <QMetaEnum>

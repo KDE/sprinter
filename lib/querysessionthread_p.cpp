@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "runnermanagerthread_p.h"
+#include "querysessionthread_p.h"
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -605,4 +605,4 @@ void SessionDataThread::run()
     exec();
 }
 
-#include "moc_runnermanagerthread_p.cpp"
+#include "moc_querysessionthread_p.cpp"

@@ -23,7 +23,7 @@
 #include <QThreadPool>
 
 #include "abstractrunner.h"
-#include "runnermanagerthread_p.h"
+#include "querysessionthread_p.h"
 #include "runnermodel_p.h"
 
 QuerySession::Private::Private(QuerySession *session)
