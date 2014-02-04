@@ -111,6 +111,11 @@ QString QueryContext::query() const
     return d->query;
 }
 
+bool QueryContext::isDefaultMatchesRequest() const
+{
+    return d->query.isEmpty();
+}
+
 bool QueryContext::isValid() const
 {
     return d->q;

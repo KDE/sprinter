@@ -35,6 +35,8 @@ public:
     void setQuery(const QString &query);
     QString query() const;
 
+    bool isDefaultMatchesRequest() const;
+
     bool isValid() const;
     void reset();
 
