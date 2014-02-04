@@ -22,6 +22,7 @@
 #include <QDebug>
 #include <QLabel>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QTreeView>
 #include <QGridLayout>
 
@@ -55,9 +56,13 @@ int main(int argc, char** argv)
     QObject::connect(runnerView, SIGNAL(doubleClicked(QModelIndex)),
                      manager->runnerModel(), SLOT(loadRunner(QModelIndex)));
 
+    QPushButton *defaultMatchButton = new QPushButton(top);
+    defaultMatchButton->setText("Default matches");
+
     QGridLayout *topLayout = new QGridLayout(top);
     topLayout->addWidget(edit, 0, 0);
     topLayout->addWidget(matchView, 1, 0);
+    topLayout->addWidget(defaultMatchButton, 2, 0);
     topLayout->addWidget(new QLabel("Runners"), 0, 1);
     topLayout->addWidget(runnerView, 1, 1);
 
