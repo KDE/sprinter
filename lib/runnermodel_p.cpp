@@ -108,6 +108,9 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
         case IsBusyRole:
             return info[index.row()].loaded && info[index.row()].busy;
             break;
+        case GeneratesDefaultMatchesRole:
+            return info[index.row()].generatesDefaultMatches;
+            break;
         default:
             break;
     }
@@ -142,6 +145,9 @@ QVariant RunnerModel::headerData(int section, Qt::Orientation orientation, int r
                 break;
             case IsBusyRole:
                 return tr("Busy");
+                break;
+            case GeneratesDefaultMatchesRole:
+                return tr("Default Matches");
                 break;
             default:
                 break;

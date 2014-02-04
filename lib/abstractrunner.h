@@ -115,7 +115,8 @@ public:
 protected:
     /**
      * Used to set whether or not this runner has a default set of results that
-     * can be returned without any search term
+     * can be returned without any search term. Must be called in the
+     * runner's constructor to take effect.
      * @param hasDefaultsMatches true if there are default matches
      */
     void setGeneratesDefaultMatches(bool hasDefaultMatches);

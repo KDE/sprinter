@@ -293,12 +293,16 @@ void QuerySessionThread::performLoadRunner(int index)
     AbstractRunner *runner = qobject_cast<AbstractRunner *>(plugin);
     if (runner) {
         m_runnerMetaData[index].loaded = true;
+        m_runnerMetaData[index].busy = false;
+        m_runnerMetaData[index].generatesDefaultMatches = runner->generatesDefaultMatches();
         m_sessionData[index].clear();
         m_runners[index] = runner;
         retrieveSessionData(index);
         emit runnerLoaded(index);
     } else {
         m_runnerMetaData[index].loaded = false;
+        m_runnerMetaData[index].busy = false;
+        m_runnerMetaData[index].generatesDefaultMatches = false;
         qWarning() << "LOAD FAILURE" <<  path << ":" << loader.errorString();
         delete plugin;
     }

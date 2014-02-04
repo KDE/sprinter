@@ -39,7 +39,8 @@ public:
         IdRole = Qt::UserRole,
         DescriptionRole,
         IsLoadedRole,
-        IsBusyRole
+        IsBusyRole,
+        GeneratesDefaultMatchesRole
     };
     Q_ENUMS(DisplayRoles)
 

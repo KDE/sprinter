@@ -22,7 +22,8 @@ struct RunnerMetaData
 {
     RunnerMetaData()
         : loaded(false),
-          busy(false)
+          busy(false),
+          generatesDefaultMatches(false)
     {
     }
 
@@ -32,6 +33,7 @@ struct RunnerMetaData
     QString description;
     bool loaded;
     bool busy;
+    bool generatesDefaultMatches;
 };
 
 #endif
