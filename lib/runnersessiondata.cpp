@@ -86,8 +86,16 @@ void RunnerSessionData::associateManager(QuerySession *manager)
 
 bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
 {
-    if (!d->runner ||
-        !d->enabled ||
+    // no runner or not enabled -> return immediately
+    if (!d->runner || !d->enabled) {
+        return false;
+    }
+
+    // if the query is too short return, unless
+    // the runner does default matches and the context is a
+    // request for default matches
+    if (!(d->runner->generatesDefaultMatches() &&
+          context.isDefaultMatchesRequest()) &&
         (uint)context.query().length() < d->runner->minQueryLength()) {
         return false;
     }
