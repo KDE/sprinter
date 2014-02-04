@@ -72,6 +72,8 @@ QStringList RunnerModel::runnerIds() const
     return m_runnerIds;
 }
 
+//TODO: this is unlikely to work as expected from QML; look for a different solution after testing
+Q_DECLARE_METATYPE(QList<int>);
 QVariant RunnerModel::data(const QModelIndex &index, int role) const
 {
     if (!m_thread || !index.isValid() || index.parent().isValid()) {
@@ -87,9 +89,11 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
     // QML asks for a row and a role, basically ignoring roleColumns
     // Default QWidget views as for the DisplayRole of a row/column
     // so we adapt what data() returns based on what we are being asked for
+    bool asText = false;
     if (index.column() > 0 &&
         index.column() < m_roleColumns.count() &&
         role == Qt::DisplayRole) {
+        asText = true;
         role = m_roleColumns[index.column()];
     }
 
@@ -112,6 +116,40 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
         case GeneratesDefaultMatchesRole:
             return info[index.row()].runner != 0 &&
                    info[index.row()].runner->generatesDefaultMatches();
+            break;
+        case MatchTypesRole:
+            if (info[index.row()].runner) {
+                if (asText) {
+                    QStringList list;
+                    foreach (int value, info[index.row()].runner->matchTypesGenerated()) {
+                        list << textForEnum(m_thread->session(), "MatchType", value);
+                    }
+                    return list;
+                } else {
+                    QList<int> intlist;
+                    foreach (int value, info[index.row()].runner->matchTypesGenerated()) {
+                        intlist << value;
+                    }
+                    return QVariant::fromValue(intlist);
+                }
+            }
+            break;
+        case SourcesUsedRole:
+            if (info[index.row()].runner) {
+                if (asText) {
+                    QStringList list;
+                    foreach (int value, info[index.row()].runner->sourcesUsed()) {
+                        list << textForEnum(m_thread->session(), "MatchSource", value);
+                    }
+                    return list;
+                } else {
+                    QList<int> intlist;
+                    foreach (int value, info[index.row()].runner->sourcesUsed()) {
+                        intlist << value;
+                    }
+                    return QVariant::fromValue(intlist);
+                }
+            }
             break;
         default:
             break;
@@ -150,6 +188,12 @@ QVariant RunnerModel::headerData(int section, Qt::Orientation orientation, int r
                 break;
             case GeneratesDefaultMatchesRole:
                 return tr("Default Matches");
+                break;
+            case MatchTypesRole:
+                return tr("Match Types");
+                break;
+            case SourcesUsedRole:
+                return tr("Sources");
                 break;
             default:
                 break;
@@ -234,7 +278,7 @@ void RunnerModel::loadRunner(const QModelIndex &index)
 
 void RunnerModel::runnerLoaded(int index)
 {
-    emit dataChanged(createIndex(index, m_loadedColumn), createIndex(index, m_loadedColumn));
+    emit dataChanged(createIndex(index, m_loadedColumn), createIndex(index, m_roles.size()));
 }
 
 void RunnerModel::runnerBusy(int index)

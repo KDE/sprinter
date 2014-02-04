@@ -40,7 +40,9 @@ public:
         DescriptionRole,
         IsLoadedRole,
         IsBusyRole,
-        GeneratesDefaultMatchesRole
+        GeneratesDefaultMatchesRole,
+        MatchTypesRole,
+        SourcesUsedRole
     };
     Q_ENUMS(DisplayRoles)
 
