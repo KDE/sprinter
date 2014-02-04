@@ -93,6 +93,9 @@ public:
     void endQuerySession();
     void setEnabledRunners(const QStringList &runnerIds);
     QStringList enabledRunners() const;
+    void launchDefaultMatches();
+    bool launchQuery(const QString &query);
+    QString query() const;
 
 Q_SIGNALS:
     void requestFurtherMatching();
@@ -107,7 +110,6 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     void sessionDataRetrieved(const QUuid &sessionId, int, RunnerSessionData *data);
-    void startQuery(const QString &query);
     void loadRunner(int index);
 
 private Q_SLOTS:
@@ -115,6 +117,7 @@ private Q_SLOTS:
     void updateBusyStatus();
 
 private:
+    void startQuery();
     void loadRunnerMetaData();
     void retrieveSessionData(int index);
     bool startNextRunner();

@@ -67,8 +67,6 @@ QuerySessionThread::QuerySessionThread(QuerySession *parent)
             m_startSyncTimer, SLOT(startIfStopped()));
     connect(m_startSyncTimer, SIGNAL(timeout()),
             this, SLOT(startSync()));
-    connect(m_manager, SIGNAL(queryChanged(QString)),
-            this, SLOT(startQuery(QString)));
 }
 
 QuerySessionThread::~QuerySessionThread()
@@ -454,14 +452,31 @@ void QuerySessionThread::startMatching()
     m_matchIndexLock.unlock();
 }
 
-void QuerySessionThread::startQuery(const QString &query)
+void QuerySessionThread::launchDefaultMatches()
+{
+     m_context.setQuery(QString());
+     startQuery();
+}
+
+bool QuerySessionThread::launchQuery(const QString &query)
 {
     if (m_context.query() == query) {
-        return;
+        return false;
     }
 
     m_context.setQuery(query);
-    //qDebug() << "requesting query from UI thread..." << QThread::currentThread() << query;
+    startQuery();
+    return true;
+}
+
+QString QuerySessionThread::query() const
+{
+    return m_context.query();
+}
+
+void QuerySessionThread::startQuery()
+{
+    //qDebug() << "requesting query from UI thread..." << QThread::currentThread() << m_context.query();
 
     {
         QWriteLocker lock(&m_matchIndexLock);
@@ -469,7 +484,7 @@ void QuerySessionThread::startQuery(const QString &query)
         m_matchers.fill(0);
     }
 
-    if (!query.isEmpty()) {
+    if (m_context.isDefaultMatchesRequest() || !m_context.query().isEmpty()) {
         emit requestFurtherMatching();
     }
 }
