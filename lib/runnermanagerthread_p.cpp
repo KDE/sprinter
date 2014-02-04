@@ -454,7 +454,7 @@ void QuerySessionThread::startMatching()
 
 void QuerySessionThread::launchDefaultMatches()
 {
-     m_context.setQuery(QString());
+     m_context.setIsDefaultMatchesRequest(true);
      startQuery();
 }
 
