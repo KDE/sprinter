@@ -145,8 +145,8 @@ void QuerySessionThread::startSync()
     // TODO: do we need to do the sync in chunks?
     // for large numbers of runners and matches, doing them
     // all at once may be too slow. needs to be measured in future
-    QTime t;
-    t.start();
+//     QTime t;
+//     t.start();
     m_matchCount = -1;
 
     int offset = 0;
@@ -156,7 +156,7 @@ void QuerySessionThread::startSync()
         }
     }
     m_matchCount = offset;
-    qDebug() << "synchronization took" << t.elapsed();
+//     qDebug() << "synchronization took" << t.elapsed();
 }
 
 int QuerySessionThread::matchCount() const
