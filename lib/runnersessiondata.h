@@ -18,10 +18,11 @@
 #ifndef RUNNERSESSIONDATA
 #define RUNNERSESSIONDATA
 
+#include <sprinter/sprinter_export.h>
+#include <sprinter/querymatch.h>
+
 #include <QObject>
 #include <QPointer>
-
-#include "querymatch.h"
 
 namespace Sprinter
 {
@@ -30,7 +31,7 @@ class AbstractRunner;
 class QueryContext;
 class QuerySession;
 
-class RunnerSessionData : public QObject
+class SPRINTER_EXPORT RunnerSessionData : public QObject
 {
     Q_OBJECT
 

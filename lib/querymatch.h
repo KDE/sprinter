@@ -18,18 +18,19 @@
 #ifndef QUERYMATCH
 #define QUERYMATCH
 
+#include <sprinter/querysession.h>
+#include <sprinter/sprinter_export.h>
+
 #include <QExplicitlySharedDataPointer>
 #include <QString>
 #include <QVariant>
-
-#include <querysession.h>
 
 namespace Sprinter
 {
 
 class AbstractRunner;
 
-class QueryMatch
+class SPRINTER_EXPORT QueryMatch
 {
 public:
     QueryMatch();

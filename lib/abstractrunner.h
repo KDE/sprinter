@@ -18,6 +18,8 @@
 #ifndef ABSTRACTRUNNER
 #define ABSTRACTRUNNER
 
+#include <sprinter/sprinter_export.h>
+
 #include <QObject>
 #include <QRunnable>
 
@@ -32,7 +34,7 @@ class AbstractRunner;
 class QueryContext;
 class RunnerSessionData;
 
-class AbstractRunner : public QObject
+class SPRINTER_EXPORT AbstractRunner : public QObject
 {
     Q_OBJECT
 

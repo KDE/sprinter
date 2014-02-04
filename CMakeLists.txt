@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
+include (GenerateExportHeader)
 
 find_package(ECM 0.0.8 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
@@ -30,9 +31,11 @@ set(sprinterlib_HEADERS
     lib/querymatch.h
     lib/querysession.h
     lib/runnersessiondata.h
+    ${CMAKE_BINARY_DIR}/sprinter/sprinter_export.h
 )
 
 add_library(sprinter SHARED ${sprinterlib_SRCS})
+generate_export_header(sprinter BASE_NAME Sprinter EXPORT_FILE_NAME sprinter/sprinter_export.h)
 qt5_use_modules(sprinter Widgets Network)
 install(TARGETS sprinter DESTINATION lib)
 
@@ -40,7 +43,6 @@ install(TARGETS sprinter DESTINATION lib)
 set(sprinter_SRCS
     test/main.cpp
 )
-
 add_executable(sprintertest ${sprinter_SRCS})
 qt5_use_modules(sprintertest Widgets Network)
 target_link_libraries(sprintertest sprinter)

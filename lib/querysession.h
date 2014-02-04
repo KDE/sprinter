@@ -18,6 +18,8 @@
 #ifndef RUNNERMANAGER
 #define RUNNERMANAGER
 
+#include <sprinter/sprinter_export.h>
+
 #include <QAbstractItemModel>
 
 namespace Sprinter
@@ -25,7 +27,7 @@ namespace Sprinter
 
 class QueryMatch;
 
-class QuerySession : public QAbstractItemModel
+class SPRINTER_EXPORT QuerySession : public QAbstractItemModel
 {
     Q_OBJECT
     Q_PROPERTY(QString query WRITE setQuery READ query NOTIFY queryChanged)

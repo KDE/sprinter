@@ -18,7 +18,8 @@
 #ifndef QUERYCONTEXT
 #define QUERYCONTEXT
 
-#include <querymatch.h>
+#include <sprinter/querymatch.h>
+#include <sprinter/sprinter_export.h>
 
 #include <QExplicitlySharedDataPointer>
 #include <QString>
@@ -26,7 +27,7 @@
 namespace Sprinter
 {
 
-class QueryContext
+class SPRINTER_EXPORT QueryContext
 {
 public:
     QueryContext();
