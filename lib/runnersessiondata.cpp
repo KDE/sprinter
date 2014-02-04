@@ -72,18 +72,6 @@ AbstractRunner *RunnerSessionData::runner() const
     return d->runner;
 }
 
-void RunnerSessionData::associateManager(QuerySession *manager)
-{
-    if (manager == d->manager) {
-        return;
-    }
-
-    d->manager = manager;
-    if (d->manager && !d->currentMatches.isEmpty()) {
-        d->manager->d->matchesArrived();
-    }
-}
-
 bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
 {
     // no runner or not enabled -> return immediately
@@ -163,72 +151,6 @@ void RunnerSessionData::startMatch(const QueryContext &context)
     d->runner->match(this, context);
 }
 
-int RunnerSessionData::Private::syncMatches(int offset)
-{
-    Q_ASSERT(manager);
-
-    QVector<QueryMatch> unsynced;
-
-    {
-        QMutexLocker lock(&currentMatchesLock);
-        if (matchesUnsynced) {
-            matchesUnsynced = false;
-            unsynced = currentMatches;
-            currentMatches.clear();
-        } else {
-            return syncedMatches.count();
-        }
-    }
-
-#ifdef DEBUG_SYNC
-    qDebug() << "SYNC offset, synced, unsynced:" << offset << syncedMatches.count() << unsynced.count();
-#endif
-
-    // only accept pagesize matches
-    if ((uint)unsynced.size() > pageSize) {
-        unsynced.resize(pageSize);
-    }
-
-    if (syncedMatches.isEmpty()) {
-        // no sync'd matches, so we only need to do something if we now do have matches
-        if (!unsynced.isEmpty()) {
-            // we had no matches, now we do
-            manager->d->addingMatches(offset, offset + unsynced.size());
-            syncedMatches = unsynced;
-            manager->d->matchesAdded();
-        }
-    } else if (unsynced.isEmpty()) {
-        // we had matches, and now we don't
-        manager->d->removingMatches(offset, offset + syncedMatches.size());
-        syncedMatches.clear();
-        manager->d->matchesRemoved();
-    } else {
-        // now the more complex situation: we have both synced and new matches
-        // these need to be merged with the correct add/remove/update rows
-        // methods called in the manager (the model)
-        //TODO: implement merging; this implementation is naive and does not
-        // allow for updating results
-        const int oldCount = syncedMatches.count();
-        const int newCount = unsynced.count();
-        if (oldCount == newCount) {
-            syncedMatches = unsynced;
-            manager->d->matchesUpdated(offset, offset + newCount);
-        } else if (oldCount < newCount) {
-            manager->d->addingMatches(offset + oldCount, offset + newCount);
-            syncedMatches = unsynced;
-            manager->d->matchesAdded();
-            manager->d->matchesUpdated(offset, offset + newCount);
-        } else {
-            manager->d->removingMatches(offset + newCount, offset + oldCount);
-            syncedMatches = unsynced;
-            manager->d->matchesAdded();
-            manager->d->matchesUpdated(offset, offset + newCount);
-        }
-    }
-
-    return syncedMatches.count();
-}
-
 void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const QueryContext &context)
 {
     if (!context.isValid()) {
@@ -261,14 +183,14 @@ void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const Que
         d->matchesUnsynced = true;
     }
 
-    if (d->manager) {
-        d->manager->d->matchesArrived();
+    if (d->session) {
+        d->session->d->matchesArrived();
     }
 }
 
 void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
 {
-    Q_ASSERT(d->manager);
+    Q_ASSERT(d->session);
 
     // FIXME: this is a truly horrible way of doing this: nested for loops,
     //        comparing data() .. *shudder*
@@ -291,7 +213,7 @@ void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
                 //qDebug() << "found update in pending matches at" << count << cit.value().data();
                 cit.setValue(match);
                 d->matchesUnsynced = true;
-                d->manager->d->matchesArrived();
+                d->session->d->matchesArrived();
                 found = true;
                 break;
             }
@@ -318,7 +240,7 @@ void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
     }
 
     if (updateModel) {
-        d->manager->d->matchesArrived();
+        d->session->d->matchesArrived();
     }
 }
 
@@ -367,6 +289,84 @@ void RunnerSessionData::setCanFetchMoreMatches(bool hasMore, const QueryContext 
 bool RunnerSessionData::canFetchMoreMatches() const
 {
     return d->canFetchMoreMatches;
+}
+
+void RunnerSessionData::Private::associateSession(QuerySession *newSession)
+{
+    if (newSession == session) {
+        return;
+    }
+
+    session = newSession;
+    if (session && !currentMatches.isEmpty()) {
+        session->d->matchesArrived();
+    }
+}
+
+int RunnerSessionData::Private::syncMatches(int offset)
+{
+    Q_ASSERT(session);
+
+    QVector<QueryMatch> unsynced;
+
+    {
+        QMutexLocker lock(&currentMatchesLock);
+        if (matchesUnsynced) {
+            matchesUnsynced = false;
+            unsynced = currentMatches;
+            currentMatches.clear();
+        } else {
+            return syncedMatches.count();
+        }
+    }
+
+#ifdef DEBUG_SYNC
+    qDebug() << "SYNC offset, synced, unsynced:" << offset << syncedMatches.count() << unsynced.count();
+#endif
+
+    // only accept pagesize matches
+    if ((uint)unsynced.size() > pageSize) {
+        unsynced.resize(pageSize);
+    }
+
+    if (syncedMatches.isEmpty()) {
+        // no sync'd matches, so we only need to do something if we now do have matches
+        if (!unsynced.isEmpty()) {
+            // we had no matches, now we do
+            session->d->addingMatches(offset, offset + unsynced.size());
+            syncedMatches = unsynced;
+            session->d->matchesAdded();
+        }
+    } else if (unsynced.isEmpty()) {
+        // we had matches, and now we don't
+        session->d->removingMatches(offset, offset + syncedMatches.size());
+        syncedMatches.clear();
+        session->d->matchesRemoved();
+    } else {
+        // now the more complex situation: we have both synced and new matches
+        // these need to be merged with the correct add/remove/update rows
+        // methods called in the session (the model)
+        //TODO: implement merging; this implementation is naive and does not
+        // allow for updating results
+        const int oldCount = syncedMatches.count();
+        const int newCount = unsynced.count();
+        if (oldCount == newCount) {
+            syncedMatches = unsynced;
+            session->d->matchesUpdated(offset, offset + newCount);
+        } else if (oldCount < newCount) {
+            session->d->addingMatches(offset + oldCount, offset + newCount);
+            syncedMatches = unsynced;
+            session->d->matchesAdded();
+            session->d->matchesUpdated(offset, offset + newCount);
+        } else {
+            session->d->removingMatches(offset + newCount, offset + oldCount);
+            syncedMatches = unsynced;
+            session->d->matchesAdded();
+            session->d->matchesUpdated(offset, offset + newCount);
+        }
+    }
+
+    return syncedMatches.count();
 }
 
 #include "moc_runnersessiondata.cpp"

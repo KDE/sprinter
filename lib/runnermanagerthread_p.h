@@ -98,7 +98,7 @@ public:
     void launchDefaultMatches();
     bool launchQuery(const QString &query);
     QString query() const;
-    QuerySession *session() const { return m_manager; }
+    QuerySession *session() const { return m_session; }
 
 Q_SIGNALS:
     void requestFurtherMatching();
@@ -127,7 +127,7 @@ private:
     void clearSessionData();
 
     QThreadPool *m_threadPool;
-    QuerySession *m_manager;
+    QuerySession *m_session;
     QStringList m_enabledRunnerIds;
     // these vectors are all the same size at all times
     QVector<RunnerMetaData> m_runnerMetaData;

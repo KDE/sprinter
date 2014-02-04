@@ -27,7 +27,7 @@ class RunnerSessionData::Private
 public:
     Private(AbstractRunner *r)
         : runner(r),
-          manager(0),
+          session(0),
           matchesUnsynced(false),
           canFetchMoreMatches(false),
           enabled(false),
@@ -37,12 +37,13 @@ public:
     }
 
     int syncMatches(int offset);
+    void associateSession(QuerySession *session);
 
     AbstractRunner *runner;
     QAtomicInt busyCount;
     QVector<QueryMatch> syncedMatches;
     QVector<QueryMatch> currentMatches;
-    QuerySession *manager;
+    QuerySession *session;
     QMutex currentMatchesLock;
     bool matchesUnsynced;
     bool canFetchMoreMatches;

@@ -26,10 +26,10 @@
 #include "runnermanagerthread_p.h"
 #include "runnermodel_p.h"
 
-QuerySession::Private::Private(QuerySession *manager)
-    : q(manager),
-      thread(new QuerySessionThread(manager)),
-      runnerModel(new RunnerModel(thread, manager)),
+QuerySession::Private::Private(QuerySession *session)
+    : q(session),
+      thread(new QuerySessionThread(session)),
+      runnerModel(new RunnerModel(thread, session)),
       matchesArrivedWhileExecuting(false)
 {
     qRegisterMetaType<QUuid>("QUuid");

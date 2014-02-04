@@ -53,8 +53,6 @@ public:
 
     AbstractRunner *runner() const;
 
-    void associateManager(QuerySession *manager);
-
     void setMatches(const QVector<QueryMatch> &matches, const QueryContext &context);
     void updateMatches(const QVector<QueryMatch> &matches);
     QVector<QueryMatch> matches(MatchState state) const;

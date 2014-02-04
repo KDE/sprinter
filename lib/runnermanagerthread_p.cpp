@@ -49,7 +49,7 @@ QString textForEnum(const QObject *obj, const char *enumName, int value)
 QuerySessionThread::QuerySessionThread(QuerySession *parent)
     : QThread(0),
       m_threadPool(new QThreadPool(this)),
-      m_manager(parent),
+      m_session(parent),
       m_dummySessionData(new RunnerSessionData(0)),
       m_dummyMatcher(new MatchRunnable(0,
                                        QSharedPointer<RunnerSessionData>(),
@@ -61,7 +61,7 @@ QuerySessionThread::QuerySessionThread(QuerySession *parent)
       m_startSyncTimer(0),
       m_matchCount(-1)
 {
-    // to synchronize in the thread the manager lives in
+    // to synchronize in the thread the session lives in
     // the timer is created in this parent thread, rather than in
     // run() below
     // if synchronization becomes too slow, it could be moved to happen
@@ -353,7 +353,7 @@ void QuerySessionThread::sessionDataRetrieved(const QUuid &sessionId, int index,
     }
 
     if (data) {
-        data->d->manager = m_manager;
+        data->d->associateSession(m_session);
         data->d->enabled = m_enabledRunnerIds.contains(m_runnerMetaData[index].id);
     }
 
