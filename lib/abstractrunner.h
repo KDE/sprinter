@@ -83,15 +83,6 @@ public:
     bool startExec(const QueryMatch &match);
 
     /**
-     * Sets the minimum query length accepted by this runner
-     * Used by pre-match checks in @see startMatch, for instance.
-     *
-     * @param legnth the number of characters a query term must have
-     * minimally to be of interest to the runner
-     */
-    void setMinQueryLength(uint length);
-
-    /**
      * @return the  number of characters a query term must have
      * minimally to be of interest to the runner. Defaults to 3.
      */
@@ -116,6 +107,15 @@ public:
     QVector<QuerySession::MatchSource> sourcesUsed() const;
 
 protected:
+    /**
+     * Sets the minimum query length accepted by this runner
+     * Used by pre-match checks in @see startMatch, for instance.
+     *
+     * @param legnth the number of characters a query term must have
+     * minimally to be of interest to the runner
+     */
+    void setMinQueryLength(uint length);
+
     /**
      * Called when a match is to be executed. What that means
      * precisely is up to the runner. The match is guaranteed
