@@ -23,6 +23,9 @@
 #include <QExplicitlySharedDataPointer>
 #include <QString>
 
+namespace Sprinter
+{
+
 class QueryContext
 {
 public:
@@ -66,4 +69,5 @@ private:
     QExplicitlySharedDataPointer<Private> d;
 };
 
+} // namespace
 #endif

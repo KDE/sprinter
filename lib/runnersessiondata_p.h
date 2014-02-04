@@ -22,6 +22,9 @@
 #include <QMutex>
 #include <QMutexLocker>
 
+namespace Sprinter
+{
+
 class RunnerSessionData::Private
 {
 public:
@@ -51,5 +54,7 @@ public:
     uint pageSize;
     uint offset;
 };
+
+} // namespace
 
 #endif

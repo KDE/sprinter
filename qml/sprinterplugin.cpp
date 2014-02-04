@@ -22,9 +22,6 @@
 
 #include <querysession.h>
 
-
-
-
 #include <QDebug>
 
 
@@ -32,8 +29,7 @@ void SprinterPlugin::registerTypes(const char *uri)
 {
     Q_ASSERT(uri == QLatin1String("org.kde.experimental.sprinter"));
 
-    qmlRegisterType<QuerySession>(uri, 0, 1, "QuerySession");
-
+    qmlRegisterType<Sprinter::QuerySession>(uri, 0, 1, "QuerySession");
 }
 
 

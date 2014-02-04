@@ -24,6 +24,9 @@
 #include <QDebug>
 #include <QPointer>
 
+namespace Sprinter
+{
+
 class QueryMatch::Private : public QSharedData
 {
 public:
@@ -181,3 +184,5 @@ bool QueryMatch::sendUserDataToClipboard() const
 
     return false;
 }
+
+} // namespace

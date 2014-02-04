@@ -22,6 +22,9 @@
 #include <QPointer>
 #include <QStringList>
 
+namespace Sprinter
+{
+
 class QuerySessionThread;
 
 class RunnerModel : public QAbstractItemModel
@@ -88,5 +91,5 @@ public:
     QHash<int, QByteArray> roleNames() const;
 };
 
+} // namespace
 #endif
-

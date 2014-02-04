@@ -34,6 +34,9 @@
 #include "querysession.h"
 #include "runnersessiondata_p.h"
 
+namespace Sprinter
+{
+
 QString textForEnum(const QObject *obj, const char *enumName, int value)
 {
     QMetaEnum e = obj->metaObject()->enumerator(obj->metaObject()->indexOfEnumerator(enumName));
@@ -605,4 +608,5 @@ void SessionDataThread::run()
     exec();
 }
 
+} // namespace
 #include "moc_querysessionthread_p.cpp"

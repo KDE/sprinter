@@ -20,6 +20,9 @@
 
 #include <QAbstractItemModel>
 
+namespace Sprinter
+{
+
 class QueryMatch;
 
 class QuerySession : public QAbstractItemModel
@@ -212,5 +215,6 @@ private:
     Q_PRIVATE_SLOT(d, void executionFinished(const QueryMatch &match, bool success));
 };
 
-#endif
+} // namespace
 
+#endif

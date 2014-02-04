@@ -23,6 +23,12 @@
 #include <QDebug>
 #include <QMetaEnum>
 
+//TODO: this is unlikely to work as expected from QML; look for a different solution after testing; see usage of QList<int> in data()
+Q_DECLARE_METATYPE(QList<int>);
+
+namespace Sprinter
+{
+
 RunnerModel::RunnerModel(QuerySessionThread *thread, QObject *parent)
     : QAbstractItemModel(parent),
       m_thread(thread),
@@ -72,8 +78,6 @@ QStringList RunnerModel::runnerIds() const
     return m_runnerIds;
 }
 
-//TODO: this is unlikely to work as expected from QML; look for a different solution after testing
-Q_DECLARE_METATYPE(QList<int>);
 QVariant RunnerModel::data(const QModelIndex &index, int role) const
 {
     if (!m_thread || !index.isValid() || index.parent().isValid()) {
@@ -286,4 +290,5 @@ void RunnerModel::runnerBusy(int index)
     emit dataChanged(createIndex(index, m_busyColumn), createIndex(index, m_busyColumn));
 }
 
+} //namespace
 #include "moc_runnermodel_p.cpp"

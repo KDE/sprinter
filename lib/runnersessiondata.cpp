@@ -27,6 +27,9 @@
 
 // #define DEBUG_SYNC
 
+namespace Sprinter
+{
+
 RunnerSessionData::Busy::Busy(RunnerSessionData *data)
     : m_data(data)
 {
@@ -369,4 +372,5 @@ int RunnerSessionData::Private::syncMatches(int offset)
     return syncedMatches.count();
 }
 
+} // namespace
 #include "moc_runnersessiondata.cpp"

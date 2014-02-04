@@ -22,9 +22,12 @@
 #include <QString>
 #include <QVariant>
 
-class AbstractRunner;
-
 #include <querysession.h>
+
+namespace Sprinter
+{
+
+class AbstractRunner;
 
 class QueryMatch
 {
@@ -118,5 +121,7 @@ private:
     class Private;
     QExplicitlySharedDataPointer<Private> d;
 };
+
+} // namespace
 
 #endif

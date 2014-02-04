@@ -18,6 +18,9 @@
 #ifndef RUNNERMETADATA
 #define RUNNERMETADATA
 
+namespace Sprinter
+{
+
 class AbstractRunner;
 
 struct RunnerMetaData
@@ -35,5 +38,7 @@ struct RunnerMetaData
     AbstractRunner *runner;
     bool busy;
 };
+
+} // namespace
 
 #endif

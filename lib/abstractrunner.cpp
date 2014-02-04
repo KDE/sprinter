@@ -21,6 +21,9 @@
 
 #include "runnersessiondata.h"
 
+namespace Sprinter
+{
+
 class AbstractRunner::Private
 {
 public:
@@ -126,5 +129,7 @@ void AbstractRunner::setSourcesUsed(const QVector<QuerySession::MatchSource> &so
 {
     d->matchSources = sources;
 }
+
+} // namespace
 
 #include "moc_abstractrunner.cpp"

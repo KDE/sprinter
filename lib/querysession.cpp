@@ -26,6 +26,9 @@
 #include "querysessionthread_p.h"
 #include "runnermodel_p.h"
 
+namespace Sprinter
+{
+
 QuerySession::Private::Private(QuerySession *session)
     : q(session),
       thread(new QuerySessionThread(session)),
@@ -346,4 +349,5 @@ QHash<int, QByteArray> QuerySession::roleNames() const
     return d->roles;
 }
 
+} // namespace
 #include "moc_querysession.cpp"

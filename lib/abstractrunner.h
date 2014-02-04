@@ -24,6 +24,9 @@
 #include <querycontext.h>
 #include <runnersessiondata.h>
 
+namespace Sprinter
+{
+
 class QueryMatch;
 class AbstractRunner;
 class QueryContext;
@@ -179,5 +182,7 @@ private:
     class Private;
     Private * const d;
 };
+
+} //namespace
 
 #endif

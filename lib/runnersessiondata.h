@@ -23,6 +23,9 @@
 
 #include "querymatch.h"
 
+namespace Sprinter
+{
+
 class AbstractRunner;
 class QueryContext;
 class QuerySession;
@@ -80,5 +83,7 @@ private:
     class Private;
     Private * const d;
 };
+
+} // namespace
 
 #endif

@@ -28,6 +28,8 @@
 
 #include "querysession.h"
 
+using namespace Sprinter;
+
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);

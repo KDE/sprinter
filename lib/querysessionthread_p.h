@@ -29,8 +29,12 @@
 #include "runnermetadata_p.h"
 #include "querycontext.h"
 
-class AbstractRunner;
 class QThreadPool;
+
+namespace Sprinter
+{
+
+class AbstractRunner;
 class RunnableMatch;
 class QuerySession;
 class RunnerSessionData;
@@ -207,5 +211,6 @@ private:
     QueryMatch m_match;
 };
 
-#endif
+} // namespace
 
+#endif

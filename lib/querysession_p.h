@@ -18,6 +18,9 @@
 #ifndef RUNNERMANAGER_PRIVATE
 #define RUNNERMANAGER_PRIVATE
 
+namespace Sprinter
+{
+
 class QuerySession;
 class QueryMatch;
 class QuerySessionThread;
@@ -46,4 +49,5 @@ public:
     bool matchesArrivedWhileExecuting;
 };
 
+} // namespace
 #endif

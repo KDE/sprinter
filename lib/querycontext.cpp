@@ -22,6 +22,9 @@
 #include <QReadWriteLock>
 #include <QNetworkAccessManager>
 
+namespace Sprinter
+{
+
 class QueryContext::Private : public QSharedData
 {
 public:
@@ -159,3 +162,5 @@ void QueryContext::readUnlock() const
 {
     d->lock.unlock();
 }
+
+} //namespace
