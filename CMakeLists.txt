@@ -24,6 +24,14 @@ set(sprinterlib_SRCS
     lib/runnersessiondata.cpp
 )
 
+set(sprinterlib_HEADERS
+    lib/abstractrunner.h
+    lib/querycontext.h
+    lib/querymatch.h
+    lib/querysession.h
+    lib/runnersessiondata.h
+)
+
 add_library(sprinter SHARED ${sprinterlib_SRCS})
 qt5_use_modules(sprinter Widgets Network)
 install(TARGETS sprinter DESTINATION lib)
@@ -38,6 +46,7 @@ qt5_use_modules(sprintertest Widgets Network)
 target_link_libraries(sprintertest sprinter)
 install(TARGETS sprintertest DESTINATION bin)
 
+install(FILES ${sprinterlib_HEADERS} DESTINATION include/sprinter/)
 
 ### QML plugins
 set(qmlsprinterplugin_SRCS
