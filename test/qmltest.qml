@@ -34,7 +34,7 @@ ColumnLayout {
         ListView {
             id: view
 
-            model: RunnerManager {
+            model: QuerySession {
                 query: searchField.text
             }
             delegate: PlasmaComponents.Label {
