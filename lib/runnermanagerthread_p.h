@@ -98,6 +98,7 @@ public:
     void launchDefaultMatches();
     bool launchQuery(const QString &query);
     QString query() const;
+    QuerySession *session() const { return m_manager; }
 
 Q_SIGNALS:
     void requestFurtherMatching();
