@@ -127,12 +127,19 @@ QAbstractItemModel *QuerySession::runnerModel() const
     return d->runnerModel;
 }
 
+void QuerySession::requestDefaultMatches()
+{
+    qDebug() << "Manager, default query:" << QThread::currentThread();
+    d->thread->launchDefaultMatches();
+    emit queryChanged(d->thread->query());
+}
+
 void QuerySession::setQuery(const QString &query)
 {
     qDebug() << "Manager:" << QThread::currentThread() << query;
-    d->query = query;
-    //QMetaObject::invokeMethod(d->thread, "startQuery", Qt::AutoConnection, Q_ARG(QString, query));
-    emit queryChanged(query);
+    if (d->thread->launchQuery(query)) {
+        emit queryChanged(d->thread->query());
+    }
 }
 
 void QuerySession::executeMatch(int index)

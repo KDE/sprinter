@@ -106,6 +106,11 @@ public:
 
 public Q_SLOTS:
     /**
+     * Executes a request for the default match set from all enabled runners
+     */
+    void requestDefaultMatches();
+
+    /**
      * Sets the text to be used as the query string
      * This may be called multiple times while querying, allowing
      * for "search as you type" patterns.
