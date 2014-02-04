@@ -114,14 +114,6 @@ public:
 
 protected:
     /**
-     * Used to set whether or not this runner has a default set of results that
-     * can be returned without any search term. Must be called in the
-     * runner's constructor to take effect.
-     * @param hasDefaultsMatches true if there are default matches
-     */
-    void setGeneratesDefaultMatches(bool hasDefaultMatches);
-
-    /**
      * Sets the minimum query length accepted by this runner
      * Used by pre-match checks in @see startMatch, for instance.
      *
@@ -146,6 +138,15 @@ protected:
     virtual bool exec(const QueryMatch &match);
 
     /**
+     * Used to set whether or not this runner has a default set of results that
+     * can be returned without any search term.
+     *
+     * Must be called in the runner's constructor to take effect.
+     * @param hasDefaultsMatches true if there are default matches
+     */
+    void setGeneratesDefaultMatches(bool hasDefaultMatches);
+
+    /**
      * Sets the types of matches this runner may generate in response to @see match
      * being called. The runner may not always generate matches of all types in the
      * list, but any matches generated should be of a type in the list set.
@@ -162,6 +163,7 @@ protected:
      * Sets the sources which this runner uses to generate its matches
      * This allows things such as runners requiring network to be filtered out
      * if there is no network available.
+     * Must be called in the runner's constructor to take effect.
      */
     void setSourcesUsed(const QVector<QuerySession::MatchSource> &sources);
 

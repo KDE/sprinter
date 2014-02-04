@@ -17,6 +17,7 @@
 
 #include "runnermodel_p.h"
 
+#include "abstractrunner.h"
 #include "runnermanagerthread_p.h"
 
 #include <QDebug>
@@ -103,13 +104,14 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
             return info[index.row()].description;
             break;
         case IsLoadedRole:
-            return info[index.row()].loaded;
+            return info[index.row()].runner != 0;
             break;
         case IsBusyRole:
-            return info[index.row()].loaded && info[index.row()].busy;
+            return info[index.row()].runner != 0 && info[index.row()].busy;
             break;
         case GeneratesDefaultMatchesRole:
-            return info[index.row()].generatesDefaultMatches;
+            return info[index.row()].runner != 0 &&
+                   info[index.row()].runner->generatesDefaultMatches();
             break;
         default:
             break;

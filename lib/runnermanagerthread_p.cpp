@@ -283,7 +283,7 @@ void QuerySessionThread::performLoadRunner(int index)
         return;
     }
 
-    if (m_runnerMetaData[index].loaded) {
+    if (m_runnerMetaData[index].runner) {
         return;
     }
 
@@ -292,17 +292,16 @@ void QuerySessionThread::performLoadRunner(int index)
     QObject *plugin = loader.instance();
     AbstractRunner *runner = qobject_cast<AbstractRunner *>(plugin);
     if (runner) {
-        m_runnerMetaData[index].loaded = true;
         m_runnerMetaData[index].busy = false;
-        m_runnerMetaData[index].generatesDefaultMatches = runner->generatesDefaultMatches();
+        m_runnerMetaData[index].runner = runner;
+
         m_sessionData[index].clear();
         m_runners[index] = runner;
         retrieveSessionData(index);
         emit runnerLoaded(index);
     } else {
-        m_runnerMetaData[index].loaded = false;
+        m_runnerMetaData[index].runner = 0;
         m_runnerMetaData[index].busy = false;
-        m_runnerMetaData[index].generatesDefaultMatches = false;
         qWarning() << "LOAD FAILURE" <<  path << ":" << loader.errorString();
         delete plugin;
     }

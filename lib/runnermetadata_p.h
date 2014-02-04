@@ -18,12 +18,13 @@
 #ifndef RUNNERMETADATA
 #define RUNNERMETADATA
 
+class AbstractRunner;
+
 struct RunnerMetaData
 {
     RunnerMetaData()
-        : loaded(false),
-          busy(false),
-          generatesDefaultMatches(false)
+        : runner(0),
+          busy(false)
     {
     }
 
@@ -31,9 +32,8 @@ struct RunnerMetaData
     QString id;
     QString name;
     QString description;
-    bool loaded;
+    AbstractRunner *runner;
     bool busy;
-    bool generatesDefaultMatches;
 };
 
 #endif
