@@ -40,7 +40,7 @@ class NonRestartingTimer : public QTimer
     Q_OBJECT
 //
 public:
-    NonRestartingTimer(QObject *parent)
+    NonRestartingTimer(QObject *parent = 0)
         : QTimer(parent)
     {
     }
@@ -71,7 +71,7 @@ class SessionDataThread : public QThread
     Q_OBJECT
 
 public:
-    SessionDataThread(QObject *parent);
+    SessionDataThread(QObject *parent = 0);
     void run();
 };
 

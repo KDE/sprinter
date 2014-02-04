@@ -126,6 +126,11 @@ void QuerySessionThread::run()
     delete m_restartMatchingTimer;
     m_restartMatchingTimer = 0;
     delete forwarder;
+
+    //FIXME: should not delete right away -> sh
+    delete m_sessionDataThread;
+    m_sessionDataThread = 0;
+
     deleteLater();
     qDebug() << "************** WORKER THREAD COMPLETE **************";
 }
@@ -311,7 +316,7 @@ void QuerySessionThread::retrieveSessionData(int index)
     }
 
     if (!m_sessionDataThread) {
-        m_sessionDataThread = new SessionDataThread(this);
+        m_sessionDataThread = new SessionDataThread();
     }
 
     m_sessionDataThread->start();
