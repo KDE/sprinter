@@ -306,13 +306,14 @@ void QuerySessionThread::performLoadRunner(int index)
         m_sessionData[index].clear();
         m_runners[index] = runner;
         retrieveSessionData(index);
-        emit runnerLoaded(index);
     } else {
         m_runnerMetaData[index].runner = 0;
         m_runnerMetaData[index].busy = false;
         qWarning() << "LOAD FAILURE" <<  path << ":" << loader.errorString();
         delete plugin;
     }
+
+    emit runnerLoaded(index);
 }
 
 void QuerySessionThread::retrieveSessionData(int index)
