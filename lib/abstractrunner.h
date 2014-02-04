@@ -106,7 +106,20 @@ public:
      */
     QVector<QuerySession::MatchSource> sourcesUsed() const;
 
+    /**
+     * @return true if this runner has a default set of results that
+     * can be returned without any search term. False by default.
+     */
+    bool generatesDefaultMatches() const;
+
 protected:
+    /**
+     * Used to set whether or not this runner has a default set of results that
+     * can be returned without any search term
+     * @param hasDefaultsMatches true if there are default matches
+     */
+    void setGeneratesDefaultMatches(bool hasDefaultMatches);
+
     /**
      * Sets the minimum query length accepted by this runner
      * Used by pre-match checks in @see startMatch, for instance.

@@ -25,12 +25,14 @@ class AbstractRunner::Private
 {
 public:
     Private()
-        : minQueryLength(3)
+        : minQueryLength(3),
+          hasDefaultMatches(false)
     {
     }
 
     uint minQueryLength;
     QString id;
+    bool hasDefaultMatches;
     QVector<QuerySession::MatchType> matchTypes;
     QVector<QuerySession::MatchSource> matchSources;
 };
@@ -68,6 +70,16 @@ void AbstractRunner::setMinQueryLength(uint length)
 uint AbstractRunner::minQueryLength() const
 {
     return d->minQueryLength;
+}
+
+bool AbstractRunner::generatesDefaultMatches() const
+{
+    return d->hasDefaultMatches;
+}
+
+void AbstractRunner::setGeneratesDefaultMatches(bool hasDefaultMatches)
+{
+    d->hasDefaultMatches = hasDefaultMatches;
 }
 
 RunnerSessionData *AbstractRunner::createSessionData()
