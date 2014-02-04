@@ -184,7 +184,7 @@ void QuerySession::halt()
 
 QString QuerySession::query() const
 {
-    return d->query;
+    return d->thread->query();
 }
 
 int QuerySession::columnCount(const QModelIndex &parent) const

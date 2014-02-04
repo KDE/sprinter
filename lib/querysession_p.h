@@ -40,7 +40,6 @@ public:
     QuerySession *q;
     QuerySessionThread *thread;
     RunnerModel *runnerModel;
-    QString query;
     QHash<int, QByteArray> roles;
     QVector<int> roleColumns;
     QHash<int, QueryMatch> executingMatches;
