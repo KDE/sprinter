@@ -196,18 +196,6 @@ int QuerySession::columnCount(const QModelIndex &parent) const
     return d->roles.count();
 }
 
-QString textForEnum(const QObject *obj, const char *enumName, int value)
-{
-    QMetaEnum e = obj->metaObject()->enumerator(obj->metaObject()->indexOfEnumerator(enumName));
-    for (int i = 0; i < e.keyCount(); ++i) {
-        if (e.value(i) == value) {
-            return e.key(i);
-        }
-    }
-
-    return "Unknown";
-}
-
 QVariant QuerySession::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.parent().isValid()) {

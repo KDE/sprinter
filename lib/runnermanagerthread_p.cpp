@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
+#include <QMetaEnum>
 #include <QPluginLoader>
 #include <QReadLocker>
 #include <QThreadPool>
@@ -33,10 +34,17 @@
 #include "querysession.h"
 #include "runnersessiondata_p.h"
 
-// temporary include for non-pluggable plugins
-// #include "runners/datetime/datetime.h"
-// #include "runners/c/c.h"
-// #include "runners/youtube/youtube.h"
+QString textForEnum(const QObject *obj, const char *enumName, int value)
+{
+    QMetaEnum e = obj->metaObject()->enumerator(obj->metaObject()->indexOfEnumerator(enumName));
+    for (int i = 0; i < e.keyCount(); ++i) {
+        if (e.value(i) == value) {
+            return e.key(i);
+        }
+    }
+
+    return "Unknown";
+}
 
 QuerySessionThread::QuerySessionThread(QuerySession *parent)
     : QThread(0),

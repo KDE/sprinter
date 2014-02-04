@@ -35,6 +35,8 @@ class RunnableMatch;
 class QuerySession;
 class RunnerSessionData;
 
+QString textForEnum(const QObject *obj, const char *enumName, int value);
+
 class NonRestartingTimer : public QTimer
 {
     Q_OBJECT
