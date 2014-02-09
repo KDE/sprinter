@@ -243,6 +243,9 @@ QVariant QuerySession::data(const QModelIndex &index, int role) const
         case TextRole:
             return match.text();
             break;
+        case ImageRole:
+            return match.image();
+            break;
         case TypeRole:
             if (asText) {
                 return textForEnum(this, "MatchType", match.type());
@@ -301,6 +304,9 @@ QVariant QuerySession::headerData(int section, Qt::Orientation orientation, int 
                 break;
             case TextRole:
                 return tr("Text");
+                break;
+            case ImageRole:
+                return tr("Image");
                 break;
             case TypeRole:
                 return tr("Type");

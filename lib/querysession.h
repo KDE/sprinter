@@ -37,6 +37,7 @@ class SPRINTER_EXPORT QuerySession : public QAbstractItemModel
 public:
     enum DisplayRoles {
         TextRole = Qt::UserRole,
+        ImageRole,
         TypeRole,
         SourceRole,
         PrecisionRole,
