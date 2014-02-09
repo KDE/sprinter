@@ -15,15 +15,10 @@
 = Next milestone: 0.2
 
 == Features
-* QueryMatch execution
-    * Learning: record chosen QueryMatches, weight future matches with this information
+* Learning: record chosen QueryMatches, weight future matches with this information
 * Pre-match() runner filtering
-    * Based on:
-        * Runner's advertised matching types
-        * QuerySyntax
-    * Controlled by:
-        * A MatchType filter (from user, or UI component)
-        * Query pre-processing?
+    * A MatchType filter (from user, or UI component)
+    * Query pre-processing?
 
 == Improvements
 * Improve RunnerSessionData::updateMatches
