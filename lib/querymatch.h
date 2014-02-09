@@ -22,6 +22,7 @@
 #include <sprinter/sprinter_export.h>
 
 #include <QExplicitlySharedDataPointer>
+#include <QImage>
 #include <QString>
 #include <QVariant>
 
@@ -53,6 +54,19 @@ public:
 
     void setSource(QuerySession::MatchSource source);
     QuerySession::MatchSource source() const;
+
+    /**
+     * Sets an image to be displayed along with this result
+     * It should be sized within the bounds of QueryContext::imageSize
+     *
+     * @param image the image to use with this match
+     */
+    void setImage(const QImage &image);
+
+    /**
+     * @return the image associated with this match (if any)
+     */
+    QImage image() const;
 
     /**
      * Sets if this match is a search term itself; when exec'd

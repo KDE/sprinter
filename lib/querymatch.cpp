@@ -47,6 +47,7 @@ public:
     QuerySession::MatchPrecision precision;
     QVariant data;
     QVariant userData;
+    QImage image;
     bool isSearchTerm;
 };
 
@@ -119,6 +120,16 @@ void QueryMatch::setSource(QuerySession::MatchSource source)
 QuerySession::MatchSource QueryMatch::source() const
 {
     return d->source;
+}
+
+void QueryMatch::setImage(const QImage &image)
+{
+    d->image = image;
+}
+
+QImage QueryMatch::image() const
+{
+    return d->image;
 }
 
 void QueryMatch::setUserData(const QVariant &data)
