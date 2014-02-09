@@ -112,8 +112,12 @@ QuerySession::QuerySession(QObject *parent)
     d->roleColumns.append(Qt::DisplayRole);
     QMetaEnum e = metaObject()->enumerator(metaObject()->indexOfEnumerator("DisplayRoles"));
     for (int i = 0; i < e.keyCount(); ++i) {
-        d->roles.insert(e.value(i), e.key(i));
-        d->roleColumns.append(e.value(i));
+        const int enumVal = e.value(i);
+        if (enumVal == ImageRole) {
+            d->imageRoleColumn = i + 1;
+        }
+        d->roles.insert(enumVal, e.key(i));
+        d->roleColumns.append(enumVal);
     }
 
     d->thread->start();
@@ -227,6 +231,8 @@ QVariant QuerySession::data(const QModelIndex &index, int role) const
         role == Qt::DisplayRole) {
         asText = true;
         role = d->roleColumns[index.column()];
+    } else if (index.column() == d->imageRoleColumn && role == Qt::DecorationRole) {
+        role = ImageRole;
     }
 
     // short circuit for execution; don't need the QueryMatch object
