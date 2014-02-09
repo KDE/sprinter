@@ -36,8 +36,8 @@ QuerySession::Private::Private(QuerySession *session)
       matchesArrivedWhileExecuting(false)
 {
     qRegisterMetaType<QUuid>("QUuid");
-    qRegisterMetaType<QUuid>("QueryContext");
-    qRegisterMetaType<QUuid>("QueryMatch");
+    qRegisterMetaType<Sprinter::QueryContext>("Sprinter::QueryContext");
+    qRegisterMetaType<Sprinter::QueryMatch>("Sprinter::QueryMatch");
 
     q->connect(thread, SIGNAL(resetModel()), q, SLOT(resetModel()));
 }
