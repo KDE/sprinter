@@ -3,7 +3,6 @@
 == Features
 * icons for QueryMatches
 * add paging support to setMatches / updateMatches
-* expose the sources and match types via the RunnerModel
 
 == Improvements
 * Clear all TODOs/FIXMEs in code
