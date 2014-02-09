@@ -173,13 +173,7 @@ protected:
     void setSourcesUsed(const QVector<QuerySession::MatchSource> &sources);
 
 private:
-    friend class RunnerFactory;
-    /**
-     * Allows setting the internal ID for the runner. This should
-     * not be called by the runner itself, but rather will be set
-     * for it on plugin load.
-     */
-    void setId(const QString &newId);
+    friend class QuerySessionThread;
 
     class Private;
     Private * const d;

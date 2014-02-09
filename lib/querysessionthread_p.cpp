@@ -31,6 +31,7 @@
 #include <unistd.h>
 
 #include "abstractrunner.h"
+#include "abstractrunner_p.h"
 #include "querysession.h"
 #include "runnersessiondata_p.h"
 
@@ -308,6 +309,7 @@ void QuerySessionThread::performLoadRunner(int index)
 
         m_sessionData[index].clear();
         m_runners[index] = runner;
+        runner->d->id = m_runnerMetaData[index].id;
         retrieveSessionData(index);
     } else {
         m_runnerMetaData[index].runner = 0;

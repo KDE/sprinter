@@ -56,7 +56,6 @@ QueryMatch::QueryMatch()
 {
 }
 
-//FIXME: if the runner is deleted?
 QueryMatch::QueryMatch(AbstractRunner *runner)
     : d(new Private(runner))
 {
