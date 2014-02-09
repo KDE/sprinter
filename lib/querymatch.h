@@ -34,25 +34,76 @@ class AbstractRunner;
 class SPRINTER_EXPORT QueryMatch
 {
 public:
+    /**
+     * Default constructor; creates an invalid match
+     */
     QueryMatch();
+
+    /**
+     * Creates a match with an associated runner. Used to create valid matches.
+     * @param runner the runner that created this match.
+     */
     QueryMatch(AbstractRunner *runner);
+
+    /**
+     * Copy constructor; valid if the other match is also valid. QueryMatch is
+     * implicitly shared so this is fast
+     */
     QueryMatch(const QueryMatch &other);
+
     ~QueryMatch();
 
     QueryMatch &operator=(const QueryMatch &other);
     bool operator==(const QueryMatch &rhs) const;
+
+    /**
+     * @returns true if this match is valid and can be used.
+     */
     bool isValid() const;
 
+    /**
+     * Sets a title for this match; should be translated if possible
+     * @param title the test to use as the title
+     */
     void setTitle(const QString &title);
+
+    /**
+     * @return the title for this match
+     */
     QString title() const;
 
+    /**
+     * Sets descriptive text for this match; should be translated if possible.
+     * @param text the text to use
+     */
     void setText(const QString &text);
+
+    /**
+     * @return the descriptive text for this match
+     */
     QString text() const;
 
+    /**
+     * Sets the type of the match; this should always be set.
+     * @param type type of the match
+     */
     void setType(QuerySession::MatchType type);
+
+    /**
+     * @return the type of this match
+     */
     QuerySession::MatchType type() const;
 
+    /**
+     * Sets the source that this match came from. Useful for sortings
+     * and filtering in user interfaces. Should always be set.
+     * @param source where the match came from
+     */
     void setSource(QuerySession::MatchSource source);
+
+    /**
+     * @return where this match came from
+     */
     QuerySession::MatchSource source() const;
 
     /**
