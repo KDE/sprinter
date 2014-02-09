@@ -32,6 +32,7 @@ class SPRINTER_EXPORT QuerySession : public QAbstractItemModel
     Q_OBJECT
     Q_PROPERTY(QString query WRITE setQuery READ query NOTIFY queryChanged)
     Q_PROPERTY(QAbstractItemModel *runnerModel READ runnerModel CONSTANT)
+    Q_PROPERTY(QSize imageSize WRITE setImageSize READ imageSize NOTIFY imageSizeChanged)
 
 public:
     enum DisplayRoles {
@@ -109,6 +110,18 @@ public:
      */
     QString query() const;
 
+    /**
+     * Sets the size of image that matches should generate for their
+     * icon or previews
+     * @param size the desired size of images
+     */
+    void setImageSize(const QSize &size);
+
+    /**
+     * @return the size of images matches should generate
+     */
+    QSize imageSize() const;
+
 public Q_SLOTS:
     /**
      * Executes a request for the default match set from all enabled runners
@@ -167,6 +180,11 @@ Q_SIGNALS:
      * @see setQuery
      */
     void queryChanged(const QString &query);
+
+    /**
+     * Emitted when the size of match images changes
+     */
+    void imageSizeChanged(const QSize &size);
 
 public:
     // The reimplemented model API follows below:

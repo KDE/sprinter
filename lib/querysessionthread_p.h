@@ -103,6 +103,8 @@ public:
     bool launchQuery(const QString &query);
     QString query() const;
     QuerySession *session() const { return m_session; }
+    bool setImageSize(const QSize &size);
+    QSize imageSize() const;
 
 Q_SIGNALS:
     void requestFurtherMatching();

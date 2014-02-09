@@ -23,6 +23,7 @@
 
 #include <QExplicitlySharedDataPointer>
 #include <QString>
+#include <QSize>
 
 namespace Sprinter
 {
@@ -48,6 +49,9 @@ public:
 
     void setFetchMore(bool fetchMore);
     bool fetchMore() const;
+
+    void setImageSize(const QSize &size);
+    QSize imageSize() const;
 
     template<typename Func>
     bool ifValid(Func algorithm) const {

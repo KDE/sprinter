@@ -145,6 +145,18 @@ void QuerySession::setQuery(const QString &query)
     }
 }
 
+void QuerySession::setImageSize(const QSize &size)
+{
+    if (d->thread->setImageSize(size)) {
+        emit imageSizeChanged(size);
+    }
+}
+
+QSize QuerySession::imageSize() const
+{
+    return d->thread->imageSize();
+}
+
 void QuerySession::executeMatch(int index)
 {
     QueryMatch match = d->thread->matchAt(index);

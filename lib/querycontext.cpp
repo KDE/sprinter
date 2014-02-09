@@ -32,6 +32,7 @@ public:
         : QSharedData(),
           q(context),
           network(new QNetworkAccessManager),
+          imageSize(64, 64),
           fetchMore(false),
           isDefaultMatchesRequest(false)
     {
@@ -52,6 +53,7 @@ public:
     QString query;
     QReadWriteLock lock;
     QSharedPointer<QNetworkAccessManager> network;
+    QSize imageSize;
     bool fetchMore;
     bool isDefaultMatchesRequest;
 };
@@ -151,6 +153,16 @@ void QueryContext::setFetchMore(bool fetchMore)
 bool QueryContext::fetchMore() const
 {
     return d->fetchMore;
+}
+
+void QueryContext::setImageSize(const QSize &size)
+{
+    d->imageSize = size;
+}
+
+QSize QueryContext::imageSize() const
+{
+    return d->imageSize;
 }
 
 void QueryContext::readLock() const

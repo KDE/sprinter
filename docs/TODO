@@ -1,7 +1,6 @@
 = Curent milestone: 0.1
 
 == Features
-* icons for QueryMatches
 * add paging support to setMatches / updateMatches
 
 == Improvements

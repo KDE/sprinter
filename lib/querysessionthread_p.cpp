@@ -489,6 +489,21 @@ QString QuerySessionThread::query() const
     return m_context.query();
 }
 
+bool QuerySessionThread::setImageSize(const QSize &size)
+{
+    if (m_context.imageSize() != size) {
+        m_context.setImageSize(size);
+        return true;
+    }
+
+    return false;
+}
+
+QSize QuerySessionThread::imageSize() const
+{
+    return m_context.imageSize();
+}
+
 void QuerySessionThread::startQuery()
 {
     //qDebug() << "requesting query from UI thread..." << QThread::currentThread() << m_context.query();
