@@ -26,7 +26,7 @@
 #include "querycontext.h"
 
 // #define DEBUG_SYNC
-
+// #define DEBUG_UPDATEMATCHES
 namespace Sprinter
 {
 
@@ -208,34 +208,46 @@ void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
         }
 
         QMutableVectorIterator<QueryMatch> cit (d->currentMatches);
+#ifdef DEBUG_UPDATEMATCHES
         int count = 0;
+#endif
         bool found = false;
 
         while (cit.hasNext()) {
             if (match.data() == cit.next().data()) {
-                //qDebug() << "found update in pending matches at" << count << cit.value().data();
+#ifdef DEBUG_UPDATEMATCHES
+                qDebug() << "found update in pending matches at" << count << cit.value().data();
+#endif
                 cit.setValue(match);
                 d->matchesUnsynced = true;
                 d->session->d->matchesArrived();
                 found = true;
                 break;
             }
-            //qDebug() << "compared" << match.data() << cit.value().data();
+#ifdef DEBUG_UPDATEMATCHES
+            qDebug() << "compared" << match.data() << cit.value().data();
             ++count;
+#endif
         }
 
         if (!found) {
             QVectorIterator<QueryMatch> sit (d->syncedMatches);
+#ifdef DEBUG_UPDATEMATCHES
             count = 0;
+#endif
             while (sit.hasNext()) {
                 if (match.data() == sit.next().data()) {
-                    //qDebug() << "found update in existing matches at" << count;
+#ifdef DEBUG_UPDATEMATCHES
+                    qDebug() << "found update in existing matches at" << count;
+#endif
                     d->currentMatches << match;
                     d->matchesUnsynced = true;
                     found = true;
                     break;
                 }
+#ifdef DEBUG_UPDATEMATCHES
                 ++count;
+#endif
             }
         }
 
