@@ -4,9 +4,7 @@
 * add paging support to setMatches / updateMatches
 
 == Improvements
-* Clear all TODOs/FIXMEs in code
-* QueryMatch::isSearchTerm should allow setting whether to only run against same runner that generated it (relies on a single-runner mode)
-* currently Runner plugins hang out in memory once access the first time; should probably be ref counted and deleted when no longer used
+* Clear TODOs/FIXMEs in code
 
 == Bugfixes
 * Ensure all threads cleaned up before exit
@@ -40,3 +38,7 @@
     * Correctness of results
     * Threading safety
     * Speed
+* Allow unloading of runners in RunnerModel
+    * currently Runner plugins hang out in memory once access the first time
+    * ref counted and delete when no longer used
+* QueryMatch::isSearchTerm should allow setting whether to only run against the same runner that generated it (relies on a single-runner mode)
