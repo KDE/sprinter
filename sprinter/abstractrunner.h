@@ -23,8 +23,8 @@
 #include <QObject>
 #include <QRunnable>
 
-#include <querycontext.h>
-#include <runnersessiondata.h>
+#include <sprinter/querycontext.h>
+#include <sprinter/runnersessiondata.h>
 
 namespace Sprinter
 {

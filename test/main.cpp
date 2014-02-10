@@ -26,7 +26,7 @@
 #include <QTreeView>
 #include <QGridLayout>
 
-#include "querysession.h"
+#include "sprinter/querysession.h"
 
 using namespace Sprinter;
 

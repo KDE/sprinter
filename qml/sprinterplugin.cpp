@@ -20,7 +20,7 @@
 #include <QtQml/qqml.h>
 #include <QtQml/QQmlContext>
 
-#include <querysession.h>
+#include <sprinter/querysession.h>
 
 #include <QDebug>
 

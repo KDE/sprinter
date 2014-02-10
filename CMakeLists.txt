@@ -10,27 +10,27 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Declarative REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
-include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/lib ${CMAKE_BINARY_DIR})
+include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
 
 add_definitions("-Wall -std=c++0x")
 
 ### Main library
 set(sprinterlib_SRCS
-    lib/abstractrunner.cpp
-    lib/querymatch.cpp
-    lib/querycontext.cpp
-    lib/querysession.cpp
-    lib/querysessionthread_p.cpp
-    lib/runnermodel_p.cpp
-    lib/runnersessiondata.cpp
+    sprinter/abstractrunner.cpp
+    sprinter/querymatch.cpp
+    sprinter/querycontext.cpp
+    sprinter/querysession.cpp
+    sprinter/querysessionthread_p.cpp
+    sprinter/runnermodel_p.cpp
+    sprinter/runnersessiondata.cpp
 )
 
 set(sprinterlib_HEADERS
-    lib/abstractrunner.h
-    lib/querycontext.h
-    lib/querymatch.h
-    lib/querysession.h
-    lib/runnersessiondata.h
+    sprinter/abstractrunner.h
+    sprinter/querycontext.h
+    sprinter/querymatch.h
+    sprinter/querysession.h
+    sprinter/runnersessiondata.h
     ${CMAKE_BINARY_DIR}/sprinter/sprinter_export.h
 )
 
