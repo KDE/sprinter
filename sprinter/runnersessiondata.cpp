@@ -21,9 +21,10 @@
 #include <QDebug>
 
 #include "abstractrunner.h"
+#include "querycontext.h"
 #include "querysession.h"
 #include "querysession_p.h"
-#include "querycontext.h"
+#include "querysessionthread_p.h"
 
 // #define DEBUG_SYNC
 // #define DEBUG_UPDATEMATCHES
@@ -161,7 +162,7 @@ void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const Que
     }
 
 #ifdef DEBUG_SYNC
-    qDebug() << "New matches from, to: " << d->currentMatches.count() << matches.count();
+    qDebug() << "New matches from, to: " << d->currentMatches.size() << matches.size();
     int count = 0;
     foreach (const QueryMatch &match, matches) {
         qDebug() << "     " << count++ << match.title();
@@ -195,67 +196,54 @@ void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
 {
     Q_ASSERT(d->session);
 
-    // FIXME: this is a truly horrible way of doing this: nested for loops,
-    //        comparing data() .. *shudder*
+    // TODO: find a nicer way to to do updates than comparing data(), nested loops..
+#ifdef DEBUG_UPDATEMATCHES
+    qDebug() << "updating" << matches.size();
+#endif
+
     QMutexLocker lock(&d->currentMatchesLock);
-    //qDebug() << "updating" << matches.count();
-    bool updateModel = false;
 
     foreach (const QueryMatch &match, matches) {
-        //qDebug() <<" looking through" << match.data();
+#ifdef DEBUG_UPDATEMATCHES
+        qDebug() << "looking for match of" << match.data();
+#endif
         if (match.data().isNull()) {
             continue;
         }
 
-        QMutableVectorIterator<QueryMatch> cit (d->currentMatches);
-#ifdef DEBUG_UPDATEMATCHES
-        int count = 0;
-#endif
         bool found = false;
-
-        while (cit.hasNext()) {
-            if (match.data() == cit.next().data()) {
+        for (int i = 0; i < d->currentMatches.size(); ++i) {
+            if (match.data() == d->currentMatches[i].data()) {
 #ifdef DEBUG_UPDATEMATCHES
-                qDebug() << "found update in pending matches at" << count << cit.value().data();
+                qDebug() << "found update in pending matches at" << i << d->currentMatches[i].data();
 #endif
-                cit.setValue(match);
-                d->matchesUnsynced = true;
-                d->session->d->matchesArrived();
+                d->currentMatches[i] = match;
                 found = true;
                 break;
             }
 #ifdef DEBUG_UPDATEMATCHES
-            qDebug() << "compared" << match.data() << cit.value().data();
-            ++count;
+            qDebug() << "compared" << i << match.data() << d->currentMatches[i].data();
 #endif
         }
 
-        if (!found) {
-            QVectorIterator<QueryMatch> sit (d->syncedMatches);
+        if (found) {
+            continue;
+        }
+
+        for (int i = 0; i < d->syncedMatches.size(); ++i) {
+            if (match.data() == d->syncedMatches[i].data()) {
 #ifdef DEBUG_UPDATEMATCHES
-            count = 0;
+                qDebug() << "found update in existing matches at" << i << d->syncedMatches[i].data();
 #endif
-            while (sit.hasNext()) {
-                if (match.data() == sit.next().data()) {
-#ifdef DEBUG_UPDATEMATCHES
-                    qDebug() << "found update in existing matches at" << count;
-#endif
-                    d->currentMatches << match;
-                    d->matchesUnsynced = true;
-                    found = true;
-                    break;
-                }
-#ifdef DEBUG_UPDATEMATCHES
-                ++count;
-#endif
+                d->syncedMatches[i] = match;
+                d->updatedMatchIndexes.insert(i);
+                d->session->d->matchesArrived();
+                break;
             }
+#ifdef DEBUG_UPDATEMATCHES
+            qDebug() << "compared" << i << match.data() << d->syncedMatches[i].data();
+#endif
         }
-
-        updateModel = updateModel || found;
-    }
-
-    if (updateModel) {
-        d->session->d->matchesArrived();
     }
 }
 
@@ -326,17 +314,31 @@ int RunnerSessionData::Private::syncMatches(int offset)
 
     {
         QMutexLocker lock(&currentMatchesLock);
+
+        if (!updatedMatchIndexes.isEmpty()) {
+            foreach (int index, updatedMatchIndexes) {
+                if (index < syncedMatches.size()) {
+#ifdef DEBUG_UPDATEMATCHES
+                    qDebug() << "Telling the model we've updated" << offset + index;
+#endif
+                    session->d->matchesUpdated(offset + index, offset + index);
+                }
+            }
+
+            updatedMatchIndexes.clear();
+        }
+
         if (matchesUnsynced) {
             matchesUnsynced = false;
             unsynced = currentMatches;
             currentMatches.clear();
         } else {
-            return syncedMatches.count();
+            return syncedMatches.size();
         }
     }
 
 #ifdef DEBUG_SYNC
-    qDebug() << "SYNC offset, synced, unsynced:" << offset << syncedMatches.count() << unsynced.count();
+    qDebug() << "SYNC offset, synced, unsynced:" << offset << syncedMatches.size() << unsynced.size();
 #endif
 
     // only accept pagesize matches
@@ -363,8 +365,8 @@ int RunnerSessionData::Private::syncMatches(int offset)
         // methods called in the session (the model)
         //TODO: implement merging; this implementation is naive and does not
         // allow for updating results
-        const int oldCount = syncedMatches.count();
-        const int newCount = unsynced.count();
+        const int oldCount = syncedMatches.size();
+        const int newCount = unsynced.size();
         if (oldCount == newCount) {
             syncedMatches = unsynced;
             session->d->matchesUpdated(offset, offset + newCount);
@@ -381,7 +383,7 @@ int RunnerSessionData::Private::syncMatches(int offset)
         }
     }
 
-    return syncedMatches.count();
+    return syncedMatches.size();
 }
 
 } // namespace

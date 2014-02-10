@@ -21,6 +21,7 @@
 #include <QAtomicInt>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QSet>
 
 namespace Sprinter
 {
@@ -46,6 +47,7 @@ public:
     QAtomicInt busyCount;
     QVector<QueryMatch> syncedMatches;
     QVector<QueryMatch> currentMatches;
+    QSet<int> updatedMatchIndexes;
     QuerySession *session;
     QMutex currentMatchesLock;
     bool matchesUnsynced;
