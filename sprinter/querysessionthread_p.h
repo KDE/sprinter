@@ -34,7 +34,7 @@ class QThreadPool;
 namespace Sprinter
 {
 
-class AbstractRunner;
+class Runner;
 class RunnableMatch;
 class QuerySession;
 class RunnerSessionData;
@@ -63,11 +63,11 @@ public Q_SLOTS:
 class MatchRunnable : public QRunnable
 {
 public:
-    MatchRunnable(AbstractRunner *runner, QSharedPointer<RunnerSessionData> sessionData, QueryContext &context);
+    MatchRunnable(Runner *runner, QSharedPointer<RunnerSessionData> sessionData, QueryContext &context);
     void run();
 
 private:
-    AbstractRunner *m_runner;
+    Runner *m_runner;
     QSharedPointer<RunnerSessionData> m_sessionData;
     QueryContext &m_context;
 };
@@ -137,7 +137,7 @@ private:
     QStringList m_enabledRunnerIds;
     // these vectors are all the same size at all times
     QVector<RunnerMetaData> m_runnerMetaData;
-    QVector<AbstractRunner *> m_runners;
+    QVector<Runner *> m_runners;
     QVector<QSharedPointer<RunnerSessionData> > m_sessionData;
     QVector<MatchRunnable *> m_matchers;
 
@@ -186,7 +186,7 @@ class SessionDataRetriever : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    SessionDataRetriever(QThread *destinationThread, const QUuid &sessionId, int index, AbstractRunner *runner);
+    SessionDataRetriever(QThread *destinationThread, const QUuid &sessionId, int index, Runner *runner);
     void run();
 
 Q_SIGNALS:
@@ -194,7 +194,7 @@ Q_SIGNALS:
 
 private:
     QThread *m_destinationThread;
-    AbstractRunner *m_runner;
+    Runner *m_runner;
     QUuid m_sessionId;
     int m_index;
 };

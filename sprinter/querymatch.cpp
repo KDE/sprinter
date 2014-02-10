@@ -30,7 +30,7 @@ namespace Sprinter
 class QueryMatch::Private : public QSharedData
 {
 public:
-    Private(AbstractRunner *r)
+    Private(Runner *r)
         : runner(r),
           type(QuerySession::UnknownType),
           source(QuerySession::FromInternalSource),
@@ -39,7 +39,7 @@ public:
     {
     }
 
-    QPointer<AbstractRunner> runner;
+    QPointer<Runner> runner;
     QString title;
     QString text;
     QuerySession::MatchType type;
@@ -56,7 +56,7 @@ QueryMatch::QueryMatch()
 {
 }
 
-QueryMatch::QueryMatch(AbstractRunner *runner)
+QueryMatch::QueryMatch(Runner *runner)
     : d(new Private(runner))
 {
 }
@@ -166,7 +166,7 @@ QuerySession::MatchPrecision QueryMatch::precision() const
     return d->precision;
 }
 
-AbstractRunner *QueryMatch::runner() const
+Runner *QueryMatch::runner() const
 {
     return d->runner;
 }

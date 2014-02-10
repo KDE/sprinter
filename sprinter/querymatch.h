@@ -29,7 +29,7 @@
 namespace Sprinter
 {
 
-class AbstractRunner;
+class Runner;
 
 class SPRINTER_EXPORT QueryMatch
 {
@@ -43,7 +43,7 @@ public:
      * Creates a match with an associated runner. Used to create valid matches.
      * @param runner the runner that created this match.
      */
-    QueryMatch(AbstractRunner *runner);
+    QueryMatch(Runner *runner);
 
     /**
      * Copy constructor; valid if the other match is also valid. QueryMatch is
@@ -175,7 +175,7 @@ public:
      * @return a pointer to the runner that created this match. May return
      * a null pointer if the match is invalid or the runner has been deleted.
      */
-    AbstractRunner *runner() const;
+    Runner *runner() const;
 
     /**
      * Puts the contents of userData() on the clipboard.

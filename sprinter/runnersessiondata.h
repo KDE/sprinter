@@ -27,7 +27,7 @@
 namespace Sprinter
 {
 
-class AbstractRunner;
+class Runner;
 class QueryContext;
 class QuerySession;
 
@@ -49,13 +49,13 @@ public:
             QPointer<RunnerSessionData> m_data;
     };
 
-    RunnerSessionData(AbstractRunner *runner);
+    RunnerSessionData(Runner *runner);
     virtual ~RunnerSessionData();
 
     void setEnabled(bool enabled);
     bool enabled() const;
 
-    AbstractRunner *runner() const;
+    Runner *runner() const;
 
     void setMatches(const QVector<QueryMatch> &matches, const QueryContext &context);
     void updateMatches(const QVector<QueryMatch> &matches);

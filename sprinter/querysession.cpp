@@ -283,7 +283,7 @@ QVariant QuerySession::data(const QModelIndex &index, int role) const
             return match.isSearchTerm();
             break;
         case RunnerRole: {
-            AbstractRunner *runner = match.runner();
+            Runner *runner = match.runner();
             if (runner) {
                 return runner->id();
             }

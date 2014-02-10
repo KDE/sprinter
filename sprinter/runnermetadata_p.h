@@ -21,7 +21,7 @@
 namespace Sprinter
 {
 
-class AbstractRunner;
+class Runner;
 
 struct RunnerMetaData
 {
@@ -35,7 +35,7 @@ struct RunnerMetaData
     QString id;
     QString name;
     QString description;
-    AbstractRunner *runner;
+    Runner *runner;
     bool busy;
 };
 

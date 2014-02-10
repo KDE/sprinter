@@ -25,54 +25,54 @@
 namespace Sprinter
 {
 
-AbstractRunner::AbstractRunner(QObject *parent)
+Runner::Runner(QObject *parent)
     : QObject(parent),
       d(new Private)
 {
 }
 
-AbstractRunner::~AbstractRunner()
+Runner::~Runner()
 {
     delete d;
 }
 
-QString AbstractRunner::id() const
+QString Runner::id() const
 {
     return d->id;
 }
 
-void AbstractRunner::setMinQueryLength(uint length)
+void Runner::setMinQueryLength(uint length)
 {
     d->minQueryLength = length;
 }
 
-uint AbstractRunner::minQueryLength() const
+uint Runner::minQueryLength() const
 {
     return d->minQueryLength;
 }
 
-bool AbstractRunner::generatesDefaultMatches() const
+bool Runner::generatesDefaultMatches() const
 {
     return d->hasDefaultMatches;
 }
 
-void AbstractRunner::setGeneratesDefaultMatches(bool hasDefaultMatches)
+void Runner::setGeneratesDefaultMatches(bool hasDefaultMatches)
 {
     d->hasDefaultMatches = hasDefaultMatches;
 }
 
-RunnerSessionData *AbstractRunner::createSessionData()
+RunnerSessionData *Runner::createSessionData()
 {
     return new RunnerSessionData(this);
 }
 
-void AbstractRunner::match(RunnerSessionData *sessionData, const QueryContext &context)
+void Runner::match(RunnerSessionData *sessionData, const QueryContext &context)
 {
     Q_UNUSED(sessionData)
     Q_UNUSED(context)
 }
 
-bool AbstractRunner::startExec(const QueryMatch &match)
+bool Runner::startExec(const QueryMatch &match)
 {
     if (match.runner() != this) {
         return false;
@@ -81,27 +81,27 @@ bool AbstractRunner::startExec(const QueryMatch &match)
     return exec(match);
 }
 
-bool AbstractRunner::exec(const QueryMatch &match)
+bool Runner::exec(const QueryMatch &match)
 {
     return match.sendUserDataToClipboard();
 }
 
-QVector<QuerySession::MatchType> AbstractRunner::matchTypesGenerated() const
+QVector<QuerySession::MatchType> Runner::matchTypesGenerated() const
 {
     return d->matchTypes;
 }
 
-void AbstractRunner::setMatchTypesGenerated(const QVector<QuerySession::MatchType> types)
+void Runner::setMatchTypesGenerated(const QVector<QuerySession::MatchType> types)
 {
     d->matchTypes = types;
 }
 
-QVector<QuerySession::MatchSource> AbstractRunner::sourcesUsed() const
+QVector<QuerySession::MatchSource> Runner::sourcesUsed() const
 {
     return d->matchSources;
 }
 
-void AbstractRunner::setSourcesUsed(const QVector<QuerySession::MatchSource> &sources)
+void Runner::setSourcesUsed(const QVector<QuerySession::MatchSource> &sources)
 {
     d->matchSources = sources;
 }

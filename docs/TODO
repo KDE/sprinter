@@ -6,7 +6,7 @@
 == Improvements
 * Clear all TODOs/FIXMEs in code
 * QueryMatch::isSearchTerm should allow setting whether to only run against same runner that generated it (relies on a single-runner mode)
-* currently AbstractRunner plugins hang out in memory once access the first time; should probably be ref counted and deleted when no longer used
+* currently Runner plugins hang out in memory once access the first time; should probably be ref counted and deleted when no longer used
 
 == Bugfixes
 * Ensure all threads cleaned up before exit
@@ -24,6 +24,7 @@
 * Implement merging in setMatches
 
 = Unscheduled
+* Provide per-plugin help in the json file, exported to the RunnerModel
 * Add application affiliation to the json & export to RunnerModel
     * With model filtering, it becomes easy to get plugins relevant to a specific application
 * Tiered match run priorities on runners set by the user

@@ -26,9 +26,9 @@ The other methods all describe the runner's properties: the minimum query length
 
 == When To Subclass RunnerSessionData
 
-A runner should create a subclass of RunnerSessionData and return it from a reimplementation of AbstractRunner::createSessionData when one or more of the following is true:
+A runner should create a subclass of RunnerSessionData and return it from a reimplementation of Runner::createSessionData when one or more of the following is true:
 
- * there is shareable, non-trivial data or session set up needed to perform AbstractRunner::match. Putting this into RunnerSessionData and doing the initialization in creationSessionData allows this to happens once per query session and in a separate thread (therefore non-blocking)
+ * there is shareable, non-trivial data or session set up needed to perform Runner::match. Putting this into RunnerSessionData and doing the initialization in creationSessionData allows this to happens once per query session and in a separate thread (therefore non-blocking)
  * the runner produces matches asynchronously
  * the runner may not always be ready to perform matches
 
@@ -44,7 +44,7 @@ The last point deserves more attention: if a runner relies on a service being av
         // return false if the matching should not be performed
     }
 
-Note that RunnerSessionData::shouldStartMatch already checks to see if network is available in the case that AbstractRunner::sourcesUsed() returns a single value of FromNetworkService. So in the common case of requiring network availability, a runner can simply do this in its constructor:
+Note that RunnerSessionData::shouldStartMatch already checks to see if network is available in the case that Runner::sourcesUsed() returns a single value of FromNetworkService. So in the common case of requiring network availability, a runner can simply do this in its constructor:
 
     setSourcesUsed(QVector<RunnerManager::MatchSource>()
                     << RunnerManager::FromNetworkService);
@@ -55,7 +55,7 @@ You may notice that there is an "enabled" property in RunnerSessionData. However
 
 == Fast Synchronous Matching
 
-Runners whose query matching is necessarily synchronous, either because a library they are using only offers a synchronous API or because the matching is fast (e.g. sub-100ms), can take the easiest approach: reimplement AbstractRunner::match and call RunnerSessionData::setMatches at least once, even on failure (this will clear the set of matches).
+Runners whose query matching is necessarily synchronous, either because a library they are using only offers a synchronous API or because the matching is fast (e.g. sub-100ms), can take the easiest approach: reimplement Runner::match and call RunnerSessionData::setMatches at least once, even on failure (this will clear the set of matches).
 
 == Slow Synchronous Matching
 
@@ -65,11 +65,11 @@ Runners whose query matching is necessarily synchronous, either because a librar
 
 To achieve proper asynchronous matching the following steps must be followed:
 
-* Create a RunnerSessionData subclass, returned from AbstractRunner::createSessionData
+* Create a RunnerSessionData subclass, returned from Runner::createSessionData
 * In the RunnerSessionData subclass include a slot that will create the async jobs
 * Add a signal to the runner that can send all necessary information to the RunnerSessionData's slot; at a minimum this will include the QueryContext
 * Connect the runner's signal to the slot in the RunnerSessionData constructor; this is important to ensure that the connection, and therefore the slot call, happens in the correct thread
-* In AbstractRunner::match, after doing any necessary pre-processing of the QueryContext, emit the signal
+* In Runner::match, after doing any necessary pre-processing of the QueryContext, emit the signal
 * In the RunnerSessionData slot start the job, invalidating or merging older jobs; it will need to at a minimum hold on to the QueryContext object associated with the query
 * create a RunnerSession::Busy object
 * When the async jobs complete, the RunnerSessionData subclass should create the matches and call setMatches if the associated QueryContext is still valid, delete the RunnerSession::Busy object

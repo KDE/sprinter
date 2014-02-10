@@ -21,7 +21,7 @@
 namespace Sprinter
 {
 
-class AbstractRunner::Private
+class Runner::Private
 {
 public:
     Private()

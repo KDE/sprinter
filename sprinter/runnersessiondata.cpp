@@ -51,7 +51,7 @@ RunnerSessionData::Busy::~Busy()
     }
 }
 
-RunnerSessionData::RunnerSessionData(AbstractRunner *runner)
+RunnerSessionData::RunnerSessionData(Runner *runner)
     : QObject(0),
       d(new Private(runner))
 {
@@ -71,7 +71,7 @@ bool RunnerSessionData::enabled() const
     return d->enabled;
 }
 
-AbstractRunner *RunnerSessionData::runner() const
+Runner *RunnerSessionData::runner() const
 {
     return d->runner;
 }

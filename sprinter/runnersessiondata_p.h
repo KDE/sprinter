@@ -29,7 +29,7 @@ namespace Sprinter
 class RunnerSessionData::Private
 {
 public:
-    Private(AbstractRunner *r)
+    Private(Runner *r)
         : runner(r),
           session(0),
           matchesUnsynced(false),
@@ -43,7 +43,7 @@ public:
     int syncMatches(int offset);
     void associateSession(QuerySession *session);
 
-    AbstractRunner *runner;
+    Runner *runner;
     QAtomicInt busyCount;
     QVector<QueryMatch> syncedMatches;
     QVector<QueryMatch> currentMatches;

@@ -227,7 +227,7 @@ void QuerySessionThread::loadRunnerMetaData()
     t.start();
     m_sessionId = QUuid::createUuid();
 
-    QVector<AbstractRunner *> runnersTmp = m_runners;
+    QVector<Runner *> runnersTmp = m_runners;
     m_runners.clear();
     m_enabledRunnerIds.clear();
 
@@ -250,7 +250,7 @@ void QuerySessionThread::loadRunnerMetaData()
                 const QString path = pluginDir.absoluteFilePath(fileName);
                 QPluginLoader loader(path);
 
-                //TODO: check for having the AbstractRunner interface?
+                //TODO: check for having the Runner interface?
                 RunnerMetaData md;
                 md.library = path;
                 md.id = loader.metaData()["IID"].toString();
@@ -302,7 +302,7 @@ void QuerySessionThread::performLoadRunner(int index)
     const QString path = m_runnerMetaData[index].library;
     QPluginLoader loader(path);
     QObject *plugin = loader.instance();
-    AbstractRunner *runner = qobject_cast<AbstractRunner *>(plugin);
+    Runner *runner = qobject_cast<Runner *>(plugin);
     if (runner) {
         m_runnerMetaData[index].busy = false;
         m_runnerMetaData[index].runner = runner;
@@ -323,7 +323,7 @@ void QuerySessionThread::performLoadRunner(int index)
 
 void QuerySessionThread::retrieveSessionData(int index)
 {
-    AbstractRunner *runner = m_runners.at(index);
+    Runner *runner = m_runners.at(index);
 
     //qDebug() << runner;
     if (!runner || m_sessionData.at(index)) {
@@ -408,7 +408,7 @@ bool QuerySessionThread::startNextRunner()
         return true;
     }
 
-    AbstractRunner *runner = m_runners.at(m_currentRunner);
+    Runner *runner = m_runners.at(m_currentRunner);
 
     if (!sessionData->shouldStartMatch(m_context)) {
         //qDebug() << "          skipping";
@@ -565,7 +565,7 @@ QStringList QuerySessionThread::enabledRunners() const
     return m_enabledRunnerIds;
 }
 
-MatchRunnable::MatchRunnable(AbstractRunner *runner, QSharedPointer<RunnerSessionData> sessionData, QueryContext &context)
+MatchRunnable::MatchRunnable(Runner *runner, QSharedPointer<RunnerSessionData> sessionData, QueryContext &context)
     : m_runner(runner),
       m_sessionData(sessionData),
       m_context(context)
@@ -580,7 +580,7 @@ void MatchRunnable::run()
     }
 }
 
-SessionDataRetriever::SessionDataRetriever(QThread *destinationThread, const QUuid &sessionId, int index, AbstractRunner *runner)
+SessionDataRetriever::SessionDataRetriever(QThread *destinationThread, const QUuid &sessionId, int index, Runner *runner)
     : m_destinationThread(destinationThread),
       m_runner(runner),
       m_sessionId(sessionId),
@@ -607,7 +607,7 @@ void ExecRunnable::run()
     bool success = false;
     //TODO: another race condition with the runner being deleted between this call
     //      and usage
-    AbstractRunner *runner = m_match.runner();
+    Runner *runner = m_match.runner();
     if (runner) {
         success = runner->startExec(m_match);
     }

@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ABSTRACTRUNNER
-#define ABSTRACTRUNNER
+#ifndef SPRINTER_RUNNER
+#define SPRINTER_RUNNER
 
 #include <sprinter/sprinter_export.h>
 
@@ -30,17 +30,16 @@ namespace Sprinter
 {
 
 class QueryMatch;
-class AbstractRunner;
 class QueryContext;
 class RunnerSessionData;
 
-class SPRINTER_EXPORT AbstractRunner : public QObject
+class SPRINTER_EXPORT Runner : public QObject
 {
     Q_OBJECT
 
 public:
-    AbstractRunner(QObject *parent);
-    ~AbstractRunner();
+    Runner(QObject *parent);
+    ~Runner();
 
     /**
      * The unique internal ID for this runner. This is retrieved
