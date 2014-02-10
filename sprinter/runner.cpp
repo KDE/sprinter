@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "abstractrunner.h"
+#include "runner.h"
 
 #include <QDebug>
 
-#include "abstractrunner_p.h"
+#include "runner_p.h"
 #include "runnersessiondata.h"
 
 namespace Sprinter
@@ -108,4 +108,4 @@ void Runner::setSourcesUsed(const QVector<QuerySession::MatchSource> &sources)
 
 } // namespace
 
-#include "moc_abstractrunner.cpp"
+#include "moc_runner.cpp"

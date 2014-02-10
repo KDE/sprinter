@@ -30,8 +30,8 @@
 
 #include <unistd.h>
 
-#include "abstractrunner.h"
-#include "abstractrunner_p.h"
+#include "runner.h"
+#include "runner_p.h"
 #include "querysession.h"
 #include "runnersessiondata_p.h"
 

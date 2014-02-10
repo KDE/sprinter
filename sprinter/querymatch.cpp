@@ -17,7 +17,7 @@
 
 #include "querymatch.h"
 
-#include "abstractrunner.h"
+#include "runner.h"
 
 #include <QApplication>
 #include <QClipboard>

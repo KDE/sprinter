@@ -20,7 +20,7 @@
 
 #include <QDebug>
 
-#include "abstractrunner.h"
+#include "runner.h"
 #include "querycontext.h"
 #include "querysession.h"
 #include "querysession_p.h"

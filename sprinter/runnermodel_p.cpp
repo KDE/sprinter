@@ -17,7 +17,7 @@
 
 #include "runnermodel_p.h"
 
-#include "abstractrunner.h"
+#include "runner.h"
 #include "querysessionthread_p.h"
 
 #include <QDebug>

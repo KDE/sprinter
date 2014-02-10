@@ -22,7 +22,7 @@
 #include <QMetaEnum>
 #include <QThreadPool>
 
-#include "abstractrunner.h"
+#include "runner.h"
 #include "querysessionthread_p.h"
 #include "runnermodel_p.h"
 

@@ -16,20 +16,20 @@ add_definitions("-Wall -std=c++0x")
 
 ### Main library
 set(sprinterlib_SRCS
-    sprinter/abstractrunner.cpp
     sprinter/querymatch.cpp
     sprinter/querycontext.cpp
     sprinter/querysession.cpp
     sprinter/querysessionthread_p.cpp
+    sprinter/runner.cpp
     sprinter/runnermodel_p.cpp
     sprinter/runnersessiondata.cpp
 )
 
 set(sprinterlib_HEADERS
-    sprinter/abstractrunner.h
     sprinter/querycontext.h
     sprinter/querymatch.h
     sprinter/querysession.h
+    sprinter/runner.h
     sprinter/runnersessiondata.h
     ${CMAKE_BINARY_DIR}/sprinter/sprinter_export.h
 )
