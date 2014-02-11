@@ -184,18 +184,19 @@ public:
      */
     void startMatch(const QueryContext &context);
 
+Q_SIGNALS:
+    /**
+     * Emitted when the busy status changes
+     */
+    void busyChanged(bool busy);
+
+protected:
     /**
      * This method may be overridden by subclasses
      * @return true if the Runner should start matching based on the context
      * @param context the QueryContext to use in checks
      */
     virtual bool shouldStartMatch(const QueryContext &context) const;
-
-Q_SIGNALS:
-    /**
-     * Emitted when the busy status changes
-     */
-    void busyChanged(bool busy);
 
 private:
     friend class QuerySessionThread;
