@@ -10,15 +10,14 @@
 * Ensure all threads cleaned up before exit
 * complete apidocs
     * QueryContext
-    * Expand info on RunnerModel in QuerySession
 
 = Next milestone: 0.2
 
 == Features
 * Learning: record chosen QueryMatches, weight future matches with this information
-* Pre-match() runner filtering
+* Expand RunnerSessionData::shouldStartMatch with more powerful filtering
     * A MatchType filter (from user, or UI component)
-    * Query pre-processing?
+    * Query term pre-processing?
 
 == Improvements
 * Improve RunnerSessionData::updateMatches

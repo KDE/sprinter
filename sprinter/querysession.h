@@ -100,8 +100,30 @@ public:
     ~QuerySession();
 
     /**
-     * A model containing a list of runners and their status
-     * Also provides access to loading and unloading them
+     * A model containing a list of runners, their status and controls.
+     *
+     * The model provides the following roles:
+     *   DisplayRole: the user visible name of the runner
+     *   IdRole: the internal id of the runner
+     *   DescriptionRole: a user visible description
+     *   IsLoadedRole: true if the runner plugin is loaded
+     *   IsBusyRole: true if the runner is busy processing a query
+     *   GeneratesDefaultMatchesRole: true if the runner can generate a set of
+     *                                default matches
+     *   MatchTypesRole: the types of matches the runner can produce
+     *                   @see QuerySession::MatchType
+     *   SourcesUsedRole: the sources used by the runner for generating matches
+     *                   @see QuerySession::MatchSource
+     *
+     * Additionally, the model provides control over the runners with
+     * the following properties and methods which are available via the
+     * QProperty sytem to both C++ and QML users:
+     *   QStringList runnerIds: all runner ids; redundant with the IdRole but
+     *                          useful in QML to do things like:
+     *       session.runnerModel.enabledRunners = session.runnerModel.runnerIds
+     *   QStringList enabledRunners: the list of currently enabled runners
+     *   loadRunner: taking either an integer or a QModelIndex, this will cause
+     *               the plugin at that index to be loaded
      **/
     QAbstractItemModel *runnerModel() const;
 
