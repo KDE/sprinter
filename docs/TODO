@@ -9,7 +9,6 @@
 == Bugfixes
 * Ensure all threads cleaned up before exit
 * complete apidocs
-    * RunnerSessionData
     * QueryContext
     * Expand info on RunnerModel in QuerySession
 
