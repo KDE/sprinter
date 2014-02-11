@@ -408,22 +408,17 @@ bool QuerySessionThread::startNextRunner()
         return true;
     }
 
+    // if we have a session data object, we have a runner
     Runner *runner = m_runners.at(m_currentRunner);
+    Q_ASSERT(runner);
 
-    if (!sessionData->shouldStartMatch(m_context)) {
-        //qDebug() << "          skipping";
-        sessionData->setMatches(QVector<QueryMatch>(), m_context);
-        matcher = m_dummyMatcher;
-    } else {
-        matcher = new MatchRunnable(runner, sessionData, m_context);
-
-        //qDebug() << "          created a new matcher";
-        if (!m_threadPool->tryStart(matcher)) {
-            //qDebug() << "          threads be full";
-            delete matcher;
-            emit requestFurtherMatching();
-            return false;
-        }
+    //qDebug() << "          created a new matcher";
+    matcher = new MatchRunnable(runner, sessionData, m_context);
+    if (!m_threadPool->tryStart(matcher)) {
+        //qDebug() << "          threads be full";
+        delete matcher;
+        emit requestFurtherMatching();
+        return false;
     }
 
     m_matchers[m_currentRunner] = matcher;
