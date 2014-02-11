@@ -8,8 +8,6 @@
 
 == Bugfixes
 * Ensure all threads cleaned up before exit
-* complete apidocs
-    * QueryContext
 
 = Next milestone: 0.2
 
