@@ -121,6 +121,7 @@ bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
 void RunnerSessionData::startMatch(const QueryContext &context)
 {
     if (!shouldStartMatch(context)) {
+        setMatches(QVector<QueryMatch>(), context);
         return;
     }
 
@@ -344,7 +345,7 @@ int RunnerSessionData::Private::syncMatches(int offset)
     // only accept pagesize matches
     // may happen innocently when the page size changes between match and sync
     if ((uint)unsynced.size() > pageSize) {
-        d->canFetchMoreMatches = true;
+        canFetchMoreMatches = true;
         unsynced.resize(pageSize);
     }
 
