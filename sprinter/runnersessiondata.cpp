@@ -342,7 +342,9 @@ int RunnerSessionData::Private::syncMatches(int offset)
 #endif
 
     // only accept pagesize matches
+    // may happen innocently when the page size changes between match and sync
     if ((uint)unsynced.size() > pageSize) {
+        d->canFetchMoreMatches = true;
         unsynced.resize(pageSize);
     }
 
