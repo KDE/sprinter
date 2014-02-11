@@ -195,7 +195,7 @@ Q_SIGNALS:
     /**
      * Emitted when the busy status changes
      */
-    void busyChanged();
+    void busyChanged(bool busy);
 
 private:
     friend class QuerySessionThread;

@@ -365,7 +365,7 @@ void QuerySessionThread::sessionDataRetrieved(const QUuid &sessionId, int index,
     m_sessionData[index].reset(data);
 
     if (data) {
-        connect(data, SIGNAL(busyChanged()), this, SLOT(updateBusyStatus()));
+        connect(data, SIGNAL(busyChanged(bool)), this, SLOT(updateBusyStatus()));
         {
             QWriteLocker lock(&m_matchIndexLock);
             if (m_runnerBookmark == m_currentRunner) {

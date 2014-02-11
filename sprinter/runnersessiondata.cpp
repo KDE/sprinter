@@ -37,7 +37,7 @@ RunnerSessionData::Busy::Busy(RunnerSessionData *data)
     Q_ASSERT(m_data);
     bool busy = m_data->d->busyCount.load() > 0;
     if (busy != m_data->d->busyCount.ref()) {
-        emit m_data->busyChanged();
+        emit m_data->busyChanged(!busy);
     }
 }
 
@@ -46,7 +46,7 @@ RunnerSessionData::Busy::~Busy()
     if (m_data) {
         bool busy = m_data->d->busyCount.load() > 0;
         if (busy != m_data->d->busyCount.deref()) {
-            emit m_data->busyChanged();
+            emit m_data->busyChanged(!busy);
         }
     }
 }
