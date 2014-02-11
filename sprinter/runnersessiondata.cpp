@@ -83,17 +83,17 @@ bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
         return false;
     }
 
-    // if the query is too short return, unless
+    // not if the query is too short return, unless
     // the runner does default matches and the context is a
     // request for default matches
-
     if (!(d->runner->generatesDefaultMatches() &&
           context.isDefaultMatchesRequest()) &&
         (uint)context.query().length() < d->runner->minQueryLength()) {
         return false;
     }
 
-    // check if this runner requires network and if so deny it
+    // check if this runner requires network and if so skip matching
+    // if there is no network available to us
     if (d->runner->sourcesUsed().size() == 1 &&
         d->runner->sourcesUsed()[0] == QuerySession::FromNetworkService &&
         !context.networkAccessible()) {
