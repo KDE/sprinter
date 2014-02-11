@@ -55,9 +55,6 @@ QuerySessionThread::QuerySessionThread(QuerySession *parent)
       m_threadPool(new QThreadPool(this)),
       m_session(parent),
       m_dummySessionData(new RunnerSessionData(0)),
-      m_dummyMatcher(new MatchRunnable(0,
-                                       QSharedPointer<RunnerSessionData>(),
-                                       m_context)),
       m_runnerBookmark(-1),
       m_currentRunner(-1),
       m_sessionId(QUuid::createUuid()),
@@ -84,8 +81,6 @@ QuerySessionThread::QuerySessionThread(QuerySession *parent)
 QuerySessionThread::~QuerySessionThread()
 {
     clearSessionData();
-
-    delete m_dummyMatcher;
 
     //TODO: this will break if there are threads running
     qDeleteAll(m_runners);

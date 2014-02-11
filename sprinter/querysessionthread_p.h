@@ -142,7 +142,6 @@ private:
     QVector<MatchRunnable *> m_matchers;
 
     QSharedPointer<RunnerSessionData> m_dummySessionData;
-    MatchRunnable *m_dummyMatcher;
 
     QReadWriteLock m_matchIndexLock;
     int m_runnerBookmark;
