@@ -1,7 +1,6 @@
 = Curent milestone: 0.1
 
 == Features
-* add paging support to setMatches / updateMatches
 
 == Improvements
 * Clear TODOs/FIXMEs in code
