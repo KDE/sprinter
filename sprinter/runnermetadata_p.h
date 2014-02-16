@@ -27,7 +27,8 @@ struct RunnerMetaData
 {
     RunnerMetaData()
         : runner(0),
-          busy(false)
+          busy(false),
+          fetchedSessionData(false)
     {
     }
 
@@ -37,6 +38,7 @@ struct RunnerMetaData
     QString description;
     Runner *runner;
     bool busy;
+    bool fetchedSessionData;
 };
 
 } // namespace

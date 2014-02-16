@@ -299,8 +299,9 @@ void QuerySessionThread::performLoadRunner(int index)
     QObject *plugin = loader.instance();
     Runner *runner = qobject_cast<Runner *>(plugin);
     if (runner) {
-        m_runnerMetaData[index].busy = false;
         m_runnerMetaData[index].runner = runner;
+        m_runnerMetaData[index].busy = false;
+        m_runnerMetaData[index].fetchedSessionData = false;
 
         m_sessionData[index].clear();
         m_runners[index] = runner;
@@ -319,6 +320,7 @@ void QuerySessionThread::performLoadRunner(int index)
 void QuerySessionThread::retrieveSessionData(int index)
 {
     Runner *runner = m_runners.at(index);
+    m_runnerMetaData[index].fetchedSessionData = true;
 
     //qDebug() << runner;
     if (!runner || m_sessionData.at(index)) {
@@ -394,6 +396,9 @@ bool QuerySessionThread::startNextRunner()
     QSharedPointer<RunnerSessionData> sessionData = m_sessionData.at(m_currentRunner);
     if (!sessionData) {
         //qDebug() << "         no session data" << m_currentRunner;
+        if (!m_runnerMetaData[m_currentRunner].fetchedSessionData) {
+            retrieveSessionData(m_currentRunner);
+        }
         return true;
     }
 
@@ -527,6 +532,7 @@ void QuerySessionThread::clearSessionData()
 {
     for (int i = 0; i < m_sessionData.size(); ++i) {
         m_sessionData[i].clear();
+        m_runnerMetaData[i].fetchedSessionData = false;
     }
 
     if (m_sessionDataThread) {
