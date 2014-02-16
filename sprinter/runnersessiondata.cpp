@@ -121,7 +121,13 @@ bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
 void RunnerSessionData::startMatch(const QueryContext &context)
 {
     if (!shouldStartMatch(context)) {
-        setMatches(QVector<QueryMatch>(), context);
+        // we will set the matches to nothing unless this is a request
+        // for more matches, in which case we just leave whatever we
+        // currently have
+        if (!context.fetchMore()) {
+            setMatches(QVector<QueryMatch>(), context);
+        }
+
         return;
     }
 
