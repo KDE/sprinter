@@ -142,18 +142,9 @@ public:
     uint resultsPageSize() const;
 
     /**
-     * Sets the offset into the result set to start generating matches from.
-     * Combined with @see resultsPageSize a Runner can calculate where in a
-     * result set to return matches for, allowing for paged generation of
-     * matches.
-     * This will be set by the QuerySession during matching and
-     * should not be set directly.
-     * @param pageSize the offset into the result set to start at
-     */
-    void setResultsOffset(uint page);
-
-    /**
      * @return the offset into the result set to start at when generating matches
+     * This value is automatically incremented and reset as necessary by the
+     * RunnerSessionData object based on the QueryContext objects it receives.
      */
     uint resultsOffset() const;
 

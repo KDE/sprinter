@@ -32,11 +32,14 @@ public:
     Private(Runner *r)
         : runner(r),
           session(0),
+          currentMatchesLock(QMutex::Recursive),
           matchesUnsynced(false),
           canFetchMoreMatches(false),
           enabled(false),
           pageSize(10),
-          offset(0)
+          matchOffset(0),
+          lastReceivedMatchOffset(0),
+          lastSyncedMatchOffset(0)
     {
     }
 
@@ -54,7 +57,9 @@ public:
     bool canFetchMoreMatches;
     bool enabled;
     uint pageSize;
-    uint offset;
+    uint matchOffset;
+    uint lastReceivedMatchOffset;
+    uint lastSyncedMatchOffset;
 };
 
 } // namespace

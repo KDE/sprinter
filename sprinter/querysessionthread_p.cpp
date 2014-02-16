@@ -95,7 +95,7 @@ void QuerySessionThread::run()
     // can't create this with 'this' as the parent as we are in a different
     // thread at this point.
     if (!m_restartMatchingTimer) {
-        // this timer gets started whenever requestFurtherMatching() is
+        // this timer gets started whenever continueMatching() is
         // emitted; this may happen from various threads so needs to be
         // triggered by a signal to take advantage of Qt's automagic
         // queueing of signals between threads (you can't call a timer's
@@ -108,7 +108,7 @@ void QuerySessionThread::run()
         m_restartMatchingTimer = new QTimer();
         m_restartMatchingTimer->setInterval(50);
         m_restartMatchingTimer->setSingleShot(true);
-        connect(this, SIGNAL(requestFurtherMatching()),
+        connect(this, SIGNAL(continueMatching()),
                 m_restartMatchingTimer, SLOT(start()));
 
         // need to go through the forwarder, which lives in them
@@ -368,7 +368,7 @@ void QuerySessionThread::sessionDataRetrieved(const QUuid &sessionId, int index,
             }
         }
 
-        emit requestFurtherMatching();
+        emit continueMatching();
     }
 }
 
@@ -412,7 +412,7 @@ bool QuerySessionThread::startNextRunner()
     if (!m_threadPool->tryStart(matcher)) {
         //qDebug() << "          threads be full";
         delete matcher;
-        emit requestFurtherMatching();
+        emit continueMatching();
         return false;
     }
 
@@ -425,7 +425,7 @@ void QuerySessionThread::startMatching()
     //qDebug() << "starting query in work thread..." << QThread::currentThread() << m_context.query() << m_currentRunner << m_runnerBookmark;
 
     if (!m_matchIndexLock.tryLockForWrite()) {
-        emit requestFurtherMatching();
+        emit continueMatching();
         return;
     }
 
@@ -461,6 +461,7 @@ void QuerySessionThread::startMatching()
 
 void QuerySessionThread::launchDefaultMatches()
 {
+     m_context.setFetchMore(true);
      m_context.setIsDefaultMatchesRequest(true);
      startQuery();
 }
@@ -471,9 +472,16 @@ bool QuerySessionThread::launchQuery(const QString &query)
         return false;
     }
 
+    m_context.setFetchMore(true);
     m_context.setQuery(query);
     startQuery();
     return true;
+}
+
+void QuerySessionThread::launchMoreMatches()
+{
+     m_context.setFetchMore(true);
+     startQuery(m_currentRunner == m_runnerBookmark);
 }
 
 QString QuerySessionThread::query() const
@@ -496,17 +504,23 @@ QSize QuerySessionThread::imageSize() const
     return m_context.imageSize();
 }
 
-void QuerySessionThread::startQuery()
+void QuerySessionThread::startQuery(bool clearMatchers)
 {
-    //qDebug() << "requesting query from UI thread..." << QThread::currentThread() << m_context.query();
+    qDebug() << "requesting query from UI thread..." << QThread::currentThread()
+             << m_context.query()
+             << (m_context.fetchMore() ? "Fetching more." : "")
+             << (m_context.isDefaultMatchesRequest() ? "Default matches." : "")
+             << (clearMatchers ? "Clearing matchers" : "Keeping Matchers");
 
     {
         QWriteLocker lock(&m_matchIndexLock);
         m_runnerBookmark = m_currentRunner == 0 ? m_runners.size() - 1 : m_currentRunner - 1;
-        m_matchers.fill(0);
+        if (clearMatchers) {
+            m_matchers.fill(0);
+        }
     }
 
-    emit requestFurtherMatching();
+    emit continueMatching();
 }
 
 void QuerySessionThread::clearSessionData()

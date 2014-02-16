@@ -144,7 +144,7 @@ void QuerySession::requestDefaultMatches()
 void QuerySession::requestMoreMatches()
 {
     qDebug() << "Manager, more matches:" << QThread::currentThread();
-    d->thread->requestFurtherMatching();
+    d->thread->launchMoreMatches();
 }
 
 void QuerySession::setQuery(const QString &query)

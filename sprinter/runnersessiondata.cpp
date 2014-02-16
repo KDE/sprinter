@@ -128,19 +128,19 @@ void RunnerSessionData::startMatch(const QueryContext &context)
     auto updatePaging = [&]() {
             if (context.fetchMore()) {
                 // this is the minimum number of matches we need to already
-                // have to care about ggetting more
-                const uint minSize = d->offset + d->pageSize;
+                // have to care about getting more
+                const uint minSize = d->matchOffset + d->pageSize;
                 if (d->currentMatches.isEmpty()) {
                     if ((uint)d->syncedMatches.size() >= minSize) {
-                        d->offset += d->pageSize;
+                        d->matchOffset += d->pageSize;
                     }
                 } else if ((uint)d->currentMatches.size() >= minSize) {
-                    d->offset += d->pageSize;
+                    d->matchOffset += d->pageSize;
                 } else {
                     return false;
                 }
             } else {
-                d->offset = 0;
+                d->matchOffset = 0;
             }
             return true;
     };
@@ -173,15 +173,21 @@ void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const Que
     {
         QMutexLocker lock(&d->currentMatchesLock);
 
-        if (matches.isEmpty()) {
-            d->currentMatches.clear();
+        const uint prevReceivedOffset = d->lastReceivedMatchOffset;
+        d->lastReceivedMatchOffset = d->matchOffset;
+        Q_ASSERT(prevReceivedOffset <= d->lastReceivedMatchOffset);
 
+        if (matches.isEmpty()) {
             if (d->syncedMatches.isEmpty()) {
                 // nothing going on here
                 return;
             }
+        } else if (prevReceivedOffset == d->lastReceivedMatchOffset) {
+            d->currentMatches.resize(prevReceivedOffset + matches.size());
+            for (int i = 0; i < matches.size(); ++i) {
+                d->currentMatches[i + prevReceivedOffset] = matches[i];
+            }
         } else {
-            //FIXME: implement *merging* rather than simply addition
             d->currentMatches += matches;
         }
 
@@ -201,7 +207,6 @@ void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
 #ifdef DEBUG_UPDATEMATCHES
     qDebug() << "updating" << matches.size();
 #endif
-
     QMutexLocker lock(&d->currentMatchesLock);
 
     foreach (const QueryMatch &match, matches) {
@@ -250,6 +255,7 @@ void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
 
 QVector<QueryMatch> RunnerSessionData::matches(MatchState state) const
 {
+    QMutexLocker lock(&d->currentMatchesLock);
     if (state == SynchronizedMatches) {
         return d->syncedMatches;
     } else {
@@ -267,14 +273,9 @@ uint RunnerSessionData::resultsPageSize() const
     return d->pageSize;
 }
 
-void RunnerSessionData::setResultsOffset(uint offset)
-{
-    d->offset = offset;
-}
-
 uint RunnerSessionData::resultsOffset() const
 {
-    return d->offset;
+    return d->matchOffset;
 }
 
 bool RunnerSessionData::isBusy() const
@@ -307,39 +308,38 @@ void RunnerSessionData::Private::associateSession(QuerySession *newSession)
     }
 }
 
-int RunnerSessionData::Private::syncMatches(int offset)
+int RunnerSessionData::Private::syncMatches(int modelOffset)
 {
     Q_ASSERT(session);
 
     QVector<QueryMatch> unsynced;
 
-    {
-        QMutexLocker lock(&currentMatchesLock);
-
-        if (!updatedMatchIndexes.isEmpty()) {
-            foreach (int index, updatedMatchIndexes) {
-                if (index < syncedMatches.size()) {
+    QMutexLocker lock(&currentMatchesLock);
+    if (!updatedMatchIndexes.isEmpty()) {
+        foreach (int index, updatedMatchIndexes) {
+            if (index < syncedMatches.size()) {
 #ifdef DEBUG_UPDATEMATCHES
-                    qDebug() << "Telling the model we've updated" << offset + index;
+                qDebug() << "Telling the model we've updated" << modelOffset + index;
 #endif
-                    session->d->matchesUpdated(offset + index, offset + index);
-                }
+                session->d->matchesUpdated(modelOffset + index, modelOffset + index);
             }
-
-            updatedMatchIndexes.clear();
         }
 
-        if (matchesUnsynced) {
-            matchesUnsynced = false;
-            unsynced = currentMatches;
-            currentMatches.clear();
-        } else {
-            return syncedMatches.size();
-        }
+        updatedMatchIndexes.clear();
+    }
+
+    lastSyncedMatchOffset = lastReceivedMatchOffset;
+
+    if (matchesUnsynced) {
+        matchesUnsynced = false;
+        unsynced = currentMatches;
+        currentMatches.clear();
+    } else {
+        return syncedMatches.size();
     }
 
 #ifdef DEBUG_SYNC
-    qDebug() << "SYNC offset, synced, unsynced:" << offset << syncedMatches.size() << unsynced.size();
+    qDebug() << "SYNC model offset, synced, unsynced:" << modelOffset << syncedMatches.size() << unsynced.size();
 #endif
 
     // only accept pagesize matches
@@ -353,36 +353,59 @@ int RunnerSessionData::Private::syncMatches(int offset)
         // no sync'd matches, so we only need to do something if we now do have matches
         if (!unsynced.isEmpty()) {
             // we had no matches, now we do
-            session->d->addingMatches(offset, offset + unsynced.size());
+            session->d->addingMatches(modelOffset, modelOffset + unsynced.size());
             syncedMatches = unsynced;
             session->d->matchesAdded();
         }
     } else if (unsynced.isEmpty()) {
         // we had matches, and now we don't
-        session->d->removingMatches(offset, offset + syncedMatches.size());
-        syncedMatches.clear();
-        session->d->matchesRemoved();
+        if ((uint)syncedMatches.size() > lastSyncedMatchOffset) {
+            session->d->removingMatches(modelOffset + lastSyncedMatchOffset, modelOffset + syncedMatches.size() - lastSyncedMatchOffset);
+            syncedMatches.resize(lastSyncedMatchOffset);
+            session->d->matchesRemoved();
+        }
     } else {
         // now the more complex situation: we have both synced and new matches
         // these need to be merged with the correct add/remove/update rows
         // methods called in the session (the model)
-        //TODO: implement merging; this implementation is naive and does not
-        // allow for updating results
-        const int oldCount = syncedMatches.size();
-        const int newCount = unsynced.size();
+        const uint oldCount = syncedMatches.size() - lastSyncedMatchOffset;
+        const uint newCount = unsynced.size();
         if (oldCount == newCount) {
-            syncedMatches = unsynced;
-            session->d->matchesUpdated(offset, offset + newCount);
+            for (uint i = 0; i < newCount; ++i) {
+                syncedMatches[i + lastSyncedMatchOffset] = unsynced[i];
+            }
+
+            session->d->matchesUpdated(modelOffset + lastSyncedMatchOffset,
+                                       modelOffset + lastSyncedMatchOffset + newCount);
         } else if (oldCount < newCount) {
-            session->d->addingMatches(offset + oldCount, offset + newCount);
-            syncedMatches = unsynced;
+            session->d->addingMatches(modelOffset + syncedMatches.size(),
+                                      modelOffset + syncedMatches.size() +
+                                      (newCount - oldCount));
+//             qDebug() << "was" << syncedMatches.size() << "will be"
+//                      << (lastSyncedMatchOffset + newCount)
+//                      << "has" << newCount << unsynced.size();
+            syncedMatches.resize(lastSyncedMatchOffset + newCount);
+
+            for (uint i = 0; i < newCount; ++i) {
+                qDebug() << "SYNC:"
+                         << syncedMatches.size() << (i + lastSyncedMatchOffset)
+                         << unsynced.size() << i;
+                syncedMatches[i + lastSyncedMatchOffset] = unsynced[i];
+            }
             session->d->matchesAdded();
-            session->d->matchesUpdated(offset, offset + newCount);
+            session->d->matchesUpdated(modelOffset + lastSyncedMatchOffset,
+                                       modelOffset + lastSyncedMatchOffset + oldCount);
         } else {
-            session->d->removingMatches(offset + newCount, offset + oldCount);
-            syncedMatches = unsynced;
-            session->d->matchesAdded();
-            session->d->matchesUpdated(offset, offset + newCount);
+            // more old matches than new
+            session->d->removingMatches(modelOffset + lastSyncedMatchOffset + newCount,
+                                        modelOffset + lastSyncedMatchOffset + oldCount);
+            syncedMatches.resize(modelOffset + lastSyncedMatchOffset + newCount);
+            for (uint i = 0; i < newCount; ++i) {
+                syncedMatches[i + lastSyncedMatchOffset] = unsynced[i];
+            }
+            session->d->matchesRemoved();
+            session->d->matchesUpdated(modelOffset + lastSyncedMatchOffset,
+                                       modelOffset + lastSyncedMatchOffset + newCount);
         }
     }
 

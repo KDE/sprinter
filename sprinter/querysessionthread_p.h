@@ -101,13 +101,14 @@ public:
     QStringList enabledRunners() const;
     void launchDefaultMatches();
     bool launchQuery(const QString &query);
+    void launchMoreMatches();
     QString query() const;
     QuerySession *session() const { return m_session; }
     bool setImageSize(const QSize &size);
     QSize imageSize() const;
 
 Q_SIGNALS:
-    void requestFurtherMatching();
+    void continueMatching();
     void requestSync();
     void loadingRunnerMetaData();
     void loadedRunnerMetaData();
@@ -126,7 +127,7 @@ private Q_SLOTS:
     void updateBusyStatus();
 
 private:
-    void startQuery();
+    void startQuery(bool clearMatchers = true);
     void loadRunnerMetaData();
     void retrieveSessionData(int index);
     bool startNextRunner();
