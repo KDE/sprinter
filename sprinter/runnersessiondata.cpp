@@ -180,19 +180,15 @@ void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const Que
     {
         QMutexLocker lock(&d->currentMatchesLock);
 
-        const uint prevReceivedOffset = d->lastReceivedMatchOffset;
         d->lastReceivedMatchOffset = d->matchOffset;
-        Q_ASSERT(prevReceivedOffset <= d->lastReceivedMatchOffset);
 
         if (matches.isEmpty()) {
-            if (d->syncedMatches.isEmpty()) {
-                // nothing going on here
+            if ((uint)d->syncedMatches.size() <= d->lastReceivedMatchOffset) {
+                // nothing going on here; we have not matches and
+                // the syncedMatch set is smaller than the
+                // size it will end up with matches removed already,
+                // so we have nothing to remove
                 return;
-            }
-        } else if (prevReceivedOffset == d->lastReceivedMatchOffset) {
-            d->currentMatches.resize(prevReceivedOffset + matches.size());
-            for (int i = 0; i < matches.size(); ++i) {
-                d->currentMatches[i + prevReceivedOffset] = matches[i];
             }
         } else {
             d->currentMatches += matches;
