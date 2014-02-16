@@ -6,7 +6,6 @@
 * Clear TODOs/FIXMEs in code
 
 == Bugfixes
-* Ensure all threads cleaned up before exit
 
 = Next milestone: 0.2
 
@@ -19,6 +18,7 @@
 == Improvements
 * Improve RunnerSessionData::updateMatches
 * Implement merging in setMatches
+* API review of all public classes
 
 = Unscheduled
 
