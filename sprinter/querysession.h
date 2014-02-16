@@ -152,6 +152,11 @@ public Q_SLOTS:
     void requestDefaultMatches();
 
     /**
+     * Executes a request for more matches on the current query
+     */
+    void requestMoreMatches();
+
+    /**
      * Sets the text to be used as the query string
      * This may be called multiple times while querying, allowing
      * for "search as you type" patterns.
