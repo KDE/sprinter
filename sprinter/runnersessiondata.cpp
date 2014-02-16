@@ -387,9 +387,6 @@ int RunnerSessionData::Private::syncMatches(int modelOffset)
             syncedMatches.resize(lastSyncedMatchOffset + newCount);
 
             for (uint i = 0; i < newCount; ++i) {
-                qDebug() << "SYNC:"
-                         << syncedMatches.size() << (i + lastSyncedMatchOffset)
-                         << unsynced.size() << i;
                 syncedMatches[i + lastSyncedMatchOffset] = unsynced[i];
             }
             session->d->matchesAdded();
