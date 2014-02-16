@@ -158,14 +158,15 @@ void RunnerSessionData::startMatch(const QueryContext &context)
             return true;
     };
 
+    // reset if we can fetch more matches; the runner must
+    // set this again after each match
+    d->canFetchMoreMatches = false;
+
     // now we set up the paging
     if (!context.ifValid(updatePaging)) {
         return;
     }
 
-    // reset if we can fetch more matches; the runner must
-    // set this again after each match
-    d->canFetchMoreMatches = false;
     d->runner->match(this, context);
 }
 
