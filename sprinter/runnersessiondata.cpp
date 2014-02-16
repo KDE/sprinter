@@ -127,18 +127,25 @@ void RunnerSessionData::startMatch(const QueryContext &context)
 
     auto updatePaging = [&]() {
             if (context.fetchMore()) {
+                QMutexLocker lock(&d->currentMatchesLock);
                 // this is the minimum number of matches we need to already
                 // have to care about getting more
                 const uint minSize = d->matchOffset + d->pageSize;
+
+//                 qDebug() << "*****" << minSize << d->currentMatches.size() << d->syncedMatches.size();
                 if (d->currentMatches.isEmpty()) {
-                    if ((uint)d->syncedMatches.size() >= minSize) {
-                        d->matchOffset += d->pageSize;
+                    if ((uint)d->syncedMatches.size() < minSize) {
+                        return false;
+                    } else {
+                        d->matchOffset = minSize;
                     }
-                } else if ((uint)d->currentMatches.size() >= minSize) {
-                    d->matchOffset += d->pageSize;
-                } else {
+                } else if ((uint)d->currentMatches.size() < minSize) {
                     return false;
+                } else {
+                    d->matchOffset = minSize;
                 }
+//                 qDebug() << "***** WIN (min, cur, synced)" << minSize << d->currentMatches.size() << d->syncedMatches.size();
+
             } else {
                 d->matchOffset = 0;
             }
