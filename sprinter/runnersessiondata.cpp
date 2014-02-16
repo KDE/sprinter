@@ -369,6 +369,9 @@ int RunnerSessionData::Private::syncMatches(int modelOffset)
         }
     } else if (unsynced.isEmpty()) {
         // we had matches, and now we don't
+#ifdef DEBUG_SYNC
+        qDebug() << "HAD MATCHESS .. NOW WE DON'T? synced/lastOffset" << syncedMatches.size() << lastSyncedMatchOffset;
+#endif
         if ((uint)syncedMatches.size() > lastSyncedMatchOffset) {
             session->d->removingMatches(modelOffset + lastSyncedMatchOffset, modelOffset + syncedMatches.size() - lastSyncedMatchOffset);
             syncedMatches.resize(lastSyncedMatchOffset);
