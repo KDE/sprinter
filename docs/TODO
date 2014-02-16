@@ -21,18 +21,11 @@
 * Implement merging in setMatches
 
 = Unscheduled
+
+== To be scheduled
 * Provide per-plugin help in the json file, exported to the RunnerModel
 * Add application affiliation to the json & export to RunnerModel
     * With model filtering, it becomes easy to get plugins relevant to a specific application
-* Tiered match run priorities on runners set by the user
-    * 0 - in worker thread; 1 launched first in threadpool; 2 launch last in threadpool
-    * a launcher might request app launchers in tier 0, e.g.
-* Query pre-processing (similar to Plasma::RunnerContext::Private::determineType)
-    * this may actually be unecessary, or at least not as useful as was expected when krunner was in devel?
-* Actions on matches
-    * Could be done using QueryMatch::isSearchTerm to refine search?
-* MatchType specializations
-    * Allow QueryMatch to have a "free-form" QString that would represent an optional specialation to MatchType? (Only makes sense if this is a common requirement, as it incurs more overhead for all matches)
 * Runner plugin test harness that "tortures" runners to see how they perform
     * Correctness of results
     * Threading safety
@@ -40,5 +33,16 @@
 * Allow unloading of runners in RunnerModel
     * currently Runner plugins hang out in memory once access the first time
     * ref counted and delete when no longer used
-* QueryMatch::isSearchTerm should allow setting whether to only run against the same runner that generated it (relies on a single-runner mode)
 * Runner plugin configuration
+
+== Needs more evaluation (aka "Is this necessary/useful?")
+* Tiered match run priorities on runners set by the user
+    * 0 - in worker thread; 1 launched first in threadpool; 2 launch last in threadpool
+    * a launcher might request app launchers in tier 0, e.g.
+* Query pre-processing (similar to Plasma::RunnerContext::Private::determineType)
+    * this may actually be unecessary, or at least not as useful as was expected when krunner was in devel? revisit when more runner are ported
+* Actions on matches
+    * Could be done using QueryMatch::isSearchTerm to refine search?
+* MatchType specializations
+    * Allow QueryMatch to have a "free-form" QString that would represent an optional specialation to MatchType? (Only makes sense if this is a common requirement, as it incurs more overhead for all matches)
+* QueryMatch::isSearchTerm should allow setting whether to only run against the same runner that generated it
