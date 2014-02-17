@@ -237,7 +237,6 @@ void QuerySessionThread::loadRunnerMetaData()
                 const QString path = pluginDir.absoluteFilePath(fileName);
                 QPluginLoader loader(path);
 
-                //TODO: check for having the Runner interface?
                 RunnerMetaData md;
                 md.library = path;
                 md.id = loader.metaData()["IID"].toString();
@@ -247,7 +246,7 @@ void QuerySessionThread::loadRunnerMetaData()
                 }
 
                 QJsonObject json = loader.metaData()["MetaData"].toObject();
-                //TODO localization
+                //TODO localization/i18n
                 md.name = json["name"].toString();
                 md.description = json["description"].toString();
                 m_runnerMetaData << md;

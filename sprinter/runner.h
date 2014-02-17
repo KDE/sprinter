@@ -180,4 +180,6 @@ private:
 
 } //namespace
 
+Q_DECLARE_INTERFACE(Sprinter::Runner, "org.kde.sprinter.runner")
+
 #endif
