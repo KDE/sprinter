@@ -225,7 +225,6 @@ void QuerySessionThread::loadRunnerMetaData()
         m_matchers.clear();
     }
 
-    //TODO a little ugly, including the hardcoded "sprinter"
     foreach (const QString &path, QCoreApplication::instance()->libraryPaths()) {
         if (path.endsWith("plugins")) {
             QDir pluginDir(path);
@@ -243,7 +242,6 @@ void QuerySessionThread::loadRunnerMetaData()
                 }
 
                 QJsonObject json = loader.metaData()["MetaData"].toObject();
-                //TODO localization/i18n
                 md.name = json["name"].toString();
                 md.description = json["description"].toString();
                 m_runnerMetaData << md;

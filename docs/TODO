@@ -3,7 +3,6 @@
 == Features
 
 == Improvements
-* Clear TODOs/FIXMEs in code
 
 == Bugfixes
 
@@ -22,6 +21,10 @@
     * MovieType as a specialization of video?
     * spread out across the address space with explicit values?
 * API review of all public classes
+* localization/i18n in plugin metadata (name, description)
+* confirm that the QList<int>s used in RunnerModel::data() works from QML
+    * MatchTypesRole
+    * SourcesUsedRole
 
 = Unscheduled
 
@@ -39,6 +42,8 @@
 * Runner plugin configuration
 
 == Needs more evaluation (aka "Is this necessary/useful?")
+* A nicer way to find plugins in QuerySessionThread::loadRunnerMetaData()?
+    * it is currently a little ugly, including the hardcoded "sprinter"
 * Extending QueryContext
     * an optional matchTypes set which can be used to filter runners in RunnerSessionData::shouldStartMatch
 * Tiered match run priorities on runners set by the user
