@@ -144,9 +144,6 @@ void QuerySessionThread::syncMatches()
 
 void QuerySessionThread::startSync()
 {
-    // TODO: do we need to do the sync in chunks?
-    // for large numbers of runners and matches, doing them
-    // all at once may be too slow. needs to be measured in future
 //     QTime t;
 //     t.start();
     m_matchCount = -1;

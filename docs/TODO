@@ -46,3 +46,7 @@
 * MatchType specializations
     * Allow QueryMatch to have a "free-form" QString that would represent an optional specialation to MatchType? (Only makes sense if this is a common requirement, as it incurs more overhead for all matches)
 * QueryMatch::isSearchTerm should allow setting whether to only run against the same runner that generated it
+* Measure for possible performance bottlenecks
+    * QuerySessionThread::startSync does all sync's at once (no chunking)
+    * syncMatches does a fair amount of collection traversal
+    * updateMatches is really ugly ...
