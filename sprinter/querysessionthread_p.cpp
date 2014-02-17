@@ -81,11 +81,6 @@ QuerySessionThread::QuerySessionThread(QuerySession *parent)
 QuerySessionThread::~QuerySessionThread()
 {
     clearSessionData();
-
-    //TODO: this will break if there are threads running
-    qDeleteAll(m_runners);
-
-    //TODO: wait for all matching and sessiondata fetch threads to complete?
 }
 
 void QuerySessionThread::run()
