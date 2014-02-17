@@ -218,7 +218,6 @@ void QuerySessionThread::loadRunnerMetaData()
     m_enabledRunnerIds.clear();
 
     {
-        //TODO audit locking around clearSessionData
         QWriteLocker lock(&m_matchIndexLock);
         clearSessionData();
         m_matchers.clear();
