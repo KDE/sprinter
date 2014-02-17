@@ -17,7 +17,9 @@
 
 == Improvements
 * Improve RunnerSessionData::updateMatches
-* Implement merging in setMatches
+* Review QuerySession::MathType entries
+    * MovieType as a specialization of video?
+    * spread out across the address space with explicit values?
 * API review of all public classes
 
 = Unscheduled

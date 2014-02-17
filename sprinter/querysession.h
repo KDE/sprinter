@@ -49,32 +49,46 @@ public:
     };
     Q_ENUMS(DisplayRoles)
 
-    //TODO organize these in a more orderly fashion
     enum MatchType {
         UnknownType = 0,
-        ExecutableType,
-        FileType,
-        MathAndUnitsType,
-        DocumentType,
-        BookType,
-        AlbumType,
-        AudioType,
-        VideoType,
-        FilesystemLocationType,
-        NetworkLocationType,
-        ContactType,
-        EventType,
-        MessageType,
-        BookmarkType,
-        DesktopType,
-        WindowType,
-        HardwareType,
-        AppActionType,
-        AppSessionType,
-        GeolocationType,
-        LanguageType,
-        DateTimeType,
-        InstallableType
+
+        // Generic file types
+        ExecutableType, // an executable file (application, command line, e.g.)
+        FileType, // only use if there is not a relevant Content type
+        InstallableType, // Something that is installable, e.g. an app or package
+        PathType, // a path in the local filesystem
+
+        // Resource address types
+        FilesystemLocationType, // a non-literal location in the local fs
+        HardwareType, // a hardware device
+        NetworkLocationType, // a URI pointing to a resource on the network
+
+        // Information types
+        DateTimeType, // dates and time
+        GeolocationType, // geographical
+        LanguageType, // translations, definitions, etc.
+        MathAndUnitsType, // numerical and calculations
+        EnvironmentalType, // weather, etc.
+
+        // Content types
+        AlbumType, // full audio album
+        AudioType, // audio data (music, etc.)
+        BookmarkType, // web or local bookmark
+        BookType, // eBooks
+        ContactType, // person, e.g.
+        DocumentType, // word processing, spreadsheet, etc.
+        EventType, // calendaring
+        MagazineType, // magazines
+        MessageType, // email, IM, SMS, etc.
+        VideoType, // video
+
+        // Desktop shell and user interface types
+        ActivityType, // a desktop activity
+        AppActionType, // an action in an external app; perhaps from a menu
+        AppSessionType, // a desktop app session within the current user session
+        DesktopType, // virtual desktop name/numbers
+        UserSessionType, // a user session
+        WindowType, // a window on the desktop
     };
     Q_ENUMS(MatchType)
 
