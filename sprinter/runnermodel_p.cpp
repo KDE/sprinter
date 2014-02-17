@@ -23,7 +23,6 @@
 #include <QDebug>
 #include <QMetaEnum>
 
-//TODO: this is unlikely to work as expected from QML; look for a different solution after testing; see usage of QList<int> in data()
 Q_DECLARE_METATYPE(QList<int>);
 
 namespace Sprinter
