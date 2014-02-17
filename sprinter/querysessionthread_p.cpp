@@ -586,7 +586,6 @@ SessionDataRetriever::SessionDataRetriever(QThread *destinationThread, const QUu
 void SessionDataRetriever::run()
 {
     RunnerSessionData *session = m_runner->createSessionData();
-    //FIXME: session could be deleted at this point, and then this crashes?
     session->moveToThread(m_destinationThread);
     emit sessionDataRetrieved(m_sessionId, m_index, session);
 }
@@ -600,8 +599,6 @@ ExecRunnable::ExecRunnable(const QueryMatch &match, QObject *parent)
 void ExecRunnable::run()
 {
     bool success = false;
-    //TODO: another race condition with the runner being deleted between this call
-    //      and usage
     Runner *runner = m_match.runner();
     if (runner) {
         success = runner->startExec(m_match);
