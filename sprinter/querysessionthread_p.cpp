@@ -127,8 +127,10 @@ void QuerySessionThread::run()
     m_restartMatchingTimer = 0;
     delete forwarder;
 
-    //FIXME: should not delete right away -> sh
-    delete m_sessionDataThread;
+    // we will now exit the thread, and have it delete when that returns
+    connect(m_sessionDataThread, SIGNAL(finished()),
+            m_sessionDataThread, SLOT(deleteLater()));
+    m_sessionDataThread->exit();
     m_sessionDataThread = 0;
 
     deleteLater();
