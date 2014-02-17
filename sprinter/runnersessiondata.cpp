@@ -100,15 +100,6 @@ bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
         return false;
     }
 
-    /*
-        TODO: should QueryContext have an optional matchTypes set which
-        can be used to filter runners on a per-query/per-session basis?
-        if (!context.matchTypesGenerated.isEmpty() &&
-            !runner->matchTypesGenerated().isEmpty()) {
-
-        }
-    */
-
     // if we are fetching more results, make sure that the runner
     // can actually do so
     if (context.fetchMore() && !d->canFetchMoreMatches) {
@@ -212,8 +203,7 @@ void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const Que
 void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
 {
     Q_ASSERT(d->session);
-
-    // TODO: find a nicer way to to do updates than comparing data(), nested loops..
+z
 #ifdef DEBUG_UPDATEMATCHES
     qDebug() << "updating" << matches.size();
 #endif

@@ -17,6 +17,7 @@
 
 == Improvements
 * Improve RunnerSessionData::updateMatches
+    * find a nicer way to to do updates than comparing data(), nested loops..
 * Review QuerySession::MathType entries
     * MovieType as a specialization of video?
     * spread out across the address space with explicit values?
@@ -38,6 +39,8 @@
 * Runner plugin configuration
 
 == Needs more evaluation (aka "Is this necessary/useful?")
+* Extending QueryContext
+    * an optional matchTypes set which can be used to filter runners in RunnerSessionData::shouldStartMatch
 * Tiered match run priorities on runners set by the user
     * 0 - in worker thread; 1 launched first in threadpool; 2 launch last in threadpool
     * a launcher might request app launchers in tier 0, e.g.
@@ -47,7 +50,7 @@
     * Could be done using QueryMatch::isSearchTerm to refine search?
 * MatchType specializations
     * Allow QueryMatch to have a "free-form" QString that would represent an optional specialation to MatchType? (Only makes sense if this is a common requirement, as it incurs more overhead for all matches)
-* QueryMatch::isSearchTerm should allow setting whether to only run against the same runner that generated it
+* QueryMatch::isSearchTerm could allow setting whether to only run against the same runner that generated it
 * Measure for possible performance bottlenecks
     * QuerySessionThread::startSync does all sync's at once (no chunking)
     * syncMatches does a fair amount of collection traversal
