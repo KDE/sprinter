@@ -214,12 +214,8 @@ void QuerySessionThread::loadRunnerMetaData()
     t.start();
     m_sessionId = QUuid::createUuid();
 
-    QVector<Runner *> runnersTmp = m_runners;
     m_runners.clear();
     m_enabledRunnerIds.clear();
-
-    //FIXME will crash if matches are ongoing
-    qDeleteAll(runnersTmp);
 
     {
         //TODO audit locking around clearSessionData
