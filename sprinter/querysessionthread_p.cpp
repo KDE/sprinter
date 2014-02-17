@@ -55,8 +55,8 @@ QuerySessionThread::QuerySessionThread(QuerySession *parent)
       m_threadPool(new QThreadPool(this)),
       m_session(parent),
       m_dummySessionData(new RunnerSessionData(0)),
-      m_runnerBookmark(-1),
-      m_currentRunner(-1),
+      m_runnerBookmark(0),
+      m_currentRunner(0),
       m_sessionId(QUuid::createUuid()),
       m_restartMatchingTimer(0),
       m_startSyncTimer(0),
@@ -363,14 +363,7 @@ void QuerySessionThread::sessionDataRetrieved(const QUuid &sessionId, int index,
 
     if (data) {
         connect(data, SIGNAL(busyChanged(bool)), this, SLOT(updateBusyStatus()));
-        {
-            QWriteLocker lock(&m_matchIndexLock);
-            if (m_runnerBookmark == m_currentRunner) {
-                m_runnerBookmark = m_currentRunner == 0 ? m_runners.size() - 1 : m_currentRunner - 1;
-            }
-        }
-
-        emit continueMatching();
+        startQuery(false);
     }
 }
 
@@ -428,6 +421,9 @@ bool QuerySessionThread::startNextRunner()
 void QuerySessionThread::startMatching()
 {
     //qDebug() << "starting query in work thread..." << QThread::currentThread() << m_context.query() << m_currentRunner << m_runnerBookmark;
+    if (m_runners.isEmpty()) {
+        return;
+    }
 
     if (!m_matchIndexLock.tryLockForWrite()) {
         emit continueMatching();
@@ -519,7 +515,8 @@ void QuerySessionThread::startQuery(bool clearMatchers)
 
     {
         QWriteLocker lock(&m_matchIndexLock);
-        m_runnerBookmark = m_currentRunner == 0 ? m_runners.size() - 1 : m_currentRunner - 1;
+        m_runnerBookmark = qMax(0, m_currentRunner == 0 ? m_runners.size() - 1
+                                                        : m_currentRunner - 1);
         if (clearMatchers) {
             m_matchers.fill(0);
         }
