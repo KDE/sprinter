@@ -292,7 +292,11 @@ void QuerySessionThread::performLoadRunner(int index)
         m_sessionData[index].clear();
         m_runners[index] = runner;
         runner->d->id = m_runnerMetaData[index].id;
-        retrieveSessionData(index);
+        if (m_context.isValid() &&
+            (!m_context.query().isEmpty() ||
+             m_context.isDefaultMatchesRequest())) {
+            retrieveSessionData(index);
+        }
     } else {
         m_runnerMetaData[index].runner = 0;
         m_runnerMetaData[index].busy = false;
