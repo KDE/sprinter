@@ -18,7 +18,11 @@
     * MovieType as a specialization of video?
     * spread out across the address space with explicit values?
 * API review of all public classes
-* localization/i18n in plugin metadata (name, description)
+* Metadata
+    * localization/i18n in plugin metadata (name, description)
+    * license
+    * author information (name, email)
+    * icon
 * confirm that the QList<int>s used in RunnerModel::data() works from QML
     * MatchTypesRole
     * SourcesUsedRole
@@ -39,6 +43,8 @@
 * Runner plugin configuration
 
 == Needs more evaluation (aka "Is this necessary/useful?")
+* Metadata
+    * necessary to bring back equiv of X-KDE-PluginInfo-EnabledByDefault?
 * A nicer way to find plugins in QuerySessionThread::loadRunnerMetaData()?
     * it is currently a little ugly, including the hardcoded "sprinter"
 * Extending QueryContext
