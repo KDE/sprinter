@@ -10,9 +10,6 @@
 
 == Features
 * Learning: record chosen QueryMatches, weight future matches with this information
-* Expand RunnerSessionData::shouldStartMatch with more powerful filtering
-    * A MatchType filter (from user, or UI component)
-    * Query term pre-processing?
 
 == Improvements
 * Improve RunnerSessionData::updateMatches
