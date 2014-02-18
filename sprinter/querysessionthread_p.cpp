@@ -448,19 +448,20 @@ void QuerySessionThread::startMatching()
 
 void QuerySessionThread::launchDefaultMatches()
 {
-     m_context.setFetchMore(true);
+     m_context.setFetchMore(false);
      m_context.setIsDefaultMatchesRequest(true);
      startQuery();
 }
 
 bool QuerySessionThread::launchQuery(const QString &query)
 {
-    if (m_context.query() == query) {
+    const QString oldQuery = m_context.query();
+    m_context.setQuery(query);
+    if (m_context.query() == oldQuery) {
         return false;
     }
 
-    m_context.setFetchMore(true);
-    m_context.setQuery(query);
+    m_context.setFetchMore(false);
     startQuery();
     return true;
 }
