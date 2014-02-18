@@ -108,13 +108,16 @@ QueryContext &QueryContext::operator=(const QueryContext &other)
 
 void QueryContext::setQuery(const QString &query)
 {
-    const bool fetchMore = d->query == query;
+    QString trimmedQuery = query.trimmed();
+    if (d->query == trimmedQuery) {
+        return;
+    }
 
     d->reset(d, this);
 
-    d->fetchMore = fetchMore;
+    d->fetchMore = false;
     d->isDefaultMatchesRequest = false;
-    d->query = query;
+    d->query = trimmedQuery;
 }
 
 QString QueryContext::query() const
