@@ -203,7 +203,7 @@ void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const Que
 void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
 {
     Q_ASSERT(d->session);
-z
+
 #ifdef DEBUG_UPDATEMATCHES
     qDebug() << "updating" << matches.size();
 #endif
