@@ -31,15 +31,48 @@ namespace Sprinter
 
 QuerySession::Private::Private(QuerySession *session)
     : q(session),
-      thread(new QuerySessionThread(session)),
-      runnerModel(new RunnerModel(thread, session)),
+      workerThread(new QThread(q)),
+      worker(new QuerySessionThread(q)),
+      runnerModel(new RunnerModel(worker, q)),
+      syncTimer(new NonRestartingTimer(q)),
       matchesArrivedWhileExecuting(false)
 {
     qRegisterMetaType<QUuid>("QUuid");
     qRegisterMetaType<Sprinter::QueryContext>("Sprinter::QueryContext");
     qRegisterMetaType<Sprinter::QueryMatch>("Sprinter::QueryMatch");
 
-    q->connect(thread, SIGNAL(resetModel()), q, SLOT(resetModel()));
+    q->connect(worker, SIGNAL(resetModel()), q, SLOT(resetModel()));
+
+    roles.insert(Qt::DisplayRole, "Title");
+    roleColumns.append(Qt::DisplayRole);
+    QMetaEnum e = q->metaObject()->enumerator(q->metaObject()->indexOfEnumerator("DisplayRoles"));
+    for (int i = 0; i < e.keyCount(); ++i) {
+        const int enumVal = e.value(i);
+        if (enumVal == ImageRole) {
+            imageRoleColumn = i + 1;
+        }
+        roles.insert(enumVal, e.key(i));
+        roleColumns.append(enumVal);
+    }
+
+    // if synchronization becomes too slow, it could be moved to happen
+    // in this worker thread, but only with significant complexity
+    syncTimer->setInterval(10);
+    syncTimer->setSingleShot(true);
+
+    connect(syncTimer, SIGNAL(timeout()),
+            q, SLOT(startMatchSynchronization()));
+
+    // when the thread exits, the worker object should
+    // be deleted. the thread is exited in ~QuerySession
+    connect(workerThread, SIGNAL(finished()),
+            worker, SLOT(deleteLater()));
+
+    qDebug() << "Starting QuerySession worker thread from"
+             << QThread::currentThread();
+    workerThread->start();
+    worker->moveToThread(workerThread);
+    QMetaObject::invokeMethod(worker, "loadRunnerMetaData");
 }
 
 void QuerySession::Private::resetModel()
@@ -75,10 +108,11 @@ void QuerySession::Private::matchesUpdated(int start, int end)
 
 void QuerySession::Private::matchesArrived()
 {
+    //NOTE: this gets called from non-GUI threads
     matchesArrivedWhileExecuting = matchesArrivedWhileExecuting ||
                                    !executingMatches.isEmpty();
     if (!matchesArrivedWhileExecuting) {
-        thread->syncMatches();
+        QMetaObject::invokeMethod(syncTimer, "startIfStopped");
     }
 }
 
@@ -104,29 +138,20 @@ void QuerySession::Private::executionFinished(const QueryMatch &match, bool succ
     }
 }
 
+void QuerySession::Private::startMatchSynchronization()
+{
+    worker->syncMatches();
+}
+
 QuerySession::QuerySession(QObject *parent)
     : QAbstractItemModel(parent),
       d(new Private(this))
 {
-    d->roles.insert(Qt::DisplayRole, "Title");
-    d->roleColumns.append(Qt::DisplayRole);
-    QMetaEnum e = metaObject()->enumerator(metaObject()->indexOfEnumerator("DisplayRoles"));
-    for (int i = 0; i < e.keyCount(); ++i) {
-        const int enumVal = e.value(i);
-        if (enumVal == ImageRole) {
-            d->imageRoleColumn = i + 1;
-        }
-        d->roles.insert(enumVal, e.key(i));
-        d->roleColumns.append(enumVal);
-    }
-
-    qDebug() << "Starting QuerySession worker thread from" << QThread::currentThread();
-    d->thread->start();
 }
 
 QuerySession::~QuerySession()
 {
-    d->thread->exit();
+    d->workerThread->exit();
     delete d;
 }
 
@@ -138,39 +163,39 @@ QAbstractItemModel *QuerySession::runnerModel() const
 void QuerySession::requestDefaultMatches()
 {
     qDebug() << "Manager, default query:" << QThread::currentThread();
-    d->thread->launchDefaultMatches();
-    emit queryChanged(d->thread->query());
+    d->worker->launchDefaultMatches();
+    emit queryChanged(d->worker->query());
 }
 
 void QuerySession::requestMoreMatches()
 {
     qDebug() << "Manager, more matches:" << QThread::currentThread();
-    d->thread->launchMoreMatches();
+    d->worker->launchMoreMatches();
 }
 
 void QuerySession::setQuery(const QString &query)
 {
     qDebug() << "Manager:" << QThread::currentThread() << query;
-    if (d->thread->launchQuery(query)) {
-        emit queryChanged(d->thread->query());
+    if (d->worker->launchQuery(query)) {
+        emit queryChanged(d->worker->query());
     }
 }
 
 void QuerySession::setImageSize(const QSize &size)
 {
-    if (d->thread->setImageSize(size)) {
+    if (d->worker->setImageSize(size)) {
         emit imageSizeChanged(size);
     }
 }
 
 QSize QuerySession::imageSize() const
 {
-    return d->thread->imageSize();
+    return d->worker->imageSize();
 }
 
 void QuerySession::executeMatch(int index)
 {
-    QueryMatch match = d->thread->matchAt(index);
+    QueryMatch match = d->worker->matchAt(index);
 
     if (!match.isValid()) {
         return;
@@ -205,12 +230,12 @@ void QuerySession::executeMatch(const QModelIndex &index)
 void QuerySession::halt()
 {
     d->matchesArrivedWhileExecuting = false;
-    emit d->thread->requestEndQuerySession();
+    d->worker->endQuerySession();
 }
 
 QString QuerySession::query() const
 {
-    return d->thread->query();
+    return d->worker->query();
 }
 
 int QuerySession::columnCount(const QModelIndex &parent) const
@@ -247,7 +272,7 @@ QVariant QuerySession::data(const QModelIndex &index, int role) const
         return d->executingMatches.contains(index.row());
     }
 
-    QueryMatch match = d->thread->matchAt(index.row());
+    QueryMatch match = d->worker->matchAt(index.row());
 
     switch (role) {
         case Qt::DisplayRole:
@@ -372,7 +397,7 @@ int QuerySession::rowCount(const QModelIndex & parent) const
         return 0;
     }
 
-    return d->thread->matchCount();
+    return d->worker->matchCount();
 }
 
 QHash<int, QByteArray> QuerySession::roleNames() const

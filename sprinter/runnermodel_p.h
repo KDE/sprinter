@@ -49,7 +49,7 @@ public:
     };
     Q_ENUMS(DisplayRoles)
 
-    RunnerModel(QuerySessionThread *thread, QObject *parent = 0);
+    RunnerModel(QuerySessionThread *worker, QObject *parent = 0);
     ~RunnerModel();
 
     QStringList enabledRunners() const;
@@ -72,7 +72,7 @@ private Q_SLOTS:
     void runnerBusy(int);
 
 private:
-    QPointer<QuerySessionThread> m_thread;
+    QPointer<QuerySessionThread> m_worker;
     QHash<int, QByteArray> m_roles;
     QVector<int> m_roleColumns;
     QStringList m_runnerIds;

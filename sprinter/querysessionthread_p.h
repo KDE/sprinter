@@ -44,7 +44,7 @@ QString textForEnum(const QObject *obj, const char *enumName, int value);
 class NonRestartingTimer : public QTimer
 {
     Q_OBJECT
-//
+
 public:
     NonRestartingTimer(QObject *parent = 0)
         : QTimer(parent)
@@ -81,56 +81,68 @@ public:
     void run();
 };
 
-class QuerySessionThread : public QThread
+class QuerySessionThread : public QObject
 {
     Q_OBJECT
 
 public:
-    QuerySessionThread(QuerySession *parent = 0);
+    QuerySessionThread(QuerySession *session);
     ~QuerySessionThread();
 
-    void run();
-    void syncMatches();
-    int matchCount() const;
-    QueryMatch matchAt(int index);
-    QVector<RunnerMetaData> runnerMetaData() const;
-    void performLoadRunner(int index);
-    void startMatching();
-    void endQuerySession();
+    // in worker thread
+public:
+
+public Q_SLOTS:
+    void loadRunnerMetaData();
+    void loadRunner(int index);
     void setEnabledRunners(const QStringList &runnerIds);
-    QStringList enabledRunners() const;
+    void startMatching();
+
+    // in GUI thread
+public:
     void launchDefaultMatches();
     bool launchQuery(const QString &query);
     void launchMoreMatches();
-    QString query() const;
+    int matchCount() const;
+    QueryMatch matchAt(int index);
+
+public Q_SLOTS:
+    void syncMatches();
+
+    // thread agnostic
+public:
+    QStringList enabledRunners() const;
+    QVector<RunnerMetaData> runnerMetaData() const;
     QuerySession *session() const { return m_session; }
+    void endQuerySession();
+    QString query() const;
     bool setImageSize(const QSize &size);
     QSize imageSize() const;
 
 Q_SIGNALS:
-    void continueMatching();
-    void requestSync();
+    void enabledRunnersChanged();
     void loadingRunnerMetaData();
     void loadedRunnerMetaData();
+    void continueMatching();
     void busyChanged(int metaDataIndex);
-    void requestLoadRunner(int index);
     void runnerLoaded(int index);
-    void requestEndQuerySession();
     void resetModel();
 
 public Q_SLOTS:
     void sessionDataRetrieved(const QUuid &sessionId, int, RunnerSessionData *data);
-    void loadRunner(int index);
 
 private Q_SLOTS:
-    void startSync();
     void updateBusyStatus();
 
 private:
+    // in GUI thread
     void startQuery(bool clearMatchers = true);
-    void loadRunnerMetaData();
-    void retrieveSessionData(int index);
+
+    // in worker thread
     bool startNextRunner();
+    void retrieveSessionData(int index);
+
+    // thread agnostic
     void clearSessionData();
 
     QThreadPool *m_threadPool;
@@ -150,36 +162,9 @@ private:
     QueryContext m_context;
     QUuid m_sessionId;
     QTimer *m_restartMatchingTimer;
-    NonRestartingTimer *m_startSyncTimer;
     int m_matchCount;
 
     QPointer<SessionDataThread> m_sessionDataThread;
-};
-
-class SignalForwarder : public QObject
-{
-    Q_OBJECT
-public:
-    SignalForwarder(QuerySessionThread *thread)
-        : QObject(0),
-          m_thread(thread)
-    {}
-
-public Q_SLOTS:
-    void loadRunner(int index) {
-        m_thread->performLoadRunner(index);
-    }
-
-    void startMatching() {
-        m_thread->startMatching();
-    }
-
-    void endQuerySession() {
-        m_thread->endQuerySession();
-    }
-
-private:
-    QuerySessionThread *m_thread;
 };
 
 class SessionDataRetriever : public QObject, public QRunnable

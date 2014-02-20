@@ -25,6 +25,7 @@ class QuerySession;
 class QueryMatch;
 class QuerySessionThread;
 class RunnerModel;
+class NonRestartingTimer;
 
 class QuerySession::Private
 {
@@ -39,10 +40,13 @@ public:
     void matchesArrived();
     void resetModel();
     void executionFinished(const QueryMatch &match, bool success);
+    void startMatchSynchronization();
 
     QuerySession *q;
-    QuerySessionThread *thread;
+    QThread *workerThread;
+    QuerySessionThread *worker;
     RunnerModel *runnerModel;
+    NonRestartingTimer *syncTimer;
     QHash<int, QByteArray> roles;
     QVector<int> roleColumns;
     QHash<int, QueryMatch> executingMatches;

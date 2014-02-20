@@ -273,6 +273,7 @@ private:
     friend class Private;
     Private * const d;
 
+    Q_PRIVATE_SLOT(d, void startMatchSynchronization());
     Q_PRIVATE_SLOT(d, void resetModel());
     Q_PRIVATE_SLOT(d, void executionFinished(const QueryMatch &match, bool success));
 };

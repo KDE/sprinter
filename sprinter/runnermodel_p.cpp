@@ -28,12 +28,12 @@ Q_DECLARE_METATYPE(QList<int>);
 namespace Sprinter
 {
 
-RunnerModel::RunnerModel(QuerySessionThread *thread, QObject *parent)
+RunnerModel::RunnerModel(QuerySessionThread *worker, QObject *parent)
     : QAbstractItemModel(parent),
-      m_thread(thread),
+      m_worker(worker),
       m_count(0)
 {
-    Q_ASSERT(thread);
+    Q_ASSERT(worker);
 
     m_roles.insert(Qt::DisplayRole, "Name");
     m_roleColumns.append(Qt::DisplayRole);
@@ -49,10 +49,11 @@ RunnerModel::RunnerModel(QuerySessionThread *thread, QObject *parent)
         m_roleColumns.append(enumVal);
     }
 
-    connect(thread, SIGNAL(loadingRunnerMetaData()), this, SLOT(runnerMetaDataLoading()));
-    connect(thread, SIGNAL(loadedRunnerMetaData()), this, SLOT(runnerMetaDataLoaded()));
-    connect(thread, SIGNAL(runnerLoaded(int)), this, SLOT(runnerLoaded(int)));
-    connect(thread, SIGNAL(busyChanged(int)), this, SLOT(runnerBusy(int)));
+    connect(worker, SIGNAL(loadingRunnerMetaData()), this, SLOT(runnerMetaDataLoading()));
+    connect(worker, SIGNAL(loadedRunnerMetaData()), this, SLOT(runnerMetaDataLoaded()));
+    connect(worker, SIGNAL(runnerLoaded(int)), this, SLOT(runnerLoaded(int)));
+    connect(worker, SIGNAL(busyChanged(int)), this, SLOT(runnerBusy(int)));
+    connect(worker, SIGNAL(enabledRunnersChanged()), this, SIGNAL(enabledRunnersChanged()));
 }
 
 RunnerModel::~RunnerModel()
@@ -61,14 +62,13 @@ RunnerModel::~RunnerModel()
 
 QStringList RunnerModel::enabledRunners() const
 {
-    return m_thread ? m_thread->enabledRunners() : QStringList();
+    return m_worker ? m_worker->enabledRunners() : QStringList();
 }
 
 void RunnerModel::setEnabledRunners(const QStringList &runnerIds)
 {
-    if (m_thread) {
-        m_thread->setEnabledRunners(runnerIds);
-        emit enabledRunnersChanged();
+    if (m_worker) {
+        QMetaObject::invokeMethod(m_worker, "setEnabledRunners", Q_ARG(QStringList, runnerIds));
     }
 }
 
@@ -79,11 +79,11 @@ QStringList RunnerModel::runnerIds() const
 
 QVariant RunnerModel::data(const QModelIndex &index, int role) const
 {
-    if (!m_thread || !index.isValid() || index.parent().isValid()) {
+    if (!m_worker || !index.isValid() || index.parent().isValid()) {
         return QVariant();
     }
 
-    QVector<RunnerMetaData> info = m_thread->runnerMetaData();
+    QVector<RunnerMetaData> info = m_worker->runnerMetaData();
     if (index.row() >= info.count()) {
         return QVariant();
     }
@@ -125,7 +125,7 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
                 if (asText) {
                     QStringList list;
                     foreach (int value, info[index.row()].runner->matchTypesGenerated()) {
-                        list << textForEnum(m_thread->session(), "MatchType", value);
+                        list << textForEnum(m_worker->session(), "MatchType", value);
                     }
                     return list;
                 } else {
@@ -142,7 +142,7 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
                 if (asText) {
                     QStringList list;
                     foreach (int value, info[index.row()].runner->sourcesUsed()) {
-                        list << textForEnum(m_thread->session(), "MatchSource", value);
+                        list << textForEnum(m_worker->session(), "MatchSource", value);
                     }
                     return list;
                 } else {
@@ -162,7 +162,7 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
 }
 
 QVariant RunnerModel::headerData(int section, Qt::Orientation orientation, int role) const {
-    if (!m_thread) {
+    if (!m_worker) {
         return QVariant();
     }
 
@@ -235,7 +235,7 @@ int RunnerModel::rowCount(const QModelIndex & parent) const
         return 0;
     }
 
-    return m_thread ? m_count : 0;
+    return m_worker ? m_count : 0;
 }
 
 QHash<int, QByteArray> RunnerModel::roleNames() const
@@ -254,8 +254,8 @@ void RunnerModel::runnerMetaDataLoaded()
     m_runnerIds.clear();
     m_count = 0;
 
-    if (m_thread) {
-        QVector<RunnerMetaData> runners = m_thread->runnerMetaData();
+    if (m_worker) {
+        QVector<RunnerMetaData> runners = m_worker->runnerMetaData();
         m_count = runners.count();
 
         for (int i = 0; i < m_count; ++i) {
@@ -269,8 +269,8 @@ void RunnerModel::runnerMetaDataLoaded()
 
 void RunnerModel::loadRunner(int index)
 {
-    if (m_thread) {
-        m_thread->loadRunner(index);
+    if (m_worker) {
+        QMetaObject::invokeMethod(m_worker, "loadRunner", Q_ARG(int, index));
     }
 }
 

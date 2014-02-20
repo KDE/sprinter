@@ -35,6 +35,21 @@
 #include "querysession.h"
 #include "runnersessiondata_p.h"
 
+#define DEBUG_THREADING
+#define DEBUG_PLUGIN_DISCOVERY
+
+#ifdef DEBUG_THREADING
+    #define CHECK_IS_WORKER_THREAD \
+        /*qDebug() << QThread::currentThread();*/ \
+        Q_ASSERT(QThread::currentThread() != QCoreApplication::thread());
+    #define CHECK_IS_GUI_THREAD \
+        /*qDebug() << QThread::currentThread();*/ \
+        Q_ASSERT(QThread::currentThread() == QCoreApplication::thread());
+#else
+    #define CHECK_IS_WORKER_THREAD
+    #define CHECK_IS_GUI_THREAD
+#endif
+
 namespace Sprinter
 {
 
@@ -50,102 +65,39 @@ QString textForEnum(const QObject *obj, const char *enumName, int value)
     return "Unknown";
 }
 
-QuerySessionThread::QuerySessionThread(QuerySession *parent)
-    : QThread(0),
+QuerySessionThread::QuerySessionThread(QuerySession *session)
+    : QObject(0),
       m_threadPool(new QThreadPool(this)),
-      m_session(parent),
+      m_session(session),
       m_dummySessionData(new RunnerSessionData(0)),
       m_runnerBookmark(0),
       m_currentRunner(0),
       m_sessionId(QUuid::createUuid()),
-      m_restartMatchingTimer(0),
-      m_startSyncTimer(0),
+      m_restartMatchingTimer(new QTimer(this)),
       m_matchCount(-1)
 {
-    // to synchronize in the thread the session lives in
-    // the timer is created in this parent thread, rather than in
-    // run() below
-    // if synchronization becomes too slow, it could be moved to happen
-    // in this thread with significant complexity
-    m_startSyncTimer = new NonRestartingTimer(this);
-    m_startSyncTimer->setInterval(10);
-    m_startSyncTimer->setSingleShot(true);
-    // these connects may look quite round-about, but allows the timer to
-    // be moved to any thread and the right thing happen
-    connect(this, SIGNAL(requestSync()),
-            m_startSyncTimer, SLOT(startIfStopped()));
-    connect(m_startSyncTimer, SIGNAL(timeout()),
-            this, SLOT(startSync()));
+    m_restartMatchingTimer->setInterval(50);
+    m_restartMatchingTimer->setSingleShot(true);
+    connect(this, SIGNAL(continueMatching()),
+            m_restartMatchingTimer, SLOT(start()));
+    connect(m_restartMatchingTimer, SIGNAL(timeout()),
+            this, SLOT(startMatching()));
 }
 
 QuerySessionThread::~QuerySessionThread()
 {
-    clearSessionData();
-}
-
-void QuerySessionThread::run()
-{
-    qDebug() << "************** WORKER THREAD STARTING **************" << QThread::currentThread();
-    SignalForwarder *forwarder = new SignalForwarder(this);
-    // can't create this with 'this' as the parent as we are in a different
-    // thread at this point.
-    if (!m_restartMatchingTimer) {
-        // this timer gets started whenever continueMatching() is
-        // emitted; this may happen from various threads so needs to be
-        // triggered by a signal to take advantage of Qt's automagic
-        // queueing of signals between threads (you can't call a timer's
-        // start() directly from another thread)
-        //
-        // it gives a small delay to "compress" requests that come in
-        // from the UI thread; this way if this worker thread is busy doing
-        // something and multiple query updates come in, only the most
-        // recent one will be actually processed
-        m_restartMatchingTimer = new QTimer();
-        m_restartMatchingTimer->setInterval(50);
-        m_restartMatchingTimer->setSingleShot(true);
-        connect(this, SIGNAL(continueMatching()),
-                m_restartMatchingTimer, SLOT(start()));
-
-        // need to go through the forwarder, which lives in them
-        // worker thread, to call startMatching() from the worker thread
-        connect(m_restartMatchingTimer, SIGNAL(timeout()),
-                forwarder, SLOT(startMatching()));
+    {
+        QWriteLocker lock(&m_matchIndexLock);
+        clearSessionData();
     }
 
-    // need to go through the forwarder, which lives in them
-    // worker thread, to call loadRunner() from the worker thread
-    connect(this, SIGNAL(requestLoadRunner(int)),
-            forwarder, SLOT(loadRunner(int)));
-    connect(this, SIGNAL(requestEndQuerySession()),
-            forwarder, SLOT(endQuerySession()));
-
-    loadRunnerMetaData();
-
-    exec();
-
-    delete m_restartMatchingTimer;
-    m_restartMatchingTimer = 0;
-    delete forwarder;
-
-    // we will now exit the thread, and have it delete when that returns
-    connect(m_sessionDataThread, SIGNAL(finished()),
-            m_sessionDataThread, SLOT(deleteLater()));
     m_sessionDataThread->exit();
     m_sessionDataThread = 0;
-
-    deleteLater();
-    qDebug() << "************** WORKER THREAD COMPLETE **************";
 }
 
 void QuerySessionThread::syncMatches()
 {
-    // this looks quite round-about, but allows the timer to
-    // be moved to any thread and the right thing happen
-    emit requestSync();
-}
-
-void QuerySessionThread::startSync()
-{
+    CHECK_IS_GUI_THREAD
 //     QTime t;
 //     t.start();
     m_matchCount = -1;
@@ -162,6 +114,8 @@ void QuerySessionThread::startSync()
 
 int QuerySessionThread::matchCount() const
 {
+    CHECK_IS_GUI_THREAD
+
     if (m_matchCount < 0) {
         int count = 0;
 
@@ -179,6 +133,8 @@ int QuerySessionThread::matchCount() const
 
 QueryMatch QuerySessionThread::matchAt(int index)
 {
+    CHECK_IS_GUI_THREAD
+
     if (index < 0 || index >= matchCount()) {
         return QueryMatch();
     }
@@ -210,10 +166,15 @@ QVector<RunnerMetaData> QuerySessionThread::runnerMetaData() const
 
 void QuerySessionThread::loadRunnerMetaData()
 {
+    CHECK_IS_WORKER_THREAD
+
     emit loadingRunnerMetaData();
 
+#ifdef DEBUG_PLUGIN_DISCOVERY
     QTime t;
     t.start();
+#endif
+
     m_sessionId = QUuid::createUuid();
 
     m_runners.clear();
@@ -259,19 +220,15 @@ void QuerySessionThread::loadRunnerMetaData()
     m_sessionData.resize(m_runnerMetaData.size());
     m_matchers.resize(m_runnerMetaData.size());
 
-    qDebug() << m_runnerMetaData.count() << "runner plugins found" << "in" << t.elapsed() << "ms";
-
+#ifdef DEBUG_PLUGIN_DISCOVERY
+   qDebug() << m_runnerMetaData.count() << "runner plugins found" << "in" << t.elapsed() << "ms";
+#endif
 }
 
 void QuerySessionThread::loadRunner(int index)
 {
-    //qDebug() << "RUNNING LOADING REQUEST FROM" << QThread::currentThread();
-    emit requestLoadRunner(index);
-}
+    CHECK_IS_WORKER_THREAD
 
-void QuerySessionThread::performLoadRunner(int index)
-{
-    //qDebug() << "RUNNING LOADING OCCURING IN" << QThread::currentThread();
     if (index >= m_runnerMetaData.count() || index < 0) {
         return;
     }
@@ -410,7 +367,9 @@ bool QuerySessionThread::startNextRunner()
 
 void QuerySessionThread::startMatching()
 {
-    //qDebug() << "starting query in work thread..." << QThread::currentThread() << m_context.query() << m_currentRunner << m_runnerBookmark;
+    CHECK_IS_WORKER_THREAD
+    //qDebug() << m_context.query() << m_currentRunner << m_runnerBookmark;
+
     if (m_runners.isEmpty()) {
         return;
     }
@@ -452,9 +411,9 @@ void QuerySessionThread::startMatching()
 
 void QuerySessionThread::launchDefaultMatches()
 {
-     m_context.setFetchMore(false);
-     m_context.setIsDefaultMatchesRequest(true);
-     startQuery();
+    m_context.setFetchMore(false);
+    m_context.setIsDefaultMatchesRequest(true);
+    startQuery();
 }
 
 bool QuerySessionThread::launchQuery(const QString &query)
@@ -474,6 +433,26 @@ void QuerySessionThread::launchMoreMatches()
 {
      m_context.setFetchMore(true);
      startQuery(m_currentRunner == m_runnerBookmark);
+}
+
+void QuerySessionThread::startQuery(bool clearMatchers)
+{
+    CHECK_IS_GUI_THREAD
+    qDebug() << m_context.query()
+             << (m_context.fetchMore() ? "Fetching more." : "")
+             << (m_context.isDefaultMatchesRequest() ? "Default matches." : "")
+             << (clearMatchers ? "Clearing matchers" : "Keeping Matchers");
+
+    {
+        QWriteLocker lock(&m_matchIndexLock);
+        m_runnerBookmark = qMax(0, m_currentRunner == 0 ? m_runners.size() - 1
+                                                        : m_currentRunner - 1);
+        if (clearMatchers) {
+            m_matchers.fill(0);
+        }
+    }
+
+    emit continueMatching();
 }
 
 QString QuerySessionThread::query() const
@@ -496,26 +475,6 @@ QSize QuerySessionThread::imageSize() const
     return m_context.imageSize();
 }
 
-void QuerySessionThread::startQuery(bool clearMatchers)
-{
-    qDebug() << "requesting query from UI thread..." << QThread::currentThread()
-             << m_context.query()
-             << (m_context.fetchMore() ? "Fetching more." : "")
-             << (m_context.isDefaultMatchesRequest() ? "Default matches." : "")
-             << (clearMatchers ? "Clearing matchers" : "Keeping Matchers");
-
-    {
-        QWriteLocker lock(&m_matchIndexLock);
-        m_runnerBookmark = qMax(0, m_currentRunner == 0 ? m_runners.size() - 1
-                                                        : m_currentRunner - 1);
-        if (clearMatchers) {
-            m_matchers.fill(0);
-        }
-    }
-
-    emit continueMatching();
-}
-
 void QuerySessionThread::clearSessionData()
 {
     for (int i = 0; i < m_sessionData.size(); ++i) {
@@ -530,9 +489,8 @@ void QuerySessionThread::clearSessionData()
 
 void QuerySessionThread::endQuerySession()
 {
-    m_sessionId = QUuid::createUuid();
-
     QWriteLocker lock(&m_matchIndexLock);
+    m_sessionId = QUuid::createUuid();
 
     clearSessionData();
     m_matchers.fill(0);
@@ -544,6 +502,12 @@ void QuerySessionThread::endQuerySession()
 
 void QuerySessionThread::setEnabledRunners(const QStringList &runnerIds)
 {
+    CHECK_IS_WORKER_THREAD
+
+    if (m_enabledRunnerIds == runnerIds) {
+        return;
+    }
+
     m_enabledRunnerIds = runnerIds;
     // this loop relies on the (valid) assumption that the session data
     // and metadata vectors are the same size
@@ -556,6 +520,8 @@ void QuerySessionThread::setEnabledRunners(const QStringList &runnerIds)
 
         sessionData->setEnabled(m_enabledRunnerIds.contains(m_runnerMetaData[i].id));
     }
+
+    emit enabledRunnersChanged();
 }
 
 QStringList QuerySessionThread::enabledRunners() const
