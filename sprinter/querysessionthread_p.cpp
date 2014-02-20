@@ -41,10 +41,10 @@
 #ifdef DEBUG_THREADING
     #define CHECK_IS_WORKER_THREAD \
         /*qDebug() << QThread::currentThread();*/ \
-        Q_ASSERT(QThread::currentThread() != QCoreApplication::thread());
+        Q_ASSERT_X(QThread::currentThread() != QCoreApplication::thread(), "QeST thread check", "should be in worker thread, is not");
     #define CHECK_IS_GUI_THREAD \
         /*qDebug() << QThread::currentThread();*/ \
-        Q_ASSERT(QThread::currentThread() == QCoreApplication::thread());
+        Q_ASSERT_X(QThread::currentThread() == QCoreApplication::thread(), "QeST thread check", "should be in GUI thread, is not");
 #else
     #define CHECK_IS_WORKER_THREAD
     #define CHECK_IS_GUI_THREAD
