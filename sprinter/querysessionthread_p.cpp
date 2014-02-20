@@ -85,7 +85,7 @@ QuerySessionThread::~QuerySessionThread()
 
 void QuerySessionThread::run()
 {
-    qDebug() << "************** WORKER THREAD STARTING **************";
+    qDebug() << "************** WORKER THREAD STARTING **************" << QThread::currentThread();
     SignalForwarder *forwarder = new SignalForwarder(this);
     // can't create this with 'this' as the parent as we are in a different
     // thread at this point.

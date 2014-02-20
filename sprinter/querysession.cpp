@@ -120,6 +120,7 @@ QuerySession::QuerySession(QObject *parent)
         d->roleColumns.append(enumVal);
     }
 
+    qDebug() << "Starting QuerySession worker thread from" << QThread::currentThread();
     d->thread->start();
 }
 
