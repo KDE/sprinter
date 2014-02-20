@@ -28,8 +28,6 @@
 #include <QTime>
 #include <QWriteLocker>
 
-#include <unistd.h>
-
 #include "runner.h"
 #include "runner_p.h"
 #include "querysession.h"
