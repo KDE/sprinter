@@ -7,6 +7,7 @@
         * not a good candidate for "first runner I'll port"
         * shouldn't need to copy the firefox db file, e.g.
     * calculator
+        * drop javascript, just use qalculate
     * kill
     * locations
     * nepomuksearch
