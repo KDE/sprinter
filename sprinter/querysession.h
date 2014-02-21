@@ -65,10 +65,11 @@ public:
 
         // Information types
         DateTimeType, // dates and time
+        EnvironmentalType, // weather, etc.
         GeolocationType, // geographical
         LanguageType, // translations, definitions, etc.
         MathAndUnitsType, // numerical and calculations
-        EnvironmentalType, // weather, etc.
+        ReferenceType, // encyclopedia links, etc.
 
         // Content types
         AlbumType, // full audio album
