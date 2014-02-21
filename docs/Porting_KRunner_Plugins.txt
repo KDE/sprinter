@@ -50,6 +50,8 @@ If the runner was a "single runner mode" runner (look in the .desktop file for X
 
     setGeneratesDefaultMatches(true);
 
+There is no QuerySyntax, so any lines related to that can simply be deleted. If a runner should not be used in matching, e.g. because DBus service it requires is not available, then return a null pointer from createSessionData().
+
 == RunnerSessionData
 
 There are two cases when you will need to create a RunnerSessionData:
