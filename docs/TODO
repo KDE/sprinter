@@ -1,5 +1,60 @@
 = Curent milestone: 0.2
 
+== Porting Runners ==
+* kde-workspace
+    * bookmarks
+        * BIIIIG runner, needs a good going over
+        * not a good candidate for "first runner I'll port"
+        * shouldn't need to copy the firefox db file, e.g.
+    * calculator
+    * kill
+    * locations
+    * nepomuksearch
+    * places
+    * powerdevil
+    * recentdocuments
+    * services
+    * sessions
+    * shell
+    * solid
+    * webshortcuts
+    * windowedwidgets
+    * windows
+* kdeplasma-addons
+    * audioplayercontrol
+    * browserhistory
+    * characters
+    * contacts
+    * converter
+    * datetime
+    * dictionary
+    * events
+    * katesessions
+    * konquerorsessions
+    * konsolesessions
+    * kopete
+    * mediawiki
+    * spellchecker
+    * translator
+    * youtube
+* misc places in git.kde.org
+    * extragear/base/plasma-mobile/runners/
+    * extragear/kdevelop/kdevelop/app/plasma/runner/
+    * extragear/network/telepathy/ktp-contact-runner/
+    * kde/kdelibs/baloo/src/runner/
+    * playground/pim/zanshin/src/runner/
+    * kde/kdeedu/marble/src/plasmarunner/
+    * kdenetwork/kget/plasma/runner/
+* kde-apps.org
+    * http://kde-apps.org/content/show.php/krunner-vim-sessions?content=163338
+    * http://kde-apps.org/content/show.php/VBox+Runner?content=107926
+    * http://kde-apps.org/content/show.php/Choqok+KRunner+Dent?content=143208
+    * http://kde-apps.org/content/show.php/KRunner+Synonyms?content=157137
+    * http://kde-apps.org/content/show.php/ClockCalc+Runner?content=133447
+    * http://kde-apps.org/content/show.php/ShortLog?content=123379
+    * http://kde-apps.org/content/show.php/Turn+Off+Monitor?content=117849
+    * http://kde-apps.org/content/show.php/Character+Runner?content=122629
+    *
 == Features
 * Learning: record chosen QueryMatches, weight future matches with this information
 
