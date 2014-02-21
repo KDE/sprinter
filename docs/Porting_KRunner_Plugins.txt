@@ -1,0 +1,88 @@
+ = Porting KRunner Plugins
+
+ Sprinter's design is really a sort of "KRunner 2.0", building on the design for Plasma 4.x's AbstractRunner/RunnerManager duo and learning from its missteps. Due to this, porting plugins from KRunner to Sprinter makes a good deal of sense.  This document provides a quick recipe-style guide to porting.
+
+ First, copy all files of the plugin into a subdirectory of the runners/ directory. Replace the CMakeLists.txt with one modeled after one of the other runner plugins CMakeLists.txt. Add the subdirectory to runners/CMakeLists.txt
+
+ = AbstractRunner -> Runner
+
+ At the core of each KRunner plugin is an AbstractRunner subclass. This becomes a Sprinter::Runner subclass.  In the class declaration, add this below the Q_OBJECT macro:
+
+
+     Q_PLUGIN_METADATA(IID "org.kde.sprinter.<pluginname>" FILE "<plugingname>.json")
+     Q_INTERFACES(Sprinter::Runner)
+
+You can then remove this macro:
+
+    K_EXPORT_PLASMA_RUNNER(<plugin>, <className>)
+
+Next, change this:
+
+    void match(Plasma::RunnerContext &context);
+    void run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &action)
+
+to:
+
+    void match(Sprinter::RunnerSessionData *sessionData,
+               const Sprinter::QueryContext &context);
+    bool exec(const Sprinter::QueryMatch &match);
+
+All references to QList<Plasma::QueryMatch> will need to be changed to QVector<Sprinter::QueryMatch>, and then change:
+
+    context.addMatches(context.query(), matches);
+
+to:
+
+    sessionData->setMatches(matches, context);
+
+In the constructor of the Sprinter::Runner method, add declarations of what kind of matches the plugin provides:
+
+    setMatchTypesGenerated(QVector<Sprinter::QuerySession::MatchType>()
+                                << Sprinter::QuerySession::ActivityType);
+    setSourcesUsed(QVector<Sprinter::QuerySession::MatchSource>()
+                        << Sprinter::QuerySession::FromLocalService);
+
+Replace "ActivityType" and "FromLocalService" with appropriate values. Multiple values are allowed.
+
+If the runner was a "single runner mode" runner (look in the .desktop file for X-Plasma-AdvertiseSingleRunnerQueryMode=true), then also add this to the constructor:
+
+    setGeneratesDefaultMatches(true);
+
+== RunnerSessionData
+
+There are two cases when you will need to create a RunnerSessionData:
+
+    * prepare/teardown signal usage
+    * asynchronous matching
+
+The RunnerSessionData class replaces the function of the prepare/teardown signals in Plasma::AbstractRunner. Look in the runner's implementation for something like this:
+
+    connect(this, SIGNAL(prepare()), this, SLOT(prep()));
+    connect(this, SIGNAL(teardown()), this, SLOT(down()));
+
+If the signals are used, then add this to the Sprinter::Runner declaration:
+
+    Sprinter::RunnerSessionData *createSessionData()
+    {
+        return <PluginName>SessionData(this);
+    }
+
+and create a Sprinter::RunnerSessionData subclass. Move the contents of the slot connected to the prepare() signal into the constructor of the RunnerSessionData, and the contents of the slot connected to the teardown() signal to its destructor.
+
+The tell-tale sign of asynchronous matching is use of a QEventLoop in the AbstractRunner::match(..) method (or a method it calls). This is no longer necessary. Instead, the matching can be moved into the RunnerSessionData class which runs in a thread with an event loop already running. See the example in runners/youtube/youtube.cpp to see how this can be done.
+
+== QueryMatch
+
+QueryMatch no longer has setRelevance, replaced with setPrecision, or setIcon, replaced by setImage. A typical QueryMatch is now set up like this:
+
+    Sprinter::QueryMatch match(this);
+    match.setTitle(tr("A title"));
+    match.setText(tr("Some additional text to be shown below / in addition to the title"));
+    match.setData(activity.id());
+    match.setType(Sprinter::QuerySession::ActivityType);
+    match.setSource(Sprinter::QuerySession::FromLocalService);
+    match.setImage(m_defaultIcon.pixmap(context.imageSize()).toImage());
+    match.setPrecision(precision);
+    matches << match;
+
+Note that the image must be resized to the context.imageSize(). See the activities runner for an example on how to do this efficiently by caching the results and only changing it when needed.
