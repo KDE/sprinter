@@ -14,7 +14,6 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Declarative REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
-include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
 
 add_definitions("-Wall -std=c++0x")
 set(SPRINTER_PLUGINS_PATH plugins/sprinter)
