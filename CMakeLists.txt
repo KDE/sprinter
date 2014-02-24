@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 2.8)
 include (GenerateExportHeader)
 
 find_package(ECM 0.0.8 REQUIRED NO_MODULE)
-set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
+set(CMAKE_MODULE_PATH
+        ${ECM_MODULE_PATH}
+        ${ECM_KDE_MODULE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules
+        ${CMAKE_MODULE_PATH})
 
 include(KDEInstallDirs)
 
