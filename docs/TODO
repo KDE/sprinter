@@ -66,9 +66,6 @@
 * API review of all public classes
 * Metadata
     * localization/i18n in plugin metadata (name, description)
-    * license
-    * author information (name, email)
-    * icon
 * confirm that the QList<int>s used in RunnerModel::data() works from QML
     * MatchTypesRole
     * SourcesUsedRole
