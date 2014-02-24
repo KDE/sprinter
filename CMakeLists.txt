@@ -18,30 +18,8 @@ include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
 
 add_definitions("-Wall -std=c++0x")
 
-### Main library
-set(sprinterlib_SRCS
-    sprinter/querymatch.cpp
-    sprinter/querycontext.cpp
-    sprinter/querysession.cpp
-    sprinter/querysessionthread_p.cpp
-    sprinter/runner.cpp
-    sprinter/runnermodel_p.cpp
-    sprinter/runnersessiondata.cpp
-)
-
-set(sprinterlib_HEADERS
-    sprinter/querycontext.h
-    sprinter/querymatch.h
-    sprinter/querysession.h
-    sprinter/runner.h
-    sprinter/runnersessiondata.h
-    ${CMAKE_BINARY_DIR}/sprinter/sprinter_export.h
-)
-
-add_library(sprinter SHARED ${sprinterlib_SRCS})
-generate_export_header(sprinter BASE_NAME Sprinter EXPORT_FILE_NAME sprinter/sprinter_export.h)
-qt5_use_modules(sprinter Widgets Network)
-install(TARGETS sprinter DESTINATION lib)
+# the main library
+add_subdirectory(sprinter)
 
 ### Test app - temporary, will be removed at some point
 set(sprinter_SRCS
