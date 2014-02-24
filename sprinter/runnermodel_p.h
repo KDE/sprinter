@@ -20,6 +20,7 @@
 
 #include <QAbstractItemModel>
 #include <QPointer>
+#include <QSize>
 #include <QStringList>
 
 namespace Sprinter
@@ -36,11 +37,17 @@ class RunnerModel : public QAbstractItemModel
                                           NOTIFY enabledRunnersChanged)
     Q_PROPERTY(QStringList runnerIds READ runnerIds
                                      NOTIFY runnerIdsChanged)
+    Q_PROPERTY(QSize iconSize READ iconSize WRITE setIconSize NOTIFY iconSizeChanged)
 
 public:
     enum DisplayRoles {
         IdRole = Qt::UserRole,
         DescriptionRole,
+        IconRole,
+        LicenseRole,
+        AuthorRole,
+        ContactEmailRole,
+        VersionRole,
         IsLoadedRole,
         IsBusyRole,
         GeneratesDefaultMatchesRole,
@@ -57,6 +64,9 @@ public:
 
     QStringList runnerIds() const;
 
+    QSize iconSize() const;
+    void setIconSize(const QSize &size);
+
 public Q_SLOTS:
     void loadRunner(int index);
     void loadRunner(const QModelIndex &index);
@@ -64,6 +74,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void enabledRunnersChanged();
     void runnerIdsChanged();
+    void iconSizeChanged();
 
 private Q_SLOTS:
     void runnerMetaDataLoading();
@@ -79,6 +90,8 @@ private:
     int m_count;
     int m_loadedColumn;
     int m_busyColumn;
+    int m_iconRoleColumn;
+    QSize m_iconSize;
 
 public:
     // All the QAbstractItemModel reimp's

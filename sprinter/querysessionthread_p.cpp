@@ -200,9 +200,17 @@ void QuerySessionThread::loadRunnerMetaData()
                     continue;
                 }
 
+                //TODO: these values come from desktoptojson, currently in the
+                //      frameworks/kservices repository. Very ugly, discussion
+                //      ongoing as to how to make them better.
                 QJsonObject json = loader.metaData()["MetaData"].toObject();
-                md.name = json["name"].toString();
-                md.description = json["description"].toString();
+                md.name = json["Name"].toString();
+                md.description = json["Comment"].toString();
+                md.icon = json["Icon"].toString();
+                md.license = json["X-KDE-PluginInfo-License"].toString();
+                md.author = json["X-KDE-PluginInfo-Author"].toString();
+                md.contactEmail = json["X-KDE-PluginInfo-Email"].toString();
+                md.version = json["X-KDE-PluginInfo-Version"].toString();
                 m_runnerMetaData << md;
                 m_enabledRunnerIds << md.id;
             }

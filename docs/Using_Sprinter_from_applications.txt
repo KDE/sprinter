@@ -98,9 +98,16 @@ The runner model is a QAbstractItemModel (just like QuerySession). It exports th
         DisplayRole         Name of the runner (translated to locale language)
         IdRole              The internal id of the runner
         DescriptionRole     A description of the runner (translated)
+        IconRole            An icon (image) to be used with this plugin
+        LicenseRole         The license the plugin is released under
+        AuthorRole          The plugin author's name
+        ContactEmailRole    A contact email (usually of the author)
+        VersionRole         The version # of the plugin
         IsLoadedRole        True if the runner is loaded, false if not
         IsBusyRole          True if the runner is processing a query, false if not
         IsEnabledRole       True if the runner is enabled
+
+To change the size of the icons in the model, set the QSize iconSize property on the model.
 
 To load a specific runner simply call loadRunner with either the numeric (int) row number of the plugin or with its QModelIndex from the model.
 

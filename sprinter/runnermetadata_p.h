@@ -36,6 +36,11 @@ struct RunnerMetaData
     QString id;
     QString name;
     QString description;
+    QString license;
+    QString author;
+    QString contactEmail;
+    QString version;
+    QString icon;
     Runner *runner;
     bool busy;
     bool fetchedSessionData;

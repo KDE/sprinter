@@ -21,6 +21,7 @@
 #include "querysessionthread_p.h"
 
 #include <QDebug>
+#include <QIcon>
 #include <QMetaEnum>
 
 Q_DECLARE_METATYPE(QList<int>);
@@ -31,7 +32,8 @@ namespace Sprinter
 RunnerModel::RunnerModel(QuerySessionThread *worker, QObject *parent)
     : QAbstractItemModel(parent),
       m_worker(worker),
-      m_count(0)
+      m_count(0),
+      m_iconSize(32, 32)
 {
     Q_ASSERT(worker);
 
@@ -44,6 +46,8 @@ RunnerModel::RunnerModel(QuerySessionThread *worker, QObject *parent)
             m_loadedColumn = i + 1;
         } else if (enumVal == IsBusyRole) {
             m_busyColumn = i + 1;
+        } else if (enumVal == IconRole) {
+            m_iconRoleColumn = i + 1;
         }
         m_roles.insert(enumVal, e.key(i));
         m_roleColumns.append(enumVal);
@@ -77,6 +81,21 @@ QStringList RunnerModel::runnerIds() const
     return m_runnerIds;
 }
 
+QSize RunnerModel::iconSize() const
+{
+    return m_iconSize;
+}
+
+void RunnerModel::setIconSize(const QSize &size)
+{
+    if (m_iconSize != size) {
+        m_iconSize = size;
+        emit iconSizeChanged();
+        emit dataChanged(createIndex(0, m_iconRoleColumn),
+                         createIndex(rowCount(QModelIndex()), m_iconRoleColumn));
+    }
+}
+
 QVariant RunnerModel::data(const QModelIndex &index, int role) const
 {
     if (!m_worker || !index.isValid() || index.parent().isValid()) {
@@ -98,6 +117,11 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
         role == Qt::DisplayRole) {
         asText = true;
         role = m_roleColumns[index.column()];
+        if (role == IconRole) {
+            return QVariant();
+        }
+    } else if (index.column() == m_iconRoleColumn && role == Qt::DecorationRole) {
+        role = IconRole;
     }
 
     switch (role) {
@@ -109,6 +133,21 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
             break;
         case DescriptionRole:
             return info[index.row()].description;
+            break;
+        case IconRole:
+            return QIcon::fromTheme(info[index.row()].icon).pixmap(m_iconSize);
+            break;
+        case LicenseRole:
+            return info[index.row()].license;
+            break;
+        case AuthorRole:
+            return info[index.row()].author;
+            break;
+        case ContactEmailRole:
+            return info[index.row()].contactEmail;
+            break;
+        case VersionRole:
+            return info[index.row()].version;
             break;
         case IsLoadedRole:
             return info[index.row()].runner != 0;
@@ -182,6 +221,21 @@ QVariant RunnerModel::headerData(int section, Qt::Orientation orientation, int r
                 break;
             case DescriptionRole:
                 return tr("Description");
+                break;
+            case IconRole:
+                return tr("Icon");
+                break;
+            case LicenseRole:
+                return tr("License");
+                break;
+            case AuthorRole:
+                return tr("Author");
+                break;
+            case ContactEmailRole:
+                return tr("Contact Email");
+                break;
+            case VersionRole:
+                return tr("Version");
                 break;
             case IsLoadedRole:
                 return tr("Loaded");
