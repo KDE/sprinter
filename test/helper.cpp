@@ -38,6 +38,12 @@ Sprinter::QuerySession *Helper::session()
 void Helper::loadAllRunners()
 {
     qDebug() << "loading all runnears";
+    const int numRunners = m_session->runnerModel()->rowCount();
+    for (int i = 0; i < numRunners; ++i) {
+        QMetaObject::invokeMethod(m_session->runnerModel(),
+                                  "loadRunner",
+                                  Q_ARG(int, i));
+    }
 }
 
 #include "moc_helper.cpp"
