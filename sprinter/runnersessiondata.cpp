@@ -189,7 +189,7 @@ void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const Que
                 return;
             }
         } else {
-            d->currentMatches += matches;
+            d->currentMatches = matches;
         }
 
         d->matchesUnsynced = true;
