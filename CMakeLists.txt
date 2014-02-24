@@ -17,34 +17,16 @@ set(CMAKE_AUTOMOC ON)
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
 
 add_definitions("-Wall -std=c++0x")
+set(SPRINTER_PLUGINS_PATH plugins/sprinter)
 
 # the main library
 add_subdirectory(sprinter)
 
-### Test app - temporary, will be removed at some point
-set(sprinter_SRCS
-    test/main.cpp
-)
-add_executable(sprintertest ${sprinter_SRCS})
-qt5_use_modules(sprintertest Widgets Network)
-target_link_libraries(sprintertest sprinter)
-install(TARGETS sprintertest DESTINATION bin)
+# qml plugin
+add_subdirectory(qml)
 
-install(FILES ${sprinterlib_HEADERS} DESTINATION include/sprinter/)
-
-### QML plugins
-set(qmlsprinterplugin_SRCS
-    qml/sprinterplugin.cpp
-)
-
-add_library(sprinterplugin SHARED ${qmlsprinterplugin_SRCS})
-qt5_use_modules(sprinterplugin Widgets Network Declarative)
-target_link_libraries(sprinterplugin sprinter)
-
-install(TARGETS sprinterplugin DESTINATION ${QML_INSTALL_DIR}/org/kde/experimental/sprinter)
-install(FILES qml/qmldir DESTINATION ${QML_INSTALL_DIR}/org/kde/experimental/sprinter)
-
-set(SPRINTER_PLUGINS_PATH plugins/sprinter)
+# test apps
+add_subdirectory(test)
 
 ### Runners
 add_subdirectory(runners)

@@ -16,7 +16,7 @@ set(sprinterlib_HEADERS
     querysession.h
     runner.h
     runnersessiondata.h
-    ${CMAKE_BINARY_DIR}/sprinter_export.h
+    ${CMAKE_BINARY_DIR}/sprinter/sprinter_export.h
 )
 
 add_library(sprinter SHARED ${sprinterlib_SRCS})
