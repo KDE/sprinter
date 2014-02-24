@@ -29,13 +29,16 @@
 
 #include "sprinter/querysession.h"
 
+#include "helper.h"
+
 using namespace Sprinter;
 
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
 
-    QuerySession *manager = new QuerySession;
+    Helper *helper = new Helper;
+    QuerySession *session = helper->session();
 
     QSplitter *splitter = new QSplitter;
 
@@ -44,24 +47,24 @@ int main(int argc, char** argv)
     QLineEdit *edit = new QLineEdit(top);
     edit->setPlaceholderText("Enter search term");
     QObject::connect(edit, SIGNAL(textChanged(QString)),
-                     manager, SLOT(setQuery(QString)));
-    QObject::connect(manager, SIGNAL(queryChanged(QString)),
+                     session, SLOT(setQuery(QString)));
+    QObject::connect(session, SIGNAL(queryChanged(QString)),
                      edit, SLOT(setText(QString)));
     QTreeView *matchView = new QTreeView(top);
-    matchView->setModel(manager);
+    matchView->setModel(session);
     matchView->setAllColumnsShowFocus(true);
     QObject::connect(matchView, SIGNAL(doubleClicked(QModelIndex)),
-                     manager, SLOT(executeMatch(QModelIndex)));
+                     session, SLOT(executeMatch(QModelIndex)));
 
     QPushButton *defaultMatchButton = new QPushButton(top);
     defaultMatchButton->setText("Default matches");
     QObject::connect(defaultMatchButton, SIGNAL(clicked()),
-                     manager, SLOT(requestDefaultMatches()));
+                     session, SLOT(requestDefaultMatches()));
 
     QPushButton *moreMatchesButton = new QPushButton(top);
     moreMatchesButton->setText("More matches");
     QObject::connect(moreMatchesButton, SIGNAL(clicked()),
-                     manager, SLOT(requestMoreMatches()));
+                     session, SLOT(requestMoreMatches()));
 
     QGridLayout *matchLayout = new QGridLayout(top);
     matchLayout->addWidget(edit, 0, 0, 1, 2);
@@ -71,14 +74,21 @@ int main(int argc, char** argv)
     splitter->addWidget(top);
 
     top = new QWidget(splitter);
-    QVBoxLayout *runnerLayout = new QVBoxLayout(top);
-    runnerLayout->addWidget(new QLabel("Runners"));
+    QGridLayout *runnerLayout = new QGridLayout(top);
+    runnerLayout->addWidget(new QLabel("Runners"), 0, 0);
+
+    QPushButton *loadAllRunnersButton = new QPushButton(top);
+    loadAllRunnersButton->setText("Load all");
+    QObject::connect(loadAllRunnersButton, SIGNAL(clicked()),
+                     helper, SLOT(loadAllRunners()));
+    runnerLayout->addWidget(loadAllRunnersButton, 0, 1);
+
     QTreeView *runnerView = new QTreeView(top);
-    runnerView->setModel(manager->runnerModel());
+    runnerView->setModel(session->runnerModel());
     runnerView->setAllColumnsShowFocus(true);
     QObject::connect(runnerView, SIGNAL(doubleClicked(QModelIndex)),
-                     manager->runnerModel(), SLOT(loadRunner(QModelIndex)));
-    runnerLayout->addWidget(runnerView);
+                     session->runnerModel(), SLOT(loadRunner(QModelIndex)));
+    runnerLayout->addWidget(runnerView, 1, 0, 1, 2);
     splitter->addWidget(top);
 
     QAction *action = new QAction(top);
@@ -89,7 +99,7 @@ int main(int argc, char** argv)
     action = new QAction(top);
     action->setShortcut(Qt::Key_Escape);
     top->addAction(action);
-    QObject::connect(action, SIGNAL(triggered()), manager, SLOT(halt()));
+    QObject::connect(action, SIGNAL(triggered()), session, SLOT(halt()));
 
     splitter->resize(1000, 700);
     splitter->show();
