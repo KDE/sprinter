@@ -60,9 +60,7 @@
 * Learning: record chosen QueryMatches, weight future matches with this information
 
 == Improvements
-* Improve RunnerSessionData::updateMatches
-    * find a nicer way to to do updates than comparing data(), nested loops..
-* Review QuerySession::MathType entries
+* Review QuerySession::MatchType entries
     * MovieType as a specialization of video?
     * spread out across the address space with explicit values?
 * API review of all public classes
@@ -90,6 +88,12 @@
     * currently Runner plugins hang out in memory once access the first time
     * ref counted and delete when no longer used
 * Runner plugin configuration
+* Changing of Runner attributes after constructor not shown in RunnerModel
+    * setGeneratesDefaultMatches
+    * setMatchTypesGenerated
+    * setSourcesUsed
+* Improve RunnerSessionData::updateMatches
+    * find a nicer way to to do updates than comparing data(), nested loops..
 
 == Needs more evaluation (aka "Is this necessary/useful?")
 * Metadata
