@@ -9,6 +9,7 @@
     * kill
     * locations
     * nepomuksearch
+        * needs to be ported / rewritten to use baloo api
     * places
     * powerdevil
     * recentdocuments
