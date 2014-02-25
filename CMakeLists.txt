@@ -17,7 +17,7 @@ set(CMAKE_AUTOMOC ON)
 
 add_definitions("-Wall -std=c++0x")
 set(SPRINTER_PLUGINS_PATH plugins/sprinter)
-
+include_directories(${CMAKE_SOURCE_DIR})
 # the main library
 add_subdirectory(sprinter)
 
