@@ -90,8 +90,6 @@ public:
     ~QuerySessionThread();
 
     // in worker thread
-public:
-
 public Q_SLOTS:
     void loadRunnerMetaData();
     void loadRunner(int index);

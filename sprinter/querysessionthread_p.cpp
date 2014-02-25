@@ -415,6 +415,8 @@ void QuerySessionThread::startMatching()
 
 void QuerySessionThread::launchDefaultMatches()
 {
+    CHECK_IS_GUI_THREAD
+
     m_context.setFetchMore(false);
     m_context.setIsDefaultMatchesRequest(true);
     startQuery();
@@ -422,6 +424,8 @@ void QuerySessionThread::launchDefaultMatches()
 
 bool QuerySessionThread::launchQuery(const QString &query)
 {
+    CHECK_IS_GUI_THREAD
+
     const QString oldQuery = m_context.query();
     m_context.setQuery(query);
     if (m_context.query() == oldQuery) {
@@ -435,13 +439,14 @@ bool QuerySessionThread::launchQuery(const QString &query)
 
 void QuerySessionThread::launchMoreMatches()
 {
-     m_context.setFetchMore(true);
-     startQuery(m_currentRunner == m_runnerBookmark);
+    CHECK_IS_GUI_THREAD
+
+    m_context.setFetchMore(true);
+    startQuery(m_currentRunner == m_runnerBookmark);
 }
 
 void QuerySessionThread::startQuery(bool clearMatchers)
 {
-    CHECK_IS_GUI_THREAD
     qDebug() << m_context.query()
              << (m_context.fetchMore() ? "Fetching more." : "")
              << (m_context.isDefaultMatchesRequest() ? "Default matches." : "")
