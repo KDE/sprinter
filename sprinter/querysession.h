@@ -276,7 +276,7 @@ private:
 
     Q_PRIVATE_SLOT(d, void startMatchSynchronization());
     Q_PRIVATE_SLOT(d, void resetModel());
-    Q_PRIVATE_SLOT(d, void executionFinished(const QueryMatch &match, bool success));
+    Q_PRIVATE_SLOT(d, void executionFinished(const Sprinter::QueryMatch &match, bool success));
 };
 
 } // namespace

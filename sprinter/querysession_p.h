@@ -39,7 +39,7 @@ public:
     void matchesUpdated(int start, int end);
     void matchesArrived();
     void resetModel();
-    void executionFinished(const QueryMatch &match, bool success);
+    void executionFinished(const Sprinter::QueryMatch &match, bool success);
     void startMatchSynchronization();
 
     QuerySession *q;

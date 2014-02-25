@@ -192,7 +192,7 @@ public:
     void run();
 
 Q_SIGNALS:
-    void finished(const QueryMatch &match, bool success);
+    void finished(const Sprinter::QueryMatch &match, bool success);
 
 private:
     QueryMatch m_match;

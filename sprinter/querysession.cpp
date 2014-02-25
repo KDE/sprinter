@@ -116,7 +116,7 @@ void QuerySession::Private::matchesArrived()
     }
 }
 
-void QuerySession::Private::executionFinished(const QueryMatch &match, bool success)
+void QuerySession::Private::executionFinished(const Sprinter::QueryMatch &match, bool success)
 {
     // remove the match from the list of matches being executed
     QMutableHashIterator<int, QueryMatch> it(executingMatches);
@@ -217,8 +217,8 @@ void QuerySession::executeMatch(int index)
     d->executingMatches.insert(index, match);
     d->matchesUpdated(index, index);
     ExecRunnable *exec = new ExecRunnable(match);
-    connect(exec, SIGNAL(finished(QueryMatch,bool)),
-            this, SLOT(executionFinished(QueryMatch,bool)));
+    connect(exec, SIGNAL(finished(Sprinter::QueryMatch,bool)),
+            this, SLOT(executionFinished(Sprinter::QueryMatch,bool)));
     QThreadPool::globalInstance()->start(exec);
 }
 
