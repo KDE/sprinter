@@ -22,6 +22,7 @@
 
 #include "runner.h"
 #include "querycontext.h"
+#include "querymatch_p.h"
 #include "querysession.h"
 #include "querysession_p.h"
 #include "querysessionthread_p.h"
@@ -189,6 +190,9 @@ void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const Que
                 return;
             }
         } else {
+            for (int i = 0; i < matches.count(); ++i) {
+                matches[i].d->sessionData = this;
+            }
             d->currentMatches = matches;
         }
 
@@ -242,6 +246,7 @@ void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
                 qDebug() << "found update in existing matches at" << i << d->syncedMatches[i].data();
 #endif
                 d->syncedMatches[i] = match;
+                d->syncedMatches[i].d->sessionData = this;
                 d->updatedMatchIndexes.insert(i);
                 d->session->d->matchesArrived();
                 break;

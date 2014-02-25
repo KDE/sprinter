@@ -30,20 +30,16 @@ namespace Sprinter
 {
 
 class Runner;
+class RunnerSessionData;
 
 class SPRINTER_EXPORT QueryMatch
 {
 public:
     /**
-     * Default constructor; creates an invalid match
+     * Default constructor, which creates an invalid match. A match is
+     * valid once it has been passed to a RunnerSessionData object.
      */
     QueryMatch();
-
-    /**
-     * Creates a match with an associated runner. Used to create valid matches.
-     * @param runner the runner that created this match.
-     */
-    QueryMatch(Runner *runner);
 
     /**
      * Copy constructor; valid if the other match is also valid. QueryMatch is
@@ -172,8 +168,14 @@ public:
     QuerySession::MatchPrecision precision() const;
 
     /**
+     * @return a pointer to the sessionData associated with this match
+     * May return a null pointer if the match is invalid.
+     */
+    RunnerSessionData *sessionData() const;
+
+    /**
      * @return a pointer to the runner that created this match. May return
-     * a null pointer if the match is invalid or the runner has been deleted.
+     * a null pointer if the match is invalid.
      */
     Runner *runner() const;
 
@@ -184,6 +186,8 @@ public:
     bool sendUserDataToClipboard() const;
 
 private:
+    friend class RunnerSessionData;
+
     class Private;
     QExplicitlySharedDataPointer<Private> d;
 };

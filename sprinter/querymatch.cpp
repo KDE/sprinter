@@ -16,48 +16,21 @@
  */
 
 #include "querymatch.h"
-
-#include "runner.h"
+#include "querymatch_p.h"
 
 #include <QApplication>
 #include <QClipboard>
 #include <QDebug>
 #include <QPointer>
 
+// #include "runner.h"
+#include "runnersessiondata.h"
+
 namespace Sprinter
 {
 
-class QueryMatch::Private : public QSharedData
-{
-public:
-    Private(Runner *r)
-        : runner(r),
-          type(QuerySession::UnknownType),
-          source(QuerySession::FromInternalSource),
-          precision(QuerySession::UnrelatedMatch),
-          isSearchTerm(false)
-    {
-    }
-
-    QPointer<Runner> runner;
-    QString title;
-    QString text;
-    QuerySession::MatchType type;
-    QuerySession::MatchSource source;
-    QuerySession::MatchPrecision precision;
-    QVariant data;
-    QVariant userData;
-    QImage image;
-    bool isSearchTerm;
-};
-
 QueryMatch::QueryMatch()
-    : d(new Private(0))
-{
-}
-
-QueryMatch::QueryMatch(Runner *runner)
-    : d(new Private(runner))
+    : d(new Private)
 {
 }
 
@@ -83,7 +56,7 @@ bool QueryMatch::operator==(const QueryMatch &rhs) const
 
 bool QueryMatch::isValid() const
 {
-    return d->runner;
+    return d->sessionData && d->sessionData->runner();
 }
 
 void QueryMatch::setTitle(const QString &title)
@@ -166,9 +139,14 @@ QuerySession::MatchPrecision QueryMatch::precision() const
     return d->precision;
 }
 
+RunnerSessionData *QueryMatch::sessionData() const
+{
+    return d->sessionData;
+}
+
 Runner *QueryMatch::runner() const
 {
-    return d->runner;
+    return  d->sessionData ? d->sessionData->runner() : 0;
 }
 
 void QueryMatch::setIsSearchTerm(bool searchTerm)
