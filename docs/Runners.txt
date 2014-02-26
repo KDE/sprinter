@@ -69,7 +69,7 @@ To achieve proper asynchronous matching the following steps must be followed:
 * In the RunnerSessionData subclass include a slot that will create the async jobs
 * Add a signal to the runner that can send all necessary information to the RunnerSessionData's slot; at a minimum this will include the QueryContext
 * Connect the runner's signal to the slot in the RunnerSessionData constructor; this is important to ensure that the connection, and therefore the slot call, happens in the correct thread
-* In Runner::match, after doing any necessary pre-processing of the QueryContext, emit the signal
+* In Runner::match, after doing any necessary pre-processing of the QueryContext, emit the signal and call matchData.setAsynchronous(true)
 * In the RunnerSessionData slot start the job, invalidating or merging older jobs; it will need to at a minimum hold on to the QueryContext object associated with the query
 * create a RunnerSession::Busy object
 * When the async jobs complete, the RunnerSessionData subclass should create the matches and call setMatches if the associated QueryContext is still valid, delete the RunnerSession::Busy object
