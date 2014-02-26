@@ -160,7 +160,10 @@ void RunnerSessionData::startMatch(const QueryContext &context)
         return;
     }
 
-    d->runner->match(this, context);
+
+    RunnerSessionData::Busy busy(this);
+    MatchData matchData(this, context);
+    d->runner->match(matchData);
 }
 
 void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const QueryContext &context)
@@ -170,10 +173,9 @@ void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const Que
     }
 
 #ifdef DEBUG_SYNC
-    qDebug() << "New matches from, to: " << d->currentMatches.size() << matches.size();
-    int count = 0;
-    foreach (const QueryMatch &match, matches) {
-        qDebug() << "     " << count++ << match.title();
+    qDebug() << this << "New matches from, to: " << d->currentMatches.size() << matches.size();
+    for (int i = 0; i < matches.count(); ++i) {
+        qDebug() << "     " << i << matches[i].title();
     }
 #endif
 

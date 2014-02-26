@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QRunnable>
 
+#include <sprinter/matchdata.h>
 #include <sprinter/querycontext.h>
 #include <sprinter/runnersessiondata.h>
 
@@ -77,7 +78,7 @@ public:
      * @param context this object contains the query text itself and
      * additional metadata. @see QueryContext
      */
-    virtual void match(RunnerSessionData *sessionData, const QueryContext &context);
+    virtual void match(MatchData &matchData);
 
     /**
      * When a match is to be exec'd, this method can be called.

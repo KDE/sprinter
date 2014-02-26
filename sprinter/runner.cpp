@@ -66,10 +66,9 @@ RunnerSessionData *Runner::createSessionData()
     return new RunnerSessionData(this);
 }
 
-void Runner::match(RunnerSessionData *sessionData, const QueryContext &context)
+void Runner::match(MatchData &matchData)
 {
-    Q_UNUSED(sessionData)
-    Q_UNUSED(context)
+    Q_UNUSED(matchData)
 }
 
 bool Runner::startExec(const QueryMatch &match)

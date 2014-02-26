@@ -548,7 +548,6 @@ MatchRunnable::MatchRunnable(Runner *runner, QSharedPointer<RunnerSessionData> s
 void MatchRunnable::run()
 {
     if (m_sessionData) {
-        RunnerSessionData::Busy busy(m_sessionData.data());
         m_sessionData.data()->startMatch(m_context);
     }
 }
