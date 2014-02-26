@@ -25,24 +25,70 @@ namespace Sprinter
 class QueryContext;
 class RunnerSessionData;
 
+/**
+ * @class MatchData
+ * This class gets passed into @see Runner::match and does three primary things:
+ * 1. Provides access to the RunnerSessionData object
+ * 2. Provies acces to the QueryContext object
+ * 3. Provides a place to store QueryMatch objects as they are generated
+ *
+ * The class will take care of adding matches to the RunnerSessionData object
+ * automatically, relieving the Runner of having to do this.
+ *
+ * Objects of this type may not be copied or assigned to.
+ */
+
 class MatchData
 {
 public:
+    /**
+     * @param sessionData The RunnerSessionData object associated with the runner
+     *                    the MatchData will be passed in to
+     * @param context The current query's context, e.g. the query text, image size, etc.
+     */
     MatchData(RunnerSessionData *sessionData,
                 const QueryContext &context);
     ~MatchData();
 
+    /**
+     * @return The RunnerSessionData object associated with the runner
+     * the MatchData will be passed in to
+     */
     Sprinter::RunnerSessionData *sessionData() const;
+
+    /**
+     * @return The current query's context, e.g. the query text, image size, etc.
+     */
     Sprinter::QueryContext queryContext() const;
 
+    /**
+     * @return true if this MatchData is still valid; this implies that there is both
+     * valid QueryContext and a RunnerSessionData object
+     */
     bool isValid() const;
 
+    /**
+     * If performing asynchronous matching which will possibly add matches to the
+     * the set of QueryMatches after Runner::match has returned, the Runner must
+     * call this method with async set to true. The default is false.
+     * @param async true if matches may be added after Runner::match returns
+     */
     void setAsynchronous(bool async);
+
+    /**
+     * @return true if matches may be added after Runner::match returns
+     */
     bool isAsynchronous() const;
 
+    /**
+     * Used to add matches to the MatchData object
+     */
     MatchData &operator<<(Sprinter::QueryMatch &match);
-    MatchData &operator<<(QVector<Sprinter::QueryMatch> &matches);
 
+    /**
+     * Used to add matches to the MatchData object
+     */
+    MatchData &operator<<(QVector<Sprinter::QueryMatch> &matches);
 
 private:
     MatchData(const MatchData &other);
