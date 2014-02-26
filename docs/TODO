@@ -8,14 +8,21 @@
         * shouldn't need to copy the firefox db file, e.g.
     * kill
     * locations
+        * split into two plugins: one for files, one for network locations
     * nepomuksearch
-        * needs to be ported / rewritten to use baloo api
+        * needs to be ported / rewritten to use baloo
     * places
     * powerdevil
     * recentdocuments
     * services
     * sessions
+        * requires sorting out libkworkspace in kde-workspace/lib/kworkspace
+          as that has most of the functionality
     * shell
+        * has options on matches, including:
+            * run as other user (with username/password fields)
+            * run in terminal
+          need some way to preserve this functionality
     * solid
     * webshortcuts
     * windowedwidgets
@@ -65,6 +72,7 @@
 * API review of all public classes
 * Metadata
     * localization/i18n in plugin metadata (name, description)
+        * requires improvements to desktoptojson required
 * confirm that the QList<int>s used in RunnerModel::data() works from QML
     * MatchTypesRole
     * SourcesUsedRole
