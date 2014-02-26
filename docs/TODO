@@ -9,8 +9,6 @@
     * kill
     * locations
         * split out file location matcher (already have a URI plugin)
-    * nepomuksearch
-        * needs to be ported / rewritten to use baloo
     * places
     * powerdevil
     * services
@@ -30,7 +28,6 @@
     * audioplayercontrol
     * browserhistory
     * characters
-    * contacts
     * converter
     * datetime
     * dictionary
@@ -44,6 +41,7 @@
     * translator
     * youtube
 * misc places in git.kde.org
+    * kdelibs/baloo/runner (files, contacts, emails)
     * extragear/base/plasma-mobile/runners/
     * extragear/kdevelop/kdevelop/app/plasma/runner/
     * extragear/network/telepathy/ktp-contact-runner/
