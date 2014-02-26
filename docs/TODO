@@ -8,7 +8,7 @@
         * shouldn't need to copy the firefox db file, e.g.
     * kill
     * locations
-        * split into two plugins: one for files, one for network locations
+        * split out file location matcher (already have a URI plugin)
     * nepomuksearch
         * needs to be ported / rewritten to use baloo
     * places
