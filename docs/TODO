@@ -13,7 +13,6 @@
         * needs to be ported / rewritten to use baloo
     * places
     * powerdevil
-    * recentdocuments
     * services
     * sessions
         * requires sorting out libkworkspace in kde-workspace/lib/kworkspace
