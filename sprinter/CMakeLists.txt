@@ -1,6 +1,7 @@
 project(sprinter)
 
 set(sprinterlib_SRCS
+    matchdata.cpp
     querymatch.cpp
     querycontext.cpp
     querysession.cpp
@@ -11,6 +12,7 @@ set(sprinterlib_SRCS
 )
 
 set(sprinterlib_HEADERS
+    matchdata.h
     querycontext.h
     querymatch.h
     querysession.h
