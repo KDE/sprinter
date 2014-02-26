@@ -60,6 +60,7 @@ RunnerSessionData::RunnerSessionData(Runner *runner)
 
 RunnerSessionData::~RunnerSessionData()
 {
+    delete d;
 }
 
 void RunnerSessionData::setEnabled(bool enabled)
