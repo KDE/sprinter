@@ -25,17 +25,12 @@ Next, change this:
 
 to:
 
-    void match(Sprinter::RunnerSessionData *sessionData,
-               const Sprinter::QueryContext &context);
+    void match(Sprinter::MatchData &matchData);
     bool exec(const Sprinter::QueryMatch &match);
 
-All references to QList<Plasma::QueryMatch> will need to be changed to QVector<Sprinter::QueryMatch>, and then change:
+All references to QList<Plasma::QueryMatch> are replaced by adding matches to the matchData object:
 
-    context.addMatches(context.query(), matches);
-
-to:
-
-    sessionData->setMatches(matches, context);
+    matchData << match;
 
 In the constructor of the Sprinter::Runner method, add declarations of what kind of matches the plugin provides:
 

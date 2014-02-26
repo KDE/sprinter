@@ -55,7 +55,7 @@ You may notice that there is an "enabled" property in RunnerSessionData. However
 
 == Fast Synchronous Matching
 
-Runners whose query matching is necessarily synchronous, either because a library they are using only offers a synchronous API or because the matching is fast (e.g. sub-100ms), can take the easiest approach: reimplement Runner::match and call RunnerSessionData::setMatches at least once, even on failure (this will clear the set of matches).
+Runners whose query matching is necessarily synchronous, either because a library they are using only offers a synchronous API or because the matching is fast (e.g. sub-100ms), can take the easiest approach: reimplement Runner::match and add matches (if any) to the MatchData object passed to it.
 
 == Slow Synchronous Matching
 
