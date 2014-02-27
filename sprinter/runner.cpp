@@ -25,6 +25,8 @@
 namespace Sprinter
 {
 
+QCache<qint64, QImage> Runner::Private::s_imageCache;
+
 Runner::Runner(QObject *parent)
     : QObject(parent),
       d(new Private)
@@ -107,13 +109,13 @@ void Runner::setSourcesUsed(const QVector<QuerySession::MatchSource> &sources)
 
 QImage Runner::generateImage(const QIcon &icon, const Sprinter::QueryContext &context)
 {
-    QImage image = d->imageCache.value(icon.cacheKey());
-    if (image.isNull() || image.size() != context.imageSize()) {
-        image = icon.pixmap(context.imageSize()).toImage();
-        d->imageCache.insert(icon.cacheKey(), image);
+    QImage *image = Private::s_imageCache.object(icon.cacheKey());
+    if (!image || image->size() != context.imageSize()) {
+        image = new QImage(icon.pixmap(context.imageSize()).toImage());
+        Private::s_imageCache.insert(icon.cacheKey(), image);
     }
 
-    return image;
+    return *image;
 }
 
 } // namespace

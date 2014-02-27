@@ -18,6 +18,8 @@
 #ifndef SPRINTER_ABSTRACTRUNNER_P_H
 #define SPRINTER_ABSTRACTRUNNER_P_H
 
+#include <QCache>
+
 namespace Sprinter
 {
 
@@ -35,7 +37,7 @@ public:
     bool hasDefaultMatches;
     QVector<QuerySession::MatchType> matchTypes;
     QVector<QuerySession::MatchSource> matchSources;
-    QHash<qint64, QImage> imageCache;
+    static QCache<qint64, QImage> s_imageCache;
 };
 
 }
