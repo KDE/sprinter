@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     QWidget *top = new QWidget(splitter);
 
     QLineEdit *edit = new QLineEdit(top);
-    edit->setPlaceholderText("Enter search term");
+    edit->setPlaceholderText(QStringLiteral("Enter search term"));
     QObject::connect(edit, SIGNAL(textChanged(QString)),
                      session, SLOT(setQuery(QString)));
     QObject::connect(session, SIGNAL(queryChanged(QString)),
@@ -57,12 +57,12 @@ int main(int argc, char** argv)
                      session, SLOT(executeMatch(QModelIndex)));
 
     QPushButton *defaultMatchButton = new QPushButton(top);
-    defaultMatchButton->setText("Default matches");
+    defaultMatchButton->setText(QStringLiteral("Default matches"));
     QObject::connect(defaultMatchButton, SIGNAL(clicked()),
                      session, SLOT(requestDefaultMatches()));
 
     QPushButton *moreMatchesButton = new QPushButton(top);
-    moreMatchesButton->setText("More matches");
+    moreMatchesButton->setText(QStringLiteral("More matches"));
     QObject::connect(moreMatchesButton, SIGNAL(clicked()),
                      session, SLOT(requestMoreMatches()));
 
@@ -75,10 +75,10 @@ int main(int argc, char** argv)
 
     top = new QWidget(splitter);
     QGridLayout *runnerLayout = new QGridLayout(top);
-    runnerLayout->addWidget(new QLabel("Runners"), 0, 0);
+    runnerLayout->addWidget(new QLabel(QStringLiteral("Runners")), 0, 0);
 
     QPushButton *loadAllRunnersButton = new QPushButton(top);
-    loadAllRunnersButton->setText("Load all");
+    loadAllRunnersButton->setText(QStringLiteral("Load all"));
     QObject::connect(loadAllRunnersButton, SIGNAL(clicked()),
                      helper, SLOT(loadAllRunners()));
     runnerLayout->addWidget(loadAllRunnersButton, 0, 1);

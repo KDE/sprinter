@@ -54,11 +54,11 @@ QString textForEnum(const QObject *obj, const char *enumName, int value)
     QMetaEnum e = obj->metaObject()->enumerator(obj->metaObject()->indexOfEnumerator(enumName));
     for (int i = 0; i < e.keyCount(); ++i) {
         if (e.value(i) == value) {
-            return e.key(i);
+            return QLatin1String(e.key(i));
         }
     }
 
-    return "Unknown";
+    return QStringLiteral("Unknown");
 }
 
 QuerySessionThread::QuerySessionThread(QuerySession *session)
@@ -183,16 +183,16 @@ void QuerySessionThread::loadRunnerMetaData()
     }
 
     foreach (const QString &path, QCoreApplication::instance()->libraryPaths()) {
-        if (path.endsWith("plugins")) {
+        if (path.endsWith(QLatin1String("plugins"))) {
             QDir pluginDir(path);
-            pluginDir.cd("sprinter");
+            pluginDir.cd(QStringLiteral("sprinter"));
             foreach (const QString &fileName, pluginDir.entryList(QDir::Files)) {
                 const QString path = pluginDir.absoluteFilePath(fileName);
                 QPluginLoader loader(path);
 
                 RunnerMetaData md;
                 md.library = path;
-                md.id = loader.metaData()["IID"].toString();
+                md.id = loader.metaData()[QStringLiteral("IID")].toString();
                 if (md.id.isEmpty()) {
                     qDebug() << "Invalid plugin, no metadata:" << path;
                     continue;
@@ -201,14 +201,14 @@ void QuerySessionThread::loadRunnerMetaData()
                 //TODO: these values come from desktoptojson, currently in the
                 //      frameworks/kservices repository. Very ugly, discussion
                 //      ongoing as to how to make them better.
-                QJsonObject json = loader.metaData()["MetaData"].toObject();
-                md.name = json["Name"].toString();
-                md.description = json["Comment"].toString();
-                md.icon = json["Icon"].toString();
-                md.license = json["X-KDE-PluginInfo-License"].toString();
-                md.author = json["X-KDE-PluginInfo-Author"].toString();
-                md.contactEmail = json["X-KDE-PluginInfo-Email"].toString();
-                md.version = json["X-KDE-PluginInfo-Version"].toString();
+                QJsonObject json = loader.metaData()[QStringLiteral("MetaData")].toObject();
+                md.name = json[QStringLiteral("Name")].toString();
+                md.description = json[QStringLiteral("Comment")].toString();
+                md.icon = json[QStringLiteral("Icon")].toString();
+                md.license = json[QStringLiteral("X-KDE-PluginInfo-License")].toString();
+                md.author = json[QStringLiteral("X-KDE-PluginInfo-Author")].toString();
+                md.contactEmail = json[QStringLiteral("X-KDE-PluginInfo-Email")].toString();
+                md.version = json[QStringLiteral("X-KDE-PluginInfo-Version")].toString();
                 m_runnerMetaData << md;
                 m_enabledRunnerIds << md.id;
             }
