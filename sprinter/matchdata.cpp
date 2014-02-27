@@ -84,13 +84,13 @@ bool MatchData::isAsynchronous() const
     return d->async;
 }
 
-MatchData &MatchData::operator<<(Sprinter::QueryMatch &match)
+MatchData &MatchData::operator<<(const Sprinter::QueryMatch &match)
 {
     d->matches << match;
     return *this;
 }
 
-MatchData &MatchData::operator<<(QVector<Sprinter::QueryMatch> &matches)
+MatchData &MatchData::operator<<(const QVector<Sprinter::QueryMatch> &matches)
 {
     d->matches << matches;
     return *this;

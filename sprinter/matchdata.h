@@ -83,12 +83,12 @@ public:
     /**
      * Used to add matches to the MatchData object
      */
-    MatchData &operator<<(Sprinter::QueryMatch &match);
+    MatchData &operator<<(const Sprinter::QueryMatch &match);
 
     /**
      * Used to add matches to the MatchData object
      */
-    MatchData &operator<<(QVector<Sprinter::QueryMatch> &matches);
+    MatchData &operator<<(const QVector<Sprinter::QueryMatch> &matches);
 
 private:
     MatchData(const MatchData &other);
