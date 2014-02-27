@@ -28,7 +28,6 @@ find_package(Qt5Declarative REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
 add_definitions("-Wall -std=c++0x")
-set(SPRINTER_PLUGINS_PATH plugins/sprinter)
 include_directories(${CMAKE_SOURCE_DIR})
 # the main library
 add_subdirectory(sprinter)
@@ -40,8 +39,8 @@ add_subdirectory(qml)
 add_subdirectory(test)
 
 # Create a Config.cmake and a ConfigVersion.cmake file and install them
-set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_DIR}/Sprinter")
-set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_DIR}/include/Sprinter")
+set(CMAKECONFIG_INSTALL_DIR lib/cmake/Sprinter)
+set(INCLUDE_INSTALL_DIR include/Sprinter)
 
 ecm_configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/SprinterConfig.cmake.in"

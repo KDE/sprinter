@@ -31,7 +31,7 @@ generate_export_header(sprinter BASE_NAME Sprinter EXPORT_FILE_NAME sprinter_exp
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 qt5_use_modules(sprinter Widgets Network)
-install(TARGETS sprinter EXPORT SprinterTargets DESTINATION "${CMAKECONFIG_INSTALL_DIR}/lib")
+install(TARGETS sprinter EXPORT SprinterTargets DESTINATION lib)
 install(FILES
             ${sprinterlib_HEADERS}
             ${CMAKE_CURRENT_BINARY_DIR}/sprinter_export.h
