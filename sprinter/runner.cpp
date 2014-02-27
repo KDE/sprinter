@@ -105,6 +105,17 @@ void Runner::setSourcesUsed(const QVector<QuerySession::MatchSource> &sources)
     d->matchSources = sources;
 }
 
+QImage Runner::generateImage(const QIcon &icon, const Sprinter::QueryContext &context)
+{
+    QImage image = d->imageCache.value(icon.cacheKey());
+    if (image.isNull() || image.size() != context.imageSize()) {
+        image = icon.pixmap(context.imageSize()).toImage();
+        d->imageCache.insert(icon.cacheKey(), image);
+    }
+
+    return image;
+}
+
 } // namespace
 
 #include "moc_runner.cpp"

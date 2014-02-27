@@ -35,6 +35,7 @@ public:
     bool hasDefaultMatches;
     QVector<QuerySession::MatchType> matchTypes;
     QVector<QuerySession::MatchSource> matchSources;
+    QHash<qint64, QImage> imageCache;
 };
 
 }
