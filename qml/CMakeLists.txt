@@ -1,4 +1,4 @@
-project(sprtiner_qmlplugin)
+project(sprinter_qmlplugin)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
