@@ -21,6 +21,8 @@
             * run in terminal
           need some way to preserve this functionality
     * solid
+        * 4.x version uses hotplug and solid Plasma::DataEngines
+          should be re-written/ported to just use libsolid directly
     * webshortcuts
     * windowedwidgets
     * windows
