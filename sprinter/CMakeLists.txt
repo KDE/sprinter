@@ -25,6 +25,7 @@ ecm_generate_headers(sprinterlib_HEADERS
         QuerySession
         Runner
         RunnerSessionData
+    REQUIRED_HEADERS sprinterlib_HEADERS
 )
 generate_export_header(sprinter BASE_NAME Sprinter EXPORT_FILE_NAME sprinter_export.h)
 
