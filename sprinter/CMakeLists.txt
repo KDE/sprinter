@@ -11,20 +11,28 @@ set(sprinterlib_SRCS
     runnersessiondata.cpp
 )
 
-set(sprinterlib_HEADERS
-    matchdata.h
-    querycontext.h
-    querymatch.h
-    querysession.h
-    runner.h
-    runnersessiondata.h
-    ${CMAKE_BINARY_DIR}/sprinter/sprinter_export.h
+add_library(sprinter SHARED ${sprinterlib_SRCS})
+set_target_properties(sprinter PROPERTIES VERSION ${SPRINTER_VERSION_STRING}
+                                               SOVERSION ${SPRINTER_SOVERSION}
+                                               EXPORT_NAME Sprinter
 )
+
+ecm_generate_headers(sprinterlib_HEADERS
+    HEADER_NAMES
+        MatchData
+        QueryContext
+        QueryMatch
+        QuerySession
+        Runner
+        RunnerSessionData
+)
+generate_export_header(sprinter BASE_NAME Sprinter EXPORT_FILE_NAME sprinter_export.h)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-add_library(sprinter SHARED ${sprinterlib_SRCS})
-generate_export_header(sprinter BASE_NAME Sprinter EXPORT_FILE_NAME sprinter_export.h)
 qt5_use_modules(sprinter Widgets Network)
-install(TARGETS sprinter DESTINATION lib)
-install(FILES ${sprinterlib_HEADERS} DESTINATION include/sprinter/)
+install(TARGETS sprinter EXPORT SprinterTargets DESTINATION "${CMAKECONFIG_INSTALL_DIR}/lib")
+install(FILES
+            ${sprinterlib_HEADERS}
+            ${CMAKE_CURRENT_BINARY_DIR}/sprinter_export.h
+        DESTINATION include/sprinter/)
