@@ -84,6 +84,16 @@ bool MatchData::isAsynchronous() const
     return d->async;
 }
 
+uint MatchData::matchCount() const
+{
+    return d->matches.size();
+}
+
+void MatchData::clearMatches()
+{
+    d->matches.clear();
+}
+
 MatchData &MatchData::operator<<(const Sprinter::QueryMatch &match)
 {
     d->matches << match;

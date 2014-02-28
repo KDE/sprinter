@@ -81,6 +81,16 @@ public:
     bool isAsynchronous() const;
 
     /**
+     * @return the number of matches currently added to this MatchData
+     */
+    uint matchCount() const;
+
+    /**
+     * Clears all matches currently associated with this MatchData
+     */
+    void clearMatches();
+
+    /**
      * Used to add matches to the MatchData object
      */
     MatchData &operator<<(const Sprinter::QueryMatch &match);
