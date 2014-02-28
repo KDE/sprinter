@@ -182,7 +182,7 @@ void QuerySessionThread::loadRunnerMetaData()
         m_matchers.clear();
     }
 
-    QSet<QString> seenIds;
+    QHash<QString, int> seenIds;
     foreach (const QString &path, QCoreApplication::instance()->libraryPaths()) {
         if (path.endsWith(QLatin1String("plugins"))) {
             QDir pluginDir(path);
@@ -199,12 +199,17 @@ void QuerySessionThread::loadRunnerMetaData()
                     continue;
                 }
 
+                int replaceIndex = -1;
                 if (seenIds.contains(md.id)) {
-                    qDebug() << "Duplicate plugin id" << md.id << ":" << path;
-                    continue;
+                    replaceIndex = seenIds.value(md.id);
+                    Q_ASSERT(replaceIndex <= m_runnerMetaData.size());
+                    qDebug() << "Duplicate plugin id" << md.id;
+                    qDebug() << "    replacing plugin at "
+                             << m_runnerMetaData[replaceIndex].library
+                             << "with" << path;
                 }
 
-                seenIds.insert(md.id);
+                seenIds.insert(md.id, m_runnerMetaData.size());
                 //TODO: these values come from desktoptojson, currently in the
                 //      frameworks/kservices repository. Very ugly, discussion
                 //      ongoing as to how to make them better.
@@ -216,8 +221,13 @@ void QuerySessionThread::loadRunnerMetaData()
                 md.author = json[QStringLiteral("X-KDE-PluginInfo-Author")].toString();
                 md.contactEmail = json[QStringLiteral("X-KDE-PluginInfo-Email")].toString();
                 md.version = json[QStringLiteral("X-KDE-PluginInfo-Version")].toString();
-                m_runnerMetaData << md;
-                m_enabledRunnerIds << md.id;
+
+                if (replaceIndex > -1) {
+                    m_runnerMetaData[replaceIndex] = md;
+                } else {
+                    m_runnerMetaData << md;
+                    m_enabledRunnerIds << md.id;
+                }
             }
         }
     }
