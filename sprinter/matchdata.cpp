@@ -60,13 +60,13 @@ MatchData::~MatchData()
 
 Sprinter::RunnerSessionData *MatchData::sessionData() const
 {
-    qDebug() << "Sending out our session data object as" << d->sessionData;
+//     qDebug() << "Sending out our session data object as" << d->sessionData;
     return d->sessionData;
 }
 
 Sprinter::QueryContext MatchData::queryContext() const
 {
-    qDebug() << this << "query context ... " << d->context.isValid();
+//     qDebug() << this << "query context ... " << d->context.isValid();
     return d->context;
 }
 
