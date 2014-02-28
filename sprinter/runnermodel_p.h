@@ -42,14 +42,14 @@ class RunnerModel : public QAbstractItemModel
 public:
     enum DisplayRoles {
         IdRole = Qt::UserRole,
+        IsLoadedRole,
+        IsBusyRole,
         DescriptionRole,
         IconRole,
         LicenseRole,
         AuthorRole,
         ContactEmailRole,
         VersionRole,
-        IsLoadedRole,
-        IsBusyRole,
         GeneratesDefaultMatchesRole,
         MatchTypesRole,
         SourcesUsedRole
