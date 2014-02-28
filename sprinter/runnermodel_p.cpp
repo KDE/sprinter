@@ -102,7 +102,7 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    QVector<RunnerMetaData> info = m_worker->runnerMetaData();
+    const QVector<RunnerMetaData> &info = m_worker->runnerMetaData();
     if (index.row() >= info.count()) {
         return QVariant();
     }

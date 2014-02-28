@@ -17,7 +17,7 @@
 
 #ifndef RUNNERMETADATA
 #define RUNNERMETADATA
-
+#include <QDebug>
 namespace Sprinter
 {
 

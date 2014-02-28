@@ -155,7 +155,7 @@ QueryMatch QuerySessionThread::matchAt(int index)
     return QueryMatch();
 }
 
-QVector<RunnerMetaData> QuerySessionThread::runnerMetaData() const
+const QVector<RunnerMetaData> &QuerySessionThread::runnerMetaData() const
 {
      return m_runnerMetaData;
 }

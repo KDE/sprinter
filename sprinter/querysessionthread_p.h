@@ -110,7 +110,7 @@ public Q_SLOTS:
     // thread agnostic
 public:
     QStringList enabledRunners() const;
-    QVector<RunnerMetaData> runnerMetaData() const;
+    const QVector<RunnerMetaData> &runnerMetaData() const;
     QuerySession *session() const { return m_session; }
     void endQuerySession();
     QString query() const;
