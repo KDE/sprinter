@@ -182,6 +182,7 @@ void QuerySessionThread::loadRunnerMetaData()
         m_matchers.clear();
     }
 
+    QSet<QString> seenIds;
     foreach (const QString &path, QCoreApplication::instance()->libraryPaths()) {
         if (path.endsWith(QLatin1String("plugins"))) {
             QDir pluginDir(path);
@@ -198,6 +199,12 @@ void QuerySessionThread::loadRunnerMetaData()
                     continue;
                 }
 
+                if (seenIds.contains(md.id)) {
+                    qDebug() << "Duplicate plugin id" << md.id << ":" << path;
+                    continue;
+                }
+
+                seenIds.insert(md.id);
                 //TODO: these values come from desktoptojson, currently in the
                 //      frameworks/kservices repository. Very ugly, discussion
                 //      ongoing as to how to make them better.
