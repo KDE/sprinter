@@ -9,6 +9,9 @@
     * spread out across the address space with explicit values?
 * API review of all public classes
 * Metadata
+    * put types, sources and default results in the json
+        * will remove some ugly-ish boilerplate code from every plugin
+        * will allow sorting/querying the runner model w/out loading every plugin
     * localization/i18n in plugin metadata (name, description)
         * requires improvements to desktoptojson required
 * confirm that the QList<int>s used in RunnerModel::data() works from QML
