@@ -85,6 +85,7 @@ public:
 
         // Desktop shell and user interface types
         ActivityType, // a desktop activity
+        ApplicationGroupType, // a group of applications, such as in a launcher
         AppActionType, // an action in an external app; perhaps from a menu
         AppSessionType, // a desktop app session within the current user session
         DesktopType, // virtual desktop name/numbers
