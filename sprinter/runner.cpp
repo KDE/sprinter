@@ -55,12 +55,12 @@ uint Runner::minQueryLength() const
 
 bool Runner::generatesDefaultMatches() const
 {
-    return d->hasDefaultMatches;
+    return d->generatesDefaultMatches;
 }
 
-void Runner::setGeneratesDefaultMatches(bool hasDefaultMatches)
+void Runner::setGeneratesDefaultMatches(bool generatesDefaultMatches)
 {
-    d->hasDefaultMatches = hasDefaultMatches;
+    d->generatesDefaultMatches = generatesDefaultMatches;
 }
 
 RunnerSessionData *Runner::createSessionData()

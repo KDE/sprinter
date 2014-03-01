@@ -28,13 +28,13 @@ class Runner::Private
 public:
     Private()
         : minQueryLength(3),
-          hasDefaultMatches(false)
+          generatesDefaultMatches(false)
     {
     }
 
     uint minQueryLength;
     QString id;
-    bool hasDefaultMatches;
+    bool generatesDefaultMatches;
     QVector<QuerySession::MatchType> matchTypes;
     QVector<QuerySession::MatchSource> matchSources;
     static QCache<qint64, QImage> s_imageCache;
