@@ -150,47 +150,42 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
             return info[index.row()].version;
             break;
         case IsLoadedRole:
-            return info[index.row()].runner != 0;
+            return info[index.row()].loaded;
             break;
         case IsBusyRole:
-            return info[index.row()].runner != 0 && info[index.row()].busy;
+            return info[index.row()].busy;
             break;
         case GeneratesDefaultMatchesRole:
-            return info[index.row()].runner != 0 &&
-                   info[index.row()].runner->generatesDefaultMatches();
+            return info[index.row()].generatesDefaultMatches;
             break;
         case MatchTypesRole:
-            if (info[index.row()].runner) {
-                if (asText) {
-                    QStringList list;
-                    foreach (int value, info[index.row()].runner->matchTypesGenerated()) {
-                        list << textForEnum(m_worker->session(), "MatchType", value);
-                    }
-                    return list;
-                } else {
-                    QList<int> intlist;
-                    foreach (int value, info[index.row()].runner->matchTypesGenerated()) {
-                        intlist << value;
-                    }
-                    return QVariant::fromValue(intlist);
+            if (asText) {
+                QStringList list;
+                foreach (int value, info[index.row()].matchTypesGenerated) {
+                    list << textForEnum(m_worker->session(), "MatchType", value);
                 }
+                return list.join(',');
+            } else {
+                QList<int> intlist;
+                foreach (int value, info[index.row()].matchTypesGenerated) {
+                    intlist << value;
+                }
+                return QVariant::fromValue(intlist);
             }
             break;
         case SourcesUsedRole:
-            if (info[index.row()].runner) {
-                if (asText) {
-                    QStringList list;
-                    foreach (int value, info[index.row()].runner->sourcesUsed()) {
-                        list << textForEnum(m_worker->session(), "MatchSource", value);
-                    }
-                    return list;
-                } else {
-                    QList<int> intlist;
-                    foreach (int value, info[index.row()].runner->sourcesUsed()) {
-                        intlist << value;
-                    }
-                    return QVariant::fromValue(intlist);
+            if (asText) {
+                QStringList list;
+                foreach (int value, info[index.row()].sourcesUsed) {
+                    list << textForEnum(m_worker->session(), "MatchSource", value);
                 }
+                return list.join(',');
+            } else {
+                QList<int> intlist;
+                foreach (int value, info[index.row()].sourcesUsed) {
+                    intlist << value;
+                }
+                return QVariant::fromValue(intlist);
             }
             break;
         default:
