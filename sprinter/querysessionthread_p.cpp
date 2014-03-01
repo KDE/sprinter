@@ -210,7 +210,7 @@ void QuerySessionThread::loadRunnerMetaData()
                 if (seenIds.contains(md.id)) {
                     replaceIndex = seenIds.value(md.id);
                     Q_ASSERT(replaceIndex <= m_runnerMetaData.size());
-                    qDebug() << "Duplicate plugin id" << md.id;
+                    qDebug() << "Duplicate plugin id" << md.id << replaceIndex << m_runnerMetaData.size();
                     qDebug() << "    replacing plugin at "
                              << m_runnerMetaData[replaceIndex].library
                              << "with" << path;
