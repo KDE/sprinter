@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
+#include <QJsonArray>
 #include <QMetaEnum>
 #include <QPluginLoader>
 #include <QReadLocker>
@@ -49,16 +50,21 @@
 namespace Sprinter
 {
 
+int enumForText(const QObject *obj, const char *enumName, const QString &key)
+{
+    QMetaEnum e = obj->metaObject()->enumerator(obj->metaObject()->indexOfEnumerator(enumName));
+    return e.keyToValue(key.toLatin1().constData());
+}
+
 QString textForEnum(const QObject *obj, const char *enumName, int value)
 {
     QMetaEnum e = obj->metaObject()->enumerator(obj->metaObject()->indexOfEnumerator(enumName));
-    for (int i = 0; i < e.keyCount(); ++i) {
-        if (e.value(i) == value) {
-            return QLatin1String(e.key(i));
-        }
+    QLatin1String text(e.valueToKey(value));
+    if (text.size() < 1) {
+        return QStringLiteral("Unknown");
     }
 
-    return QStringLiteral("Unknown");
+    return text;
 }
 
 QuerySessionThread::QuerySessionThread(QuerySession *session)
@@ -183,6 +189,7 @@ void QuerySessionThread::loadRunnerMetaData()
     }
 
     QHash<QString, int> seenIds;
+    const QStringList langs = QLocale::system().uiLanguages();
     foreach (const QString &path, QCoreApplication::instance()->libraryPaths()) {
         if (path.endsWith(QLatin1String("plugins"))) {
             QDir pluginDir(path);
@@ -213,14 +220,63 @@ void QuerySessionThread::loadRunnerMetaData()
                 //TODO: these values come from desktoptojson, currently in the
                 //      frameworks/kservices repository. Very ugly, discussion
                 //      ongoing as to how to make them better.
-                QJsonObject json = loader.metaData()[QStringLiteral("MetaData")].toObject();
-                md.name = json[QStringLiteral("Name")].toString();
-                md.description = json[QStringLiteral("Comment")].toString();
-                md.icon = json[QStringLiteral("Icon")].toString();
-                md.license = json[QStringLiteral("X-KDE-PluginInfo-License")].toString();
-                md.author = json[QStringLiteral("X-KDE-PluginInfo-Author")].toString();
-                md.contactEmail = json[QStringLiteral("X-KDE-PluginInfo-Email")].toString();
-                md.version = json[QStringLiteral("X-KDE-PluginInfo-Version")].toString();
+                const QJsonObject json = loader.metaData()[QStringLiteral("MetaData")].toObject();
+                QJsonObject info = json[QStringLiteral("PluginInfo")].toObject();
+                if (!info.isEmpty()) {
+                    const QJsonObject desc = info[QStringLiteral("Description")].toObject();
+                    foreach (const QString &lang, langs) {
+                        if (desc.contains(lang)) {
+                            const QJsonObject langObj = desc[lang].toObject();
+                            md.name = langObj["Name"].toString();
+                            md.description = langObj["Comment"].toString();
+                            break;
+                        } else if (lang.contains('-')) {
+                            const QString shortLang = lang.left(lang.indexOf('-'));
+                            if (desc.contains(shortLang)) {
+                                const QJsonObject langObj = desc[shortLang].toObject();
+                                md.name = langObj["Name"].toString();
+                                md.description = langObj["Comment"].toString();
+                                break;
+                            }
+                        }
+                    }
+
+                    md.icon = info[QStringLiteral("Icon")].toString();
+                    md.license = info["License"].toString();
+                    md.version = info[QStringLiteral("Version")].toString();
+
+                    const QJsonArray authors = info[QStringLiteral("Authors")].toArray();
+                    QStringList authorStrings;
+                    for (int i = 0; i < authors.size(); ++i) {
+                        authorStrings << authors[i].toString();
+                    }
+                    md.author = authorStrings.join(',');
+
+                    QJsonObject contact = info[QStringLiteral("Contact")].toObject();
+                    md.contactEmail = contact[QStringLiteral("Email")].toString();
+
+                }
+
+                info = json[QStringLiteral("Sprinter")].toObject();
+                if (!info.isEmpty()) {
+                    md.generatesDefaultMatches = info[QStringLiteral("GeneratesDefaultMatches")].toBool();
+
+                    const QJsonArray matchSources = info[QStringLiteral("MatchSources")].toArray();
+                    foreach (const QJsonValue &matchSource, matchSources) {
+                        int val = enumForText(m_session, "MatchSource", matchSource.toString());
+                        if (val != -1) {
+                            md.sourcesUsed << (QuerySession::MatchSource)val;
+                        }
+                    }
+
+                    const QJsonArray matchTypes = info[QStringLiteral("MatchTypes")].toArray();
+                    foreach (const QJsonValue &matchType, matchTypes) {
+                        int val = enumForText(m_session, "MatchType", matchType.toString());
+                        if (val != -1) {
+                            md.matchTypesGenerated << (QuerySession::MatchType)val;
+                        }
+                    }
+                }
 
                 if (replaceIndex > -1) {
                     m_runnerMetaData[replaceIndex] = md;
@@ -254,7 +310,7 @@ void QuerySessionThread::loadRunner(int index)
         return;
     }
 
-    if (m_runnerMetaData[index].runner) {
+    if (m_runnerMetaData[index].loaded) {
         return;
     }
 
@@ -263,20 +319,23 @@ void QuerySessionThread::loadRunner(int index)
     QObject *plugin = loader.instance();
     Runner *runner = qobject_cast<Runner *>(plugin);
     if (runner) {
-        m_runnerMetaData[index].runner = runner;
         m_runnerMetaData[index].busy = false;
         m_runnerMetaData[index].fetchedSessionData = false;
 
         m_sessionData[index].clear();
         m_runners[index] = runner;
         runner->d->id = m_runnerMetaData[index].id;
+        runner->d->matchTypes = m_runnerMetaData[index].matchTypesGenerated;
+        runner->d->matchSources = m_runnerMetaData[index].sourcesUsed;
+        runner->d->generatesDefaultMatches =  m_runnerMetaData[index].generatesDefaultMatches;
+        m_runnerMetaData[index].loaded = true;
         if (m_context.isValid() &&
             (!m_context.query().isEmpty() ||
              m_context.isDefaultMatchesRequest())) {
             retrieveSessionData(index);
         }
     } else {
-        m_runnerMetaData[index].runner = 0;
+        m_runnerMetaData[index].loaded = false;
         m_runnerMetaData[index].busy = false;
         qWarning() << "LOAD FAILURE" <<  path << ":" << loader.errorString();
         delete plugin;
