@@ -216,11 +216,8 @@ void QuerySessionThread::loadRunnerMetaData()
                              << "with" << path;
                 }
 
-                seenIds.insert(md.id, m_runnerMetaData.size());
-                //TODO: these values come from desktoptojson, currently in the
-                //      frameworks/kservices repository. Very ugly, discussion
-                //      ongoing as to how to make them better.
                 const QJsonObject json = loader.metaData()[QStringLiteral("MetaData")].toObject();
+
                 QJsonObject info = json[QStringLiteral("PluginInfo")].toObject();
                 if (!info.isEmpty()) {
                     const QJsonObject desc = info[QStringLiteral("Description")].toObject();
@@ -281,6 +278,7 @@ void QuerySessionThread::loadRunnerMetaData()
                 if (replaceIndex > -1) {
                     m_runnerMetaData[replaceIndex] = md;
                 } else {
+                    seenIds.insert(md.id, m_runnerMetaData.size());
                     m_runnerMetaData << md;
                     m_enabledRunnerIds << md.id;
                 }
