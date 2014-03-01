@@ -4,7 +4,48 @@
 
  First, copy all files of the plugin into a subdirectory of the runners/ directory. Replace the CMakeLists.txt with one modeled after one of the other runner plugins CMakeLists.txt. Add the subdirectory to runners/CMakeLists.txt
 
- = AbstractRunner -> Runner
+= JSON File
+
+Add a <plugingname>.json file in the sources directory with the following contents, customized as appropriate:
+
+    {
+        "PluginInfo": {
+            "Authors": [
+                "Aaron Seigo <aseigo@kde.org>"
+            ],
+            "Contact": {
+                "Email": "kde@martin-graesslin.com"
+            },
+            "Description": {
+                "en" : {
+                    "Name": "My Awesome Plugin",
+                    "Comment": "More details on how awesome it is"
+                }
+            }
+        },
+        "Sprinter": {
+            "GeneratesDefaultMatches": true,
+            "MatchSources": [
+                "FromDesktopShell"
+            ],
+            "MatchTypes": [
+                "WindowType",
+                "DesktopType"
+            ]
+        }
+    }
+
+Note that "GeneratesDefaultMatches" is the same as "X-Plasma-AdvertiseSingleRunnerQueryMode" in the Plasma runner's .desktop file.
+
+There should also be a .desktop file with the following contents:
+
+    [Desktop Entry]
+    Name=My Awesome Plugin
+    Comment=More details on how awesome it is
+
+This will then be translated by the i18n teams and the pluginInfoGenerator tool in the sprinter-plugins package can be run to merge the translations from the .desktop file to the .json file.
+
+= AbstractRunner -> Runner
 
  At the core of each KRunner plugin is an AbstractRunner subclass. This becomes a Sprinter::Runner subclass.  In the class declaration, add this below the Q_OBJECT macro:
 
@@ -31,19 +72,6 @@ to:
 All references to QList<Plasma::QueryMatch> are replaced by adding matches to the matchData object:
 
     matchData << match;
-
-In the constructor of the Sprinter::Runner method, add declarations of what kind of matches the plugin provides:
-
-    setMatchTypesGenerated(QVector<Sprinter::QuerySession::MatchType>()
-                                << Sprinter::QuerySession::ActivityType);
-    setSourcesUsed(QVector<Sprinter::QuerySession::MatchSource>()
-                        << Sprinter::QuerySession::FromLocalService);
-
-Replace "ActivityType" and "FromLocalService" with appropriate values. Multiple values are allowed.
-
-If the runner was a "single runner mode" runner (look in the .desktop file for X-Plasma-AdvertiseSingleRunnerQueryMode=true), then also add this to the constructor:
-
-    setGeneratesDefaultMatches(true);
 
 There is no QuerySyntax, so any lines related to that can simply be deleted. If a runner should not be used in matching, e.g. because DBus service it requires is not available, then return a null pointer from createSessionData().
 

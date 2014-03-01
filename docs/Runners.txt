@@ -9,12 +9,42 @@ To make a plugin, add this to your object delcaration, replacing the IID and FIL
 
     Q_PLUGIN_METADATA(IID "org.name.pluginname" FILE "pluginname.json")
 
-Add the json file in the same directory with the following contents:
+Add the json file in the same directory with the following contents, customized as appropriate:
 
     {
-        "name": "User-visible name",
-        "description": "A short description"
+        "PluginInfo": {
+            "Authors": [
+                "Aaron Seigo <aseigo@kde.org>"
+            ],
+            "Contact": {
+                "Email": "kde@martin-graesslin.com"
+            },
+            "Description": {
+                "en" : {
+                    "Name": "My Awesome Plugin",
+                    "Comment": "More details on how awesome it is"
+                }
+            }
+        },
+        "Sprinter": {
+            "GeneratesDefaultMatches": true,
+            "MatchSources": [
+                "FromDesktopShell"
+            ],
+            "MatchTypes": [
+                "WindowType",
+                "DesktopType"
+            ]
+        }
     }
+
+There should also be a .desktop file with the following contents:
+
+    [Desktop Entry]
+    Name=My Awesome Plugin
+    Comment=More details on how awesome it is
+
+This will then be translated by the i18n teams and the pluginInfoGenerator tool in the sprinter-plugins package can be run to merge the translations from the .desktop file to the .json file.
 
 == Statelesness
 
@@ -44,10 +74,7 @@ The last point deserves more attention: if a runner relies on a service being av
         // return false if the matching should not be performed
     }
 
-Note that RunnerSessionData::shouldStartMatch already checks to see if network is available in the case that Runner::sourcesUsed() returns a single value of FromNetworkService. So in the common case of requiring network availability, a runner can simply do this in its constructor:
-
-    setSourcesUsed(QVector<RunnerManager::MatchSource>()
-                    << RunnerManager::FromNetworkService);
+Note that RunnerSessionData::shouldStartMatch already checks to see if network is available in the case that Runner::sourcesUsed() returns a single value of FromNetworkService.
 
 In that case, a subclass of RunnerSessionData is not required as this common case is checked for by the base implementation of RunnerSessionData::shouldStartMatch.
 
