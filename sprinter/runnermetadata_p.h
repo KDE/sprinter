@@ -17,7 +17,9 @@
 
 #ifndef RUNNERMETADATA
 #define RUNNERMETADATA
-#include <QDebug>
+
+#include "sprinter/querysession.h"
+
 namespace Sprinter
 {
 
@@ -26,7 +28,8 @@ class Runner;
 struct RunnerMetaData
 {
     RunnerMetaData()
-        : runner(0),
+        : generatesDefaultMatches(false),
+          loaded(false),
           busy(false),
           fetchedSessionData(false)
     {
@@ -41,7 +44,10 @@ struct RunnerMetaData
     QString contactEmail;
     QString version;
     QString icon;
-    Runner *runner;
+    QVector<QuerySession::MatchSource> sourcesUsed;
+    QVector<QuerySession::MatchType> matchTypesGenerated;
+    bool generatesDefaultMatches;
+    bool loaded;
     bool busy;
     bool fetchedSessionData;
 };
