@@ -118,6 +118,12 @@ public:
      */
     bool generatesDefaultMatches() const;
 
+    /**
+     * @return an appropriately sized image for a given icon.
+     * The results are cached, so caling multiple times is fast.
+     */
+    QImage generateImage(const QIcon &icon, const Sprinter::QueryContext &context);
+
 protected:
     /**
      * Sets the minimum query length accepted by this runner
@@ -172,12 +178,6 @@ protected:
      * Must be called in the runner's constructor to take effect.
      */
     void setSourcesUsed(const QVector<QuerySession::MatchSource> &sources);
-
-    /**
-     * @return an appropriately sized image for a given icon.
-     * The results are cached, so caling multiple times is fast.
-     */
-    QImage generateImage(const QIcon &icon, const Sprinter::QueryContext &context);
 
 private:
     friend class QuerySessionThread;
