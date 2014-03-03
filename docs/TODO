@@ -3,11 +3,13 @@
 == Features
 * Learning: record chosen QueryMatches, weight future matches with this information
 
-== Improvements
+== Reviews
 * Review QuerySession::MatchType entries
     * MovieType as a specialization of video?
     * spread out across the address space with explicit values?
 * API review of all public classes
+
+== Improvements
 * confirm that the QList<int>s used in RunnerModel::data() works from QML
     * MatchTypesRole
     * SourcesUsedRole
