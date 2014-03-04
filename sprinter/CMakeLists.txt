@@ -34,7 +34,7 @@ ecm_generate_headers(sprinterlib_HEADERS
 )
 generate_export_header(sprinter BASE_NAME Sprinter EXPORT_FILE_NAME sprinter_export.h)
 
-qt5_use_modules(sprinter Widgets Network)
+qt5_use_modules(sprinter Gui Network)
 install(TARGETS sprinter EXPORT SprinterTargets DESTINATION lib)
 install(FILES
             ${sprinterlib_HEADERS}

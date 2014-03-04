@@ -18,7 +18,7 @@
 #include "querymatch.h"
 #include "querymatch_p.h"
 
-#include <QApplication>
+#include <QGuiApplication>
 #include <QClipboard>
 #include <QDebug>
 #include <QPointer>
@@ -163,7 +163,7 @@ bool QueryMatch::sendUserDataToClipboard() const
 {
     QString clipboardText = userData().toString();
     if (!clipboardText.isEmpty()) {
-        QClipboard *clipboard = QApplication::clipboard();
+        QClipboard *clipboard = QGuiApplication::clipboard();
         if (clipboard) {
             clipboard->setText(clipboardText);
             return true;
