@@ -53,6 +53,7 @@ int main(int argc, char** argv)
     QTreeView *matchView = new QTreeView(top);
     matchView->setModel(session);
     matchView->setAllColumnsShowFocus(true);
+    matchView->setDragEnabled(true);
     QObject::connect(matchView, SIGNAL(doubleClicked(QModelIndex)),
                      session, SLOT(executeMatch(QModelIndex)));
 
