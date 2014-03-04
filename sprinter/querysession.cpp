@@ -20,7 +20,9 @@
 
 #include <QDebug>
 #include <QMetaEnum>
+#include <QMimeData>
 #include <QThreadPool>
+#include <QUrl>
 
 #include "runner.h"
 #include "querysessionthread_p.h"
@@ -403,6 +405,90 @@ int QuerySession::rowCount(const QModelIndex & parent) const
 QHash<int, QByteArray> QuerySession::roleNames() const
 {
     return d->roles;
+}
+
+QStringList QuerySession::mimeTypes() const
+{
+    //TODO is this really all the types that can be returned?
+    return QStringList() << "text/plain" << "text/uri-list";
+}
+
+void addVariantToLists(QSet<QString> &strings, QSet<QUrl> &urls, QVariant &variant)
+{
+    if (variant.canConvert(QMetaType::QUrl)) {
+        urls.insert(variant.toUrl());
+    } else if (variant.canConvert(QMetaType::QString)) {
+        strings.insert(variant.toString());
+    }
+}
+
+QMimeData *QuerySession::mimeData(const QModelIndexList &indexes) const
+{
+    QSet<QString> strings;
+    QSet<QUrl> urls;
+    const int rows = d->worker->matchCount();
+    QSet<int> rowsSeen;
+    for (auto it : indexes) {
+        if (it.parent().isValid() || it.row() >= rows) {
+            continue;
+        }
+
+        if (rowsSeen.contains(it.row())) {
+            continue;
+        }
+
+        rowsSeen.insert(it.row());
+
+        QueryMatch match = d->worker->matchAt(it.row());
+        if (!match.isValid() || match.userData().isNull()) {
+            continue;
+        }
+
+        QVariant variant = match.userData();
+        if (variant.canConvert(QMetaType::QVariantList)) {
+            QSequentialIterable iterable = variant.value<QSequentialIterable>();
+            for (auto v : iterable) {
+                addVariantToLists(strings, urls, v);
+            }
+        } else {
+            addVariantToLists(strings, urls, variant);
+        }
+    }
+
+    QMimeData *data = 0;
+
+    if (!strings.isEmpty()) {
+        if (!data) {
+            data = new QMimeData;
+        }
+        QStringList list = strings.toList();
+        data->setText(list.join('\n'));
+    }
+
+    if (!urls.isEmpty()) {
+        if (!data) {
+            data = new QMimeData;
+        }
+        data->setUrls(urls.toList());
+    }
+
+    return data;
+}
+
+Qt::DropActions QuerySession::supportedDropActions() const
+{
+    return Qt::CopyAction;
+}
+
+Qt::ItemFlags QuerySession::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags f = QAbstractItemModel::flags(index);
+
+    if (index.isValid()) {
+        f |= Qt::ItemIsDragEnabled;
+    }
+
+    return f;
 }
 
 } // namespace

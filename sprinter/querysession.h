@@ -267,6 +267,26 @@ public:
      */
     QHash<int, QByteArray> roleNames() const;
 
+    /**
+     * @reimp QAbstractItemModel
+     */
+    QStringList mimeTypes() const;
+
+    /**
+     * @reimp QAbstractItemModel
+     */
+    QMimeData *mimeData(const QModelIndexList & indexes) const;
+
+    /**
+     * @reimp QAbstractItemModel
+     */
+    Qt::DropActions supportedDropActions() const;
+
+    /**
+     * @reimp QAbstractItemModel
+     */
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+
 private:
     // these methods are for RunnserSessionData class (e.g. in syncMatches) only
     friend class RunnerSessionData;

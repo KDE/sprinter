@@ -14,9 +14,6 @@
     * MatchTypesRole
     * SourcesUsedRole
 * in KRunner, singleRunnerMode was used by some runners to drop the need for a trigger word. example: the activities runner would match on activity name directly in singleRunnerMode rather than requiring "activity <foo>"; should trigger words just be dropped for these cases, or something analogous to "singleRunnerMode" be brought back for this purpose?
-* confirm Drag-and-Drop functionality
-    * in KRunner this was done with QMimeData *AbstractRunner::mimeDataForMatch
-    * would be nice to have a generic mime data generator, rather than something per-runner
 
 = Unscheduled
 
