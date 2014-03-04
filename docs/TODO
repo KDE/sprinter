@@ -2,6 +2,7 @@
 
 == Features
 * Learning: record chosen QueryMatches, weight future matches with this information
+* autocomplete: suggest completions based on what the user is typing
 
 == Fixes
 * add a session ID to QueryContext and SessionData to that SessionData objects can tell if a  QueryContext belongs to them
