@@ -19,6 +19,7 @@
     * MatchTypesRole
     * SourcesUsedRole
 * in KRunner, singleRunnerMode was used by some runners to drop the need for a trigger word. example: the activities runner would match on activity name directly in singleRunnerMode rather than requiring "activity <foo>"; should trigger words just be dropped for these cases, or something analogous to "singleRunnerMode" be brought back for this purpose?
+    * could be done by changing QueryContext::setQuery to not reset isDefaultMatchesReqeust
 
 = Unscheduled
 
@@ -42,6 +43,9 @@
     * find a nicer way to to do updates than comparing data(), nested loops..
 
 == Needs more evaluation (aka "Is this necessary/useful?")
+* Structured / keyed data
+    * a hash/map of data to replace text?
+    * would allow more structured data, e.g. for emails (sender, subject..)
 * Metadata
     * necessary to bring back equiv of X-KDE-PluginInfo-EnabledByDefault?
 * A nicer way to find plugins in QuerySessionThread::loadRunnerMetaData()?
