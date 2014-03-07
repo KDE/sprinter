@@ -31,6 +31,7 @@
 
 #include "runner.h"
 #include "runner_p.h"
+#include "querycontext_p.h"
 #include "querysession.h"
 #include "runnersessiondata_p.h"
 
@@ -178,6 +179,7 @@ void QuerySessionThread::loadRunnerMetaData()
 #endif
 
     m_sessionId = QUuid::createUuid();
+    m_context.d->sessionId = m_sessionId;
 
     m_runners.clear();
     m_enabledRunnerIds.clear();
@@ -327,7 +329,7 @@ void QuerySessionThread::loadRunner(int index)
         runner->d->matchSources = m_runnerMetaData[index].sourcesUsed;
         runner->d->generatesDefaultMatches =  m_runnerMetaData[index].generatesDefaultMatches;
         m_runnerMetaData[index].loaded = true;
-        if (m_context.isValid() &&
+        if (m_context.isValid(0) &&
             (!m_context.query().isEmpty() ||
              m_context.isDefaultMatchesRequest())) {
             retrieveSessionData(index);
@@ -382,6 +384,7 @@ void QuerySessionThread::sessionDataRetrieved(const QUuid &sessionId, int index,
     if (data) {
         data->d->associateSession(m_session);
         data->d->enabled = m_enabledRunnerIds.contains(m_runnerMetaData[index].id);
+        data->d->sessionId = m_sessionId;
     }
 
     m_sessionData[index].reset(data);
@@ -574,6 +577,7 @@ void QuerySessionThread::endQuerySession()
 {
     QWriteLocker lock(&m_matchIndexLock);
     m_sessionId = QUuid::createUuid();
+    m_context.d->sessionId = m_sessionId;
 
     clearSessionData();
     m_matchers.fill(0);

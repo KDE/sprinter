@@ -72,8 +72,9 @@ Sprinter::QueryContext MatchData::queryContext() const
 
 bool MatchData::isValid() const
 {
-    return d->sessionData && d->context.isValid();
+    return d->sessionData && d->context.isValid(d->sessionData);
 }
+
 void MatchData::setAsynchronous(bool async)
 {
     d->async = async;

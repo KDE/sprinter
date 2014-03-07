@@ -16,47 +16,15 @@
  */
 
 #include "querycontext.h"
-
+#include "querycontext_p.h"
 
 #include <QDebug>
-#include <QReadWriteLock>
-#include <QNetworkAccessManager>
+
+#include "runnersessiondata.h"
+#include "runnersessiondata_p.h"
 
 namespace Sprinter
 {
-
-class QueryContext::Private : public QSharedData
-{
-public:
-    Private(QueryContext *context)
-        : QSharedData(),
-          q(context),
-          network(new QNetworkAccessManager),
-          imageSize(64, 64),
-          fetchMore(false),
-          isDefaultMatchesRequest(false)
-    {
-    }
-
-
-    Private(const Private &p)
-        : QSharedData(),
-          q(p.q)
-    {
-        //kDebug() << "¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿boo yeah" <<
-        //type;
-    }
-
-    void reset(QExplicitlySharedDataPointer<Private> toDetach, QueryContext *newQ);
-
-    QueryContext *q;
-    QString query;
-    QReadWriteLock lock;
-    QSharedPointer<QNetworkAccessManager> network;
-    QSize imageSize;
-    bool fetchMore;
-    bool isDefaultMatchesRequest;
-};
 
 void QueryContext::Private::reset(QExplicitlySharedDataPointer<Private> toDetach, QueryContext *newQ)
 {
@@ -138,9 +106,9 @@ void QueryContext::setIsDefaultMatchesRequest(bool requestDefaults)
     d->isDefaultMatchesRequest = requestDefaults;
 }
 
-bool QueryContext::isValid() const
+bool QueryContext::isValid(const RunnerSessionData *sessionData) const
 {
-    return d->q;
+    return d->q && (!sessionData || sessionData->d->sessionId == d->sessionId);
 }
 
 bool QueryContext::networkAccessible() const

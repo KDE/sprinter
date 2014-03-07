@@ -191,6 +191,7 @@ protected:
 
 private:
     friend class QuerySessionThread;
+    friend class QueryContext;
 
     class Private;
     Private * const d;

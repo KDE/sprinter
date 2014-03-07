@@ -108,7 +108,7 @@ bool RunnerSessionData::shouldStartMatch(const QueryContext &context) const
          return false;
     }
 
-    return context.isValid();
+    return context.isValid(this);
 }
 
 void RunnerSessionData::startMatch(const QueryContext &context)
@@ -156,7 +156,7 @@ void RunnerSessionData::startMatch(const QueryContext &context)
     d->canFetchMoreMatches = false;
 
     // now we set up the paging
-    if (!context.ifValid(updatePaging)) {
+    if (!context.ifValid(updatePaging, this)) {
         return;
     }
 
@@ -168,7 +168,7 @@ void RunnerSessionData::startMatch(const QueryContext &context)
 
 void RunnerSessionData::setMatches(const QVector<QueryMatch> &matches, const QueryContext &context)
 {
-    if (!context.isValid()) {
+    if (!context.isValid(this)) {
         return;
     }
 
@@ -296,7 +296,7 @@ void RunnerSessionData::setCanFetchMoreMatches(bool hasMore, const QueryContext 
     context.ifValid([&]() {
         d->canFetchMoreMatches = hasMore;
         return true;
-    });
+    }, this);
 }
 
 bool RunnerSessionData::canFetchMoreMatches() const

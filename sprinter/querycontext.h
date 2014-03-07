@@ -96,9 +96,11 @@ public:
 
     /**
      * @return true if this object is still valid, e.g. it represents an
-     * ongoing query.
+     * ongoing query and it comes from the same session as the provided
+     * RunnerSessionData object
+     * @param sessionData a RunnerSessionData object to compare with
      */
-    bool isValid() const;
+    bool isValid(const RunnerSessionData *sessionData) const;
 
     /**
      * @return true if the newtork is accessible
@@ -136,11 +138,11 @@ public:
      * @param algorithm the lambda function to execute
      */
     template<typename Func>
-    bool ifValid(Func algorithm) const {
+    bool ifValid(Func algorithm, const RunnerSessionData *sessionData) const {
         readLock();
         bool rv = false;
 
-        if (isValid()) {
+        if (isValid(sessionData)) {
             rv = algorithm();
         }
 
@@ -151,6 +153,8 @@ public:
 private:
     void readLock() const;
     void readUnlock() const;
+
+    friend class QuerySessionThread;
 
     class Private;
     QExplicitlySharedDataPointer<Private> d;

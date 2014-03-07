@@ -5,8 +5,6 @@
 * autocomplete: suggest completions based on what the user is typing
 
 == Fixes
-* add a session ID to QueryContext and SessionData to that SessionData objects can tell if a  QueryContext belongs to them
-    * current all runner->sessiondata signal/slot connections will cause a query in one QuerySession to activate any/all sessiondata objects for a runner, because runners are singletons!
 
 == Reviews
 * Review QuerySession::MatchType entries

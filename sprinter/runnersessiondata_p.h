@@ -22,6 +22,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QSet>
+#include <QUuid>
 
 namespace Sprinter
 {
@@ -53,6 +54,7 @@ public:
     QSet<int> updatedMatchIndexes;
     QuerySession *session;
     QMutex currentMatchesLock;
+    QUuid sessionId;
     bool matchesUnsynced;
     bool canFetchMoreMatches;
     bool enabled;
