@@ -28,9 +28,8 @@ namespace Sprinter
 class QueryContext::Private : public QSharedData
 {
 public:
-    Private(QueryContext *context)
+    Private()
         : QSharedData(),
-          q(context),
           network(new QNetworkAccessManager),
           imageSize(64, 64),
           fetchMore(false),
@@ -40,16 +39,14 @@ public:
 
 
     Private(const Private &p)
-        : QSharedData(),
-          q(p.q)
+        : QSharedData()
     {
         //kDebug() << "¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿boo yeah" <<
         //type;
     }
 
-    void reset(QExplicitlySharedDataPointer<Private> toDetach, QueryContext *newQ);
+    void reset(QExplicitlySharedDataPointer<Private> toDetach);
 
-    QueryContext *q;
     QString query;
     QReadWriteLock lock;
     QSharedPointer<QNetworkAccessManager> network;

@@ -26,25 +26,25 @@
 namespace Sprinter
 {
 
-void QueryContext::Private::reset(QExplicitlySharedDataPointer<Private> toDetach, QueryContext *newQ)
+void QueryContext::Private::reset(QExplicitlySharedDataPointer<Private> toDetach)
 {
     // We will detach if we are a copy of someone. But we will reset
     // if we are the 'main' context others copied from. Resetting
     // one QueryContext makes all the copies obsolete.
 
-    // We need to mark the q pointer of the detached QueryContextPrivate
-    // as dirty on detach to avoid receiving results for old queries
-    q = 0;
+    // We need to reset the session id of the detached instance
+    // on detach to avoid receiving results for old queries
+    const QUuid id = sessionId;
+    sessionId = QUuid();
 
     toDetach.detach();
-    query.clear();
 
     // Now that we detached the d pointer we need to reset its q pointer
-    q = newQ;
+    sessionId = id;
 }
 
 QueryContext::QueryContext()
-    : d(new Private(this))
+    : d(new Private)
 {
 }
 
@@ -81,7 +81,7 @@ void QueryContext::setQuery(const QString &query)
         return;
     }
 
-    d->reset(d, this);
+    d->reset(d);
 
     d->fetchMore = false;
     d->isDefaultMatchesRequest = false;
@@ -100,15 +100,16 @@ bool QueryContext::isDefaultMatchesRequest() const
 
 void QueryContext::setIsDefaultMatchesRequest(bool requestDefaults)
 {
-    d->reset(d, this);
+    d->reset(d);
     d->fetchMore = false;
-    d->query = QString();
+    d->query.clear();
     d->isDefaultMatchesRequest = requestDefaults;
 }
 
 bool QueryContext::isValid(const RunnerSessionData *sessionData) const
 {
-    return d->q && (!sessionData || sessionData->d->sessionId == d->sessionId);
+    return !d->sessionId.isNull() &&
+          (!sessionData || sessionData->d->sessionId == d->sessionId);
 }
 
 bool QueryContext::networkAccessible() const
