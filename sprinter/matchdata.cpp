@@ -48,10 +48,10 @@ MatchData::~MatchData()
 {
     // if we still have a sessiondata object, and we either have
     // matches or this is a synchronous matcher, set the matches
-    qDebug() << "maybe we'll sync up our data, huh?";
+    //qDebug() << "maybe we'll sync up our data, huh?";
     if (d->sessionData && (!d->matches.isEmpty() || !d->async)) {
-        qDebug() << "Our session data object is" << d->sessionData;
-        qDebug() << "and how many matches?" << d->matches.count();
+        //qDebug() << "Our session data object is" << d->sessionData;
+        //qDebug() << "and how many matches?" << d->matches.count();
         d->sessionData->setMatches(d->matches, d->context);
     }
 
