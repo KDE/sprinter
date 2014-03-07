@@ -16,8 +16,6 @@
 * confirm that the QList<int>s used in RunnerModel::data() works from QML
     * MatchTypesRole
     * SourcesUsedRole
-* in KRunner, singleRunnerMode was used by some runners to drop the need for a trigger word. example: the activities runner would match on activity name directly in singleRunnerMode rather than requiring "activity <foo>"; should trigger words just be dropped for these cases, or something analogous to "singleRunnerMode" be brought back for this purpose?
-    * could be done by changing QueryContext::setQuery to not reset isDefaultMatchesReqeust
 
 = Unscheduled
 
