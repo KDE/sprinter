@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef RUNNERMANAGER
-#define RUNNERMANAGER
+#ifndef SPRINTER_QUERYSESSION
+#define SPRINTER_QUERYSESSION
 
 #include <sprinter/sprinter_export.h>
 

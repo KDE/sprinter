@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef RUNNERSESSIONDATA
-#define RUNNERSESSIONDATA
+#ifndef SPRINTER_RUNNERSESSIONDATA
+#define SPRINTER_RUNNERSESSIONDATA
 
 #include <sprinter/sprinter_export.h>
 #include <sprinter/querymatch.h>

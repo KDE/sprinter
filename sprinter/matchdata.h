@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef SPRINTER_MATCHDATA_H
+#define SPRINTER_MATCHDATA_H
+
 #include <sprinter/querymatch.h>
 
 #include <QVector>
@@ -109,3 +112,5 @@ private:
 };
 
 } //namespace
+
+#endif

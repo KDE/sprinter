@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef QUERYMATCH
-#define QUERYMATCH
+#ifndef SPRINTER_QUERYMATCH
+#define SPRINTER_QUERYMATCH
 
 #include <sprinter/querysession.h>
 #include <sprinter/sprinter_export.h>
