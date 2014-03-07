@@ -100,10 +100,12 @@ bool QueryContext::isDefaultMatchesRequest() const
 
 void QueryContext::setIsDefaultMatchesRequest(bool requestDefaults)
 {
-    d->reset(d);
-    d->fetchMore = false;
-    d->query.clear();
-    d->isDefaultMatchesRequest = requestDefaults;
+    if (d->isDefaultMatchesRequest != requestDefaults) {
+        d->reset(d);
+        d->fetchMore = false;
+        d->query.clear();
+        d->isDefaultMatchesRequest = requestDefaults;
+    }
 }
 
 bool QueryContext::isValid(const RunnerSessionData *sessionData) const
