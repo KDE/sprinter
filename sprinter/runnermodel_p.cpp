@@ -146,6 +146,9 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
         case ContactEmailRole:
             return info[index.row()].contactEmail;
             break;
+        case ContactWebsiteRole:
+            return info[index.row()].contactWebsite;
+            break;
         case VersionRole:
             return info[index.row()].version;
             break;
@@ -228,6 +231,9 @@ QVariant RunnerModel::headerData(int section, Qt::Orientation orientation, int r
                 break;
             case ContactEmailRole:
                 return tr("Contact Email");
+                break;
+            case ContactWebsiteRole:
+                return tr("Website");
                 break;
             case VersionRole:
                 return tr("Version");

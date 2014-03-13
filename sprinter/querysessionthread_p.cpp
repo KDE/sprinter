@@ -251,9 +251,9 @@ void QuerySessionThread::loadRunnerMetaData()
                     }
                     md.author = authorStrings.join(',');
 
-                    QJsonObject contact = info[QStringLiteral("Contact")].toObject();
+                    QJsonObject contact = info[QStringLiteral("Contacts")].toObject();
                     md.contactEmail = contact[QStringLiteral("Email")].toString();
-
+                    md.contactWebsite = contact[QStringLiteral("Website")].toString();
                 }
 
                 info = json[QStringLiteral("Sprinter")].toObject();

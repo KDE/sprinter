@@ -49,6 +49,7 @@ public:
         LicenseRole,
         AuthorRole,
         ContactEmailRole,
+        ContactWebsiteRole,
         VersionRole,
         GeneratesDefaultMatchesRole,
         MatchTypesRole,

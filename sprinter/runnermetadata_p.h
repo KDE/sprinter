@@ -42,6 +42,7 @@ struct RunnerMetaData
     QString license;
     QString author;
     QString contactEmail;
+    QString contactWebsite;
     QString version;
     QString icon;
     QVector<QuerySession::MatchSource> sourcesUsed;
