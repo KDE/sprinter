@@ -55,6 +55,7 @@ public:
     QVector<QueryMatch> syncedMatches;
     QVector<QueryMatch> currentMatches;
     QSet<int> updatedMatchIndexes;
+    QSet<int> removedMatchIndexes;
     QuerySession *session;
     QMutex currentMatchesLock;
     QUuid sessionId;
