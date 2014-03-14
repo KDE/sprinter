@@ -396,17 +396,14 @@ int RunnerSessionData::Private::syncMatches(int modelOffset)
         foreach (int index, removedMatchIndexes) {
             if (index < syncedMatches.size()) {
 #ifdef DEBUG_REMOVEMATCHES
-                qDebug() << "Remove match" << modelOffset + index << "from model";
+                qDebug() << "Telling the model we've removed" << modelOffset + index;
 #endif
                 session->d->removingMatches(modelOffset + index, modelOffset + index);
+                session->d->matchesRemoved();
                 syncedMatches.removeAt(index);
             }
         }
 
-#ifdef DEBUG_REMOVEMATCHES
-        qDebug() << "Telling the model we've finished the item removing";
-#endif
-        session->d->matchesRemoved();
         removedMatchIndexes.clear();
     }
 
