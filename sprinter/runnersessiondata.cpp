@@ -399,8 +399,8 @@ int RunnerSessionData::Private::syncMatches(int modelOffset)
                 qDebug() << "Telling the model we've removed" << modelOffset + index;
 #endif
                 session->d->removingMatches(modelOffset + index, modelOffset + index);
-                session->d->matchesRemoved();
                 syncedMatches.removeAt(index);
+                session->d->matchesRemoved();
             }
         }
 
