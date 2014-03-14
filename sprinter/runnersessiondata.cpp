@@ -32,6 +32,7 @@
 
 // #define DEBUG_SYNC
 // #define DEBUG_UPDATEMATCHES
+// #define DEBUG_REMOVEMATCHES
 namespace Sprinter
 {
 
@@ -264,6 +265,58 @@ void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
     }
 }
 
+void RunnerSessionData::removeMatches(const QVector<QueryMatch> &matches)
+{
+    Q_ASSERT(d->session);
+
+#ifdef DEBUG_REMOVEMATCHES
+    qDebug() << "removing" << matches.size();
+#endif
+    QMutexLocker lock(&d->currentMatchesLock);
+
+    foreach (const QueryMatch &match, matches) {
+#ifdef DEBUG_REMOVEMATCHES
+        qDebug() << "looking for match of" << match.data();
+#endif
+        if (match.data().isNull()) {
+            continue;
+        }
+
+        bool found = false;
+        for (int i = 0; i < d->currentMatches.size(); ++i) {
+            if (match.data() == d->currentMatches[i].data()) {
+#ifdef DEBUG_REMOVEMATCHES
+                qDebug() << "remove match in pending matches at" << i << d->currentMatches[i].data();
+#endif
+                d->currentMatches.removeAt(i);
+                found = true;
+                break;
+            }
+#ifdef DEBUG_REMOVEMATCHES
+            qDebug() << "compared" << i << match.data() << d->currentMatches[i].data();
+#endif
+        }
+
+        if (found) {
+            continue;
+        }
+
+        for (int i = 0; i < d->syncedMatches.size(); ++i) {
+            if (match.data() == d->syncedMatches[i].data()) {
+#ifdef DEBUG_REMOVEMATCHES
+                qDebug() << "remove match in existing matches at" << i << d->syncedMatches[i].data();
+#endif
+                d->removedMatchIndexes.insert(i);
+                d->session->d->matchesArrived();
+                break;
+            }
+#ifdef DEBUG_REMOVEMATCHES
+            qDebug() << "compared" << i << match.data() << d->syncedMatches[i].data();
+#endif
+        }
+    }
+}
+
 QVector<QueryMatch> RunnerSessionData::matches(MatchState state) const
 {
     QMutexLocker lock(&d->currentMatchesLock);
@@ -337,6 +390,24 @@ int RunnerSessionData::Private::syncMatches(int modelOffset)
         }
 
         updatedMatchIndexes.clear();
+    }
+
+    if (!removedMatchIndexes.isEmpty()) {
+        foreach (int index, removedMatchIndexes) {
+            if (index < syncedMatches.size()) {
+#ifdef DEBUG_REMOVEMATCHES
+                qDebug() << "Remove match" << modelOffset + index << "from model";
+#endif
+                session->d->removingMatches(modelOffset + index, modelOffset + index);
+                syncedMatches.removeAt(index);
+            }
+        }
+
+#ifdef DEBUG_REMOVEMATCHES
+        qDebug() << "Telling the model we've finished the item removing";
+#endif
+        session->d->matchesRemoved();
+        removedMatchIndexes.clear();
     }
 
     lastSyncedMatchOffset = lastReceivedMatchOffset;

@@ -126,6 +126,14 @@ public:
     void updateMatches(const QVector<QueryMatch> &matches);
 
     /**
+     * Removes matches. The matches are compared using the content of their data()
+     * to identify which matches to update. If no corresponding matches are found
+     * in either the pending or synchronized states, the removed match is discarded.
+     * @param matches the matches which should be removed
+     */
+    void removeMatches(const QVector<QueryMatch> &matches);
+
+    /**
      * @param state whether to return pending or synchronized matches
      * @return the current matches held by this session data object
      */
