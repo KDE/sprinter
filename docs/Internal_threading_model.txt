@@ -75,3 +75,30 @@ The synchronized matches are what is actually available in the QuerySession mode
 When matches are updated or removed by a Runner, the pending collection is consulted first. If the match exists in the pending collection, that match is altered and nothing else is done. This is because the pending collection will replace the synchronized matches eventualy. If the match is not found in the pending matches (usually because the matches are fully synchronized) then the change requested is recorded *but not made* in synchronized match collection. In that case, the model is told that a synchronization is required and when that occurs then any update/remove requests that are pending are done on the synchronized collection, and only then are any pending matches synchronized. This guarantees consistency in the model, the synchronized collection and the pending collection.
 
 Since each RunnerSessionData object maintains its own set of matches, this alleviates any need for global management of all matches by all runners. This makes the code simpler and allows for more efficient code.
+
+= Threads methods are called from
+
+This is a listing of what threads specific methods are typical called from:
+
+* Runner
+** constructor: runner thread pool
+** match: runner thread pool
+** exec: global thread pool
+* RunnerSessionData
+** constructor: runner thread pool, which means no event loop when constructed! only after it is constructed does it get moved to the sesion data thread
+** shouldStartMatch: runner thread pool
+* QuerySessionThread
+* loadRunnerMetaData: QueST
+* loadRunner: QueST
+* setEnabledRunners: QueST
+* startMatching: QueST
+* launchDefaultMatches: main thread
+* launchQuery: main thread
+* launchMoreMatches: main thread
+* matchCount: main thread
+* matchAt: main thread
+* syncMatches: main thread
+
+Other methods are generally thread agnostic and may be called from any thread. Beware! ;)
+
+Also note that the thread pools do not come with an event loop. Usually this is not necessary, as both the QuEST and the runner session data threads have event loops. However, this is easy to miss in Runner::exec which is run in a thread without an event loop by default!
