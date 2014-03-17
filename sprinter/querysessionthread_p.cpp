@@ -109,7 +109,7 @@ void QuerySessionThread::syncMatches()
     m_matchCount = -1;
 
     int offset = 0;
-    foreach (QSharedPointer<RunnerSessionData> data, m_sessionData) {
+    for (auto const &data: m_sessionData) {
         if (data) {
             offset += data->d->syncMatches(offset);
         }
@@ -125,7 +125,7 @@ int QuerySessionThread::matchCount() const
     if (m_matchCount < 0) {
         int count = 0;
 
-        foreach (QSharedPointer<RunnerSessionData> data, m_sessionData) {
+        for (auto const &data: m_sessionData) {
             if (data) {
                 count += data->matches(RunnerSessionData::SynchronizedMatches).size();
             }
@@ -147,7 +147,7 @@ QueryMatch QuerySessionThread::matchAt(int index)
 
     //qDebug() << "** matchAt" << index;
     QVector<QueryMatch> matches;
-    foreach (QSharedPointer<RunnerSessionData> data, m_sessionData) {
+    for (auto const &data: m_sessionData) {
         if (!data) {
             continue;
         }
@@ -195,11 +195,11 @@ void QuerySessionThread::loadRunnerMetaData()
 
     QHash<QString, int> seenIds;
     const QStringList langs = QLocale::system().uiLanguages();
-    foreach (const QString &path, QCoreApplication::instance()->libraryPaths()) {
+    for (auto const &path: QCoreApplication::instance()->libraryPaths()) {
         if (path.endsWith(QLatin1String("plugins"))) {
             QDir pluginDir(path);
             pluginDir.cd(QStringLiteral("sprinter"));
-            foreach (const QString &fileName, pluginDir.entryList(QDir::Files)) {
+            for (auto const &fileName: pluginDir.entryList(QDir::Files)) {
                 const QString path = pluginDir.absoluteFilePath(fileName);
                 QPluginLoader loader(path);
 
@@ -226,7 +226,7 @@ void QuerySessionThread::loadRunnerMetaData()
                 QJsonObject info = json[QStringLiteral("PluginInfo")].toObject();
                 if (!info.isEmpty()) {
                     const QJsonObject desc = info[QStringLiteral("Description")].toObject();
-                    foreach (const QString &lang, langs) {
+                    for (auto const &lang: langs) {
                         if (desc.contains(lang)) {
                             const QJsonObject langObj = desc[lang].toObject();
                             md.name = langObj["Name"].toString();
@@ -264,7 +264,7 @@ void QuerySessionThread::loadRunnerMetaData()
                     md.generatesDefaultMatches = info[QStringLiteral("GeneratesDefaultMatches")].toBool();
 
                     const QJsonArray matchSources = info[QStringLiteral("MatchSources")].toArray();
-                    foreach (const QJsonValue &matchSource, matchSources) {
+                    for (auto const &matchSource: matchSources) {
                         int val = enumForText(m_session, "MatchSource", matchSource.toString());
                         if (val != -1) {
                             md.sourcesUsed << (QuerySession::MatchSource)val;
@@ -272,7 +272,7 @@ void QuerySessionThread::loadRunnerMetaData()
                     }
 
                     const QJsonArray matchTypes = info[QStringLiteral("MatchTypes")].toArray();
-                    foreach (const QJsonValue &matchType, matchTypes) {
+                    for (auto const &matchType: matchTypes) {
                         int val = enumForText(m_session, "MatchType", matchType.toString());
                         if (val != -1) {
                             md.matchTypesGenerated << (QuerySession::MatchType)val;

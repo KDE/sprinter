@@ -167,13 +167,13 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
         case MatchTypesRole:
             if (asText) {
                 QStringList list;
-                foreach (int value, info[index.row()].matchTypesGenerated) {
+                for (auto const &value: info[index.row()].matchTypesGenerated) {
                     list << textForEnum(m_worker->session(), "MatchType", value);
                 }
                 return list.join(',');
             } else {
                 QList<int> intlist;
-                foreach (int value, info[index.row()].matchTypesGenerated) {
+                for (auto const &value: info[index.row()].matchTypesGenerated) {
                     intlist << value;
                 }
                 return QVariant::fromValue(intlist);
@@ -182,13 +182,13 @@ QVariant RunnerModel::data(const QModelIndex &index, int role) const
         case SourcesUsedRole:
             if (asText) {
                 QStringList list;
-                foreach (int value, info[index.row()].sourcesUsed) {
+                for (auto const &value: info[index.row()].sourcesUsed) {
                     list << textForEnum(m_worker->session(), "MatchSource", value);
                 }
                 return list.join(',');
             } else {
                 QList<int> intlist;
-                foreach (int value, info[index.row()].sourcesUsed) {
+                for (auto const &value: info[index.row()].sourcesUsed) {
                     intlist << value;
                 }
                 return QVariant::fromValue(intlist);

@@ -220,7 +220,7 @@ void RunnerSessionData::updateMatches(const QVector<QueryMatch> &matches)
 #endif
     QMutexLocker lock(&d->currentMatchesLock);
 
-    foreach (const QueryMatch &match, matches) {
+    for (auto const &match: matches) {
 #ifdef DEBUG_UPDATEMATCHES
         qDebug() << "looking for match of" << match.data();
 #endif
@@ -274,7 +274,7 @@ void RunnerSessionData::removeMatches(const QVector<QueryMatch> &matches)
 #endif
     QMutexLocker lock(&d->currentMatchesLock);
 
-    foreach (const QueryMatch &match, matches) {
+    for (auto const &match: matches) {
 #ifdef DEBUG_REMOVEMATCHES
         qDebug() << "looking for match of" << match.data();
 #endif
@@ -380,7 +380,7 @@ int RunnerSessionData::Private::syncMatches(int modelOffset)
 
     QMutexLocker lock(&currentMatchesLock);
     if (!updatedMatchIndexes.isEmpty()) {
-        foreach (int index, updatedMatchIndexes) {
+        for (auto const &index: updatedMatchIndexes) {
             if (index < syncedMatches.size()) {
 #ifdef DEBUG_UPDATEMATCHES
                 qDebug() << "Telling the model we've updated" << modelOffset + index;
@@ -393,7 +393,7 @@ int RunnerSessionData::Private::syncMatches(int modelOffset)
     }
 
     if (!removedMatchIndexes.isEmpty()) {
-        foreach (int index, removedMatchIndexes) {
+        for (auto const &index: removedMatchIndexes) {
             if (index < syncedMatches.size()) {
 #ifdef DEBUG_REMOVEMATCHES
                 qDebug() << "Telling the model we've removed" << modelOffset + index;
