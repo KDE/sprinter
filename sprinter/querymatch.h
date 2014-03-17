@@ -61,7 +61,8 @@ public:
     bool isValid() const;
 
     /**
-     * Sets a title for this match; should be translated if possible
+     * Sets a title for this match; should be translated if possible.
+     * Every query should have a title, and it should be short and meaningful.
      * @param title the test to use as the title
      */
     void setTitle(const QString &title);
@@ -72,7 +73,11 @@ public:
     QString title() const;
 
     /**
-     * Sets descriptive text for this match; should be translated if possible.
+     * Sets some optional descriptive text for this match. This text allows
+     * the UI to show the user more context or details to support the title.
+     * This text may be of arbitrary length, but keeping it to a simple phrase
+     * or two is recommended.
+     * It should be translated if possible.
      * @param text the text to use
      */
     void setText(const QString &text);
