@@ -41,7 +41,7 @@ MatchData::MatchData(RunnerSessionData *sessionData,
                      const QueryContext &context)
     : d(new Private)
 {
-    qDebug() << "Our session data object is" << sessionData;
+    //qDebug() << "Our session data object is" << sessionData;
     d->sessionData = sessionData;
     d->context = context;
     d->async = false;
