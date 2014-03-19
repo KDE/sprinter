@@ -148,6 +148,28 @@ void QuerySession::Private::startMatchSynchronization()
     worker->syncMatches();
 }
 
+void QuerySession::Private::askMeAgainSetup()
+{
+    disconnect(worker, SIGNAL(enabledRunnersChanged()),
+               q, SLOT(askMeAgainSetup()));
+
+    // if the runners that were set were not the runners we were expecting,
+    // which can happen if an "ask me again" query is started and then
+    // the enabled runners is changed in the runner model, we will not
+    // do anything but clean up after ourselves.
+    if (askAgainRunners == worker->enabledRunners()) {
+        if (askAgainDelayedQuery.isEmpty()) {
+            q->requestDefaultMatches();
+        } else {
+            worker->launchQuery(askAgainDelayedQuery);
+        }
+    }
+
+    // we always clear the members
+    askAgainDelayedQuery.clear();
+    askAgainRunners.clear();
+}
+
 QuerySession::QuerySession(QObject *parent)
     : QAbstractItemModel(parent),
       d(new Private(this))
@@ -168,6 +190,20 @@ QAbstractItemModel *QuerySession::runnerModel() const
 void QuerySession::requestDefaultMatches()
 {
     qDebug() << "Manager, default query:" << QThread::currentThread();
+    if (!d->askMeAgainResetEnabledRunnersTo.isEmpty()) {
+        // the runners were temporarily reset for the "ask me again" feature
+        // we now have to re-set it back to what it was earlier
+        d->askAgainDelayedQuery.clear();
+        d->askAgainRunners = d->askMeAgainResetEnabledRunnersTo;
+        d->askMeAgainResetEnabledRunnersTo.clear();
+        connect(d->worker, SIGNAL(enabledRunnersChanged()),
+                this, SLOT(askMeAgainSetup()),
+                Qt::UniqueConnection);
+        QMetaObject::invokeMethod(d->worker, "setEnabledRunners",
+                                  Q_ARG(QStringList, d->askAgainRunners));
+        return;
+    }
+
     d->worker->launchDefaultMatches();
     emit queryChanged(d->worker->query());
 }
@@ -181,6 +217,20 @@ void QuerySession::requestMoreMatches()
 void QuerySession::setQuery(const QString &query)
 {
     qDebug() << "Manager:" << QThread::currentThread() << query;
+    if (!d->askMeAgainResetEnabledRunnersTo.isEmpty()) {
+        // the runners were temporarily reset for the "ask me again" feature
+        // we now have to re-set it back to what it was earlier
+        d->askAgainDelayedQuery = query;
+        d->askAgainRunners = d->askMeAgainResetEnabledRunnersTo;
+        d->askMeAgainResetEnabledRunnersTo.clear();
+        connect(d->worker, SIGNAL(enabledRunnersChanged()),
+                this, SLOT(askMeAgainSetup()),
+                Qt::UniqueConnection);
+        QMetaObject::invokeMethod(d->worker, "setEnabledRunners",
+                                  Q_ARG(QStringList, d->askAgainRunners));
+        return;
+    }
+
     if (d->worker->launchQuery(query)) {
         emit queryChanged(d->worker->query());
     }
@@ -206,7 +256,19 @@ void QuerySession::executeMatch(int index)
         return;
     }
 
-    if (match.isSearchTerm()) {
+    if (match.precision() == QuerySession::AskMeAgainMatch) {
+        // to fulfill "ask me again" matches, we temporarily re-set the
+        // enabled runners to just the one to ask again
+        d->askMeAgainResetEnabledRunnersTo = d->worker->enabledRunners();
+        d->askAgainRunners << match.runner()->id();
+        connect(d->worker, SIGNAL(enabledRunnersChanged()),
+                this, SLOT(askMeAgainSetup()),
+                Qt::UniqueConnection);
+        QMetaObject::invokeMethod(d->worker, "setEnabledRunners",
+                                  Q_ARG(QStringList, d->askAgainRunners));
+        d->askAgainDelayedQuery = match.data().toString();
+        return;
+    } else if (match.precision() == QuerySession::SearchTermMatch) {
         setQuery(match.data().toString());
         return;
     }
@@ -316,9 +378,6 @@ QVariant QuerySession::data(const QModelIndex &index, int role) const
         case DataRole:
             return match.data();
             break;
-        case SearchTermRole:
-            return match.isSearchTerm();
-            break;
         case RunnerRole: {
             Runner *runner = match.runner();
             if (runner) {
@@ -365,9 +424,6 @@ QVariant QuerySession::headerData(int section, Qt::Orientation orientation, int 
                 break;
             case DataRole:
                 return tr("Data");
-                break;
-            case SearchTermRole:
-                return tr("Search Term");
                 break;
             case RunnerRole:
                 return tr("Runner ID");

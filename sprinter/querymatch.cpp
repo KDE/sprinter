@@ -152,16 +152,6 @@ Runner *QueryMatch::runner() const
     return  d->sessionData ? d->sessionData->runner() : 0;
 }
 
-void QueryMatch::setIsSearchTerm(bool searchTerm)
-{
-    d->isSearchTerm = searchTerm;
-}
-
-bool QueryMatch::isSearchTerm() const
-{
-    return d->isSearchTerm;
-}
-
 bool QueryMatch::sendUserDataToClipboard() const
 {
     QString clipboardText = userData().toString();

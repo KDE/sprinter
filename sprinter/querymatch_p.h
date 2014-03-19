@@ -37,8 +37,7 @@ public:
     Private()
         : type(QuerySession::UnknownType),
           source(QuerySession::FromInternalSource),
-          precision(QuerySession::UnrelatedMatch),
-          isSearchTerm(false)
+          precision(QuerySession::UnrelatedMatch)
     {
     }
 
@@ -51,7 +50,6 @@ public:
     QVariant data;
     QVariant userData;
     QImage image;
-    bool isSearchTerm;
 };
 
 } //namespace

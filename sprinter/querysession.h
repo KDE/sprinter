@@ -36,6 +36,7 @@ class SPRINTER_EXPORT QuerySession : public QAbstractItemModel
     Q_PROPERTY(QString query WRITE setQuery READ query NOTIFY queryChanged)
     Q_PROPERTY(QAbstractItemModel *runnerModel READ runnerModel CONSTANT)
     Q_PROPERTY(QSize imageSize WRITE setImageSize READ imageSize NOTIFY imageSizeChanged)
+    Q_PROPERTY(QSize ImageSize WRITE setImageSize READ imageSize NOTIFY imageSizeChanged)
 
 public:
     enum DisplayRoles {
@@ -46,7 +47,6 @@ public:
         PrecisionRole,
         UserDataRole,
         DataRole,
-        SearchTermRole,
         RunnerRole,
         ExecutingRole
     };
@@ -108,10 +108,12 @@ public:
     Q_ENUMS(MatchSource)
 
     enum MatchPrecision {
-        UnrelatedMatch = 0,
-        FuzzyMatch,
-        CloseMatch,
-        ExactMatch
+        UnrelatedMatch = 0, // default value, should never be used
+        AskMeAgainMatch = 1, // a match that contains a search term for the runner that generated it
+        SearchTermMatch = 2, // a match that contains a search term suitable for any runner
+        FuzzyMatch = 256, // a guess or inexact match
+        CloseMatch = 1024, // a match that is probable, but not exact
+        ExactMatch = 5096, // an exact match to the query term
     };
     Q_ENUMS(MatchPrecision)
 
@@ -301,6 +303,7 @@ private:
     Q_PRIVATE_SLOT(d, void startMatchSynchronization());
     Q_PRIVATE_SLOT(d, void resetModel());
     Q_PRIVATE_SLOT(d, void executionFinished(const Sprinter::QueryMatch &match, bool success));
+    Q_PRIVATE_SLOT(d, void askMeAgainSetup());
 };
 
 } // namespace

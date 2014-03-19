@@ -124,20 +124,6 @@ public:
     QImage image() const;
 
     /**
-     * Sets if this match is a search term itself; when exec'd
-     * it will replace the current query term with its data().toString()
-     *
-     * @param searchTerm true if this is a search term, false if not
-     */
-    void setIsSearchTerm(bool searchTerm);
-
-    /**
-     * @return whether or not this match represents a
-     * search query term itself. Default is false
-     */
-    bool isSearchTerm() const;
-
-    /**
      * User data is what ends up on e.g. the clipboard for the user to
      * later reference
      *

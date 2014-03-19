@@ -44,6 +44,7 @@ public:
     void resetModel();
     void executionFinished(const Sprinter::QueryMatch &match, bool success);
     void startMatchSynchronization();
+    void askMeAgainSetup();
 
     QuerySession *q;
     QThread *workerThread;
@@ -55,6 +56,11 @@ public:
     QHash<int, QueryMatch> executingMatches;
     int imageRoleColumn;
     bool matchesArrivedWhileExecuting;
+
+    // suppor for 'ask me again' feature
+    QStringList askMeAgainResetEnabledRunnersTo;
+    QStringList askAgainRunners;
+    QString askAgainDelayedQuery;
 };
 
 } // namespace
