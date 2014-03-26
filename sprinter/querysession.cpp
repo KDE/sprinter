@@ -250,7 +250,7 @@ QSize QuerySession::imageSize() const
 
 void QuerySession::executeMatch(int index)
 {
-    QueryMatch match = d->worker->matchAt(index);
+    const QueryMatch &match = d->worker->matchAt(index);
 
     if (!match.isValid()) {
         return;
@@ -339,7 +339,7 @@ QVariant QuerySession::data(const QModelIndex &index, int role) const
         return d->executingMatches.contains(index.row());
     }
 
-    QueryMatch match = d->worker->matchAt(index.row());
+    const QueryMatch &match = d->worker->matchAt(index.row());
 
     switch (role) {
         case Qt::DisplayRole:
@@ -498,7 +498,7 @@ QMimeData *QuerySession::mimeData(const QModelIndexList &indexes) const
 
         rowsSeen.insert(it.row());
 
-        QueryMatch match = d->worker->matchAt(it.row());
+        const QueryMatch &match = d->worker->matchAt(it.row());
         if (!match.isValid() || match.userData().isNull()) {
             continue;
         }

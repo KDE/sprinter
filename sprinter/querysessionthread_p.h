@@ -105,7 +105,7 @@ public:
     bool launchQuery(const QString &query);
     void launchMoreMatches();
     int matchCount() const;
-    QueryMatch matchAt(int index);
+    const QueryMatch &matchAt(int index);
 
 public Q_SLOTS:
     void syncMatches();
@@ -156,6 +156,7 @@ private:
     QVector<MatchRunnable *> m_matchers;
 
     QSharedPointer<RunnerSessionData> m_dummySessionData;
+    QueryMatch m_dummyMatch;
 
     QReadWriteLock m_matchIndexLock;
     int m_runnerBookmark;

@@ -137,12 +137,12 @@ int QuerySessionThread::matchCount() const
     return m_matchCount;
 }
 
-QueryMatch QuerySessionThread::matchAt(int index)
+const QueryMatch &QuerySessionThread::matchAt(int index)
 {
     CHECK_IS_GUI_THREAD
 
     if (index < 0 || index >= matchCount()) {
-        return QueryMatch();
+        return m_dummyMatch;
     }
 
     //qDebug() << "** matchAt" << index;
@@ -155,14 +155,15 @@ QueryMatch QuerySessionThread::matchAt(int index)
         matches = data->matches(RunnerSessionData::SynchronizedMatches);
         //qDebug() << "    " << matches.size() << index;
         if (matches.size() > index) {
-            //qDebug() << "     found" << matches[index].title();
-            return matches[index];
+            //qDebug() << "     found" << matches.at(index).title();
+            return matches.at(index);
         } else {
             index -= matches.size();
         }
     }
 
-    return QueryMatch();
+    Q_ASSERT_X(false, "matchAt", "strange match index requested");
+    return m_dummyMatch;
 }
 
 const QVector<RunnerMetaData> &QuerySessionThread::runnerMetaData() const
