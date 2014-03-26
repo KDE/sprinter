@@ -18,6 +18,9 @@
     * SourcesUsedRole
 
 = Unscheduled
+* Allow RunnerSessionData::setMatches to do a *merge* rather than a full replace
+    * Example: The youtube runner often returns the same matches as the search continue and it would be very nice to not keep flickering the list of matches in that case
+    * Example: The appliations runner will usually return a narrowing set of matches; it would be very nice if the no longer existing matches were removed and the ones that persist were kept (less flickering in the UI)
 
 == To be scheduled
 * Provide per-plugin help in the json file, exported to the RunnerModel
