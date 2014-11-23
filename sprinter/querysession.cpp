@@ -42,6 +42,7 @@ QuerySession::Private::Private(QuerySession *session)
       syncTimer(new NonRestartingTimer(q)),
       matchesArrivedWhileExecuting(false)
 {
+    fillTypeStringSet();
     qRegisterMetaType<QUuid>("QUuid");
     qRegisterMetaType<Sprinter::QueryContext>("Sprinter::QueryContext");
     qRegisterMetaType<Sprinter::QueryMatch>("Sprinter::QueryMatch");
@@ -78,6 +79,46 @@ QuerySession::Private::Private(QuerySession *session)
     workerThread->start();
     worker->moveToThread(workerThread);
     QMetaObject::invokeMethod(worker, "loadRunnerMetaData");
+}
+
+void QuerySession::Private::fillTypeStringSet()
+{
+    typeStrings.insert(UnknownType, tr("Unknown"));
+
+    typeStrings.insert(ExecutableType, tr("Program"));
+    typeStrings.insert(FileType, tr("File"));
+    typeStrings.insert(InstallableType, tr("Package"));
+    typeStrings.insert(PathType, tr("Path"));
+
+    typeStrings.insert(FilesystemLocationType, tr("Location"));
+    typeStrings.insert(HardwareType, tr("Hardware"));
+    typeStrings.insert(NetworkLocationType, tr("Network"));
+
+    typeStrings.insert(DateTimeType, tr("Date and Time"));
+    typeStrings.insert(EnvironmentalType, tr("Environmental"));
+    typeStrings.insert(GeolocationType, tr("Geolocation"));
+    typeStrings.insert(LanguageType, tr("Langauge"));
+    typeStrings.insert(MathAndUnitsType, tr("Math and Units"));
+    typeStrings.insert(ReferenceType, tr("Reference"));
+
+    typeStrings.insert(AlbumType, tr("Album"));
+    typeStrings.insert(AudioType, tr("Audio"));
+    typeStrings.insert(BookmarkType, tr("Bookmark"));
+    typeStrings.insert(BookType, tr("Book"));
+    typeStrings.insert(ContactType, tr("Contact"));
+    typeStrings.insert(DocumentType, tr("Document"));
+    typeStrings.insert(EventType, tr("Event"));
+    typeStrings.insert(MagazineType, tr("Magazine"));
+    typeStrings.insert(MessageType, tr("Message"));
+    typeStrings.insert(VideoType, tr("Video"));
+
+    typeStrings.insert(ActivityType, tr("Activity"));
+    typeStrings.insert(ApplicationGroupType, tr("Application Group"));
+    typeStrings.insert(AppActionType, tr("Action"));
+    typeStrings.insert(AppSessionType, tr("Application Session"));
+    typeStrings.insert(DesktopType, tr("Desktop"));
+    typeStrings.insert(UserSessionType, tr("User Session"));
+    typeStrings.insert(WindowType, tr("Window"));
 }
 
 void QuerySession::Private::resetModel()
@@ -357,6 +398,9 @@ QVariant QuerySession::data(const QModelIndex &index, int role) const
             } else {
                 return match.type();
             }
+            break;
+        case TypeStringRole:
+            return d->typeStrings[match.type()];
             break;
         case SourceRole:
             if (asText) {

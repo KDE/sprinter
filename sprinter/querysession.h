@@ -43,6 +43,7 @@ public:
         TextRole = Qt::UserRole,
         ImageRole,
         TypeRole,
+        TypeStringRole,
         SourceRole,
         PrecisionRole,
         UserDataRole,

@@ -45,6 +45,7 @@ public:
     void executionFinished(const Sprinter::QueryMatch &match, bool success);
     void startMatchSynchronization();
     void askMeAgainSetup();
+    void fillTypeStringSet();
 
     QuerySession *q;
     QThread *workerThread;
@@ -54,6 +55,7 @@ public:
     QHash<int, QByteArray> roles;
     QVector<int> roleColumns;
     QHash<int, QueryMatch> executingMatches;
+    QHash<MatchType, QString> typeStrings;
     int imageRoleColumn;
     bool matchesArrivedWhileExecuting;
 
