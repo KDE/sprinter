@@ -44,6 +44,7 @@ public:
         ImageRole,
         TypeRole,
         TypeStringRole,
+        GroupHeaderRole,
         SourceRole,
         PrecisionRole,
         UserDataRole,
@@ -168,6 +169,11 @@ public:
     QSize imageSize() const;
 
 public Q_SLOTS:
+    /**
+     * @return the type of a given index, UnknownType if the index does not exist
+     */
+    int matchTypeOfIndex(int index);
+
     /**
      * Executes a request for the default match set from all enabled runners
      */

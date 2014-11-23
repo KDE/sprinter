@@ -57,6 +57,11 @@ QuerySession::Private::Private(QuerySession *session)
         if (enumVal == ImageRole) {
             imageRoleColumn = i + 1;
         }
+
+        QByteArray name = e.key(i);
+        if (name.endsWith("Role")) {
+            name.truncate(name.length() - 4); // get rid of "Role" at the end of the role names
+        }
         roles.insert(enumVal, e.key(i));
         roleColumns.append(enumVal);
     }
@@ -355,6 +360,11 @@ int QuerySession::columnCount(const QModelIndex &parent) const
     return d->roles.count();
 }
 
+int QuerySession::matchTypeOfIndex(int index)
+{
+    return d->worker->matchAt(index).type();
+}
+
 QVariant QuerySession::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.parent().isValid()) {
@@ -436,7 +446,8 @@ QVariant QuerySession::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-QVariant QuerySession::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant QuerySession::headerData(int section, Qt::Orientation orientation, int role) const
+{
     if (section > 0 &&
         section < d->roleColumns.count() &&
         role == Qt::DisplayRole) {
