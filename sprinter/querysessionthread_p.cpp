@@ -199,7 +199,9 @@ void QuerySessionThread::loadRunnerMetaData()
     for (auto const &path: QCoreApplication::instance()->libraryPaths()) {
         if (path.endsWith(QLatin1String("plugins"))) {
             QDir pluginDir(path);
-            pluginDir.cd(QStringLiteral("sprinter"));
+            if (!pluginDir.cd(QStringLiteral("sprinter"))) {
+                continue;
+            }
             for (auto const &fileName: pluginDir.entryList(QDir::Files)) {
                 const QString path = pluginDir.absoluteFilePath(fileName);
                 QPluginLoader loader(path);
